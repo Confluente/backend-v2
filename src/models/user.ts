@@ -1,10 +1,4 @@
-const Sequelize = require("sequelize");
-const db = require("./db");
-const Group = require("./group");
-const Activity = require("./activity");
-
-
-class User extends Sequelize.Model {
+class User extends sequelize.Model {
     /**
      * Email of the user.
      */
@@ -95,82 +89,82 @@ class User extends Sequelize.Model {
 User.init(
     {
         email: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             unique: true,
             allowNull: false,
             primaryKey: true,
         },
         firstName: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: false,
         },
         lastName: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: false,
         },
         displayName: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: false,
         },
         major: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: true,
         },
         address: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: true,
         },
         track: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: true,
         },
         honorsGeneration: {
-            type: new Sequelize.DataTypes.INTEGER(32),
+            type: new sequelize.DataTypes.INTEGER(32),
             allowNull: true,
         },
         honorsMembership: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: false,
         },
         campusCardNumber: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: true,
         },
         mobilePhoneNumber: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: false,
         },
         consentWithPortraitRight: {
-            type: new Sequelize.DataTypes.BOOLEAN,
+            type: new sequelize.DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
         passwordHash: {
-            type: new Sequelize.DataTypes.BLOB(),
+            type: new sequelize.DataTypes.BLOB(),
             allowNull: false,
         },
         passwordSalt: {
-            type: new Sequelize.DataTypes.BLOB(),
+            type: new sequelize.DataTypes.BLOB(),
             allowNull: false,
         },
         isAdmin: {
-            type: new Sequelize.DataTypes.BOOLEAN,
+            type: new sequelize.DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
         approved: {
-            type: new Sequelize.DataTypes.BOOLEAN,
+            type: new sequelize.DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
         approvingHash: {
-            type: new Sequelize.DataTypes.STRING(128),
+            type: new sequelize.DataTypes.STRING(128),
             allowNull: false,
         },
     },
     {
-        tableName: "users",
-        Sequelize,
+        tableName: "user",
+        sequelize,
     }
 )
 
@@ -179,7 +173,7 @@ User.init(
  * Function is the function that the user has in the group.
  */
 const UserGroup = db.define('user_group', {
-    func: Sequelize.STRING
+    func: sequelize.STRING
 });
 
 /**
@@ -187,7 +181,7 @@ const UserGroup = db.define('user_group', {
  * Answers are the answers that the user gave to the questions of the form.
  */
 const Subscription = db.define('subscription', {
-    answers: Sequelize.STRING
+    answers: sequelize.STRING
 });
 
 // All relationships defined hereafter are onDelete 'CASCADE' to make sure that when an instance is deleted,
