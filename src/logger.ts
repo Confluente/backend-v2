@@ -1,6 +1,6 @@
 let bunyan = require('bunyan');
 
-function reqSerializer(req: { connection: any; method: any; url: any; headers: any; }) {
+function reqSerializer(req: { connection: any; method: any; url: any; headers: any; }): any {
     if (!req || !req.connection) {
         return req;
     }
