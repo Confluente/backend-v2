@@ -135,7 +135,7 @@ User.init(
             allowNull: false,
         },
         consentWithPortraitRight: {
-            type: new sequelize.DataTypes.BOOLEAN,
+            type: new sequelize.DataTypes.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
@@ -148,12 +148,12 @@ User.init(
             allowNull: false,
         },
         isAdmin: {
-            type: new sequelize.DataTypes.BOOLEAN,
+            type: new sequelize.DataTypes.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
         approved: {
-            type: new sequelize.DataTypes.BOOLEAN,
+            type: new sequelize.DataTypes.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
@@ -166,13 +166,13 @@ User.init(
         tableName: "user",
         sequelize,
     }
-)
+);
 
 /**
  * UserGroup is the function relating users to groups via UserGroup.
  * Function is the function that the user has in the group.
  */
-const UserGroup = db.define('user_group', {
+const UserGroup: any = db.define('user_group', {
     func: sequelize.STRING
 });
 
@@ -180,7 +180,7 @@ const UserGroup = db.define('user_group', {
  * Subscription is the function relating users to activities via subscriptions.
  * Answers are the answers that the user gave to the questions of the form.
  */
-const Subscription = db.define('subscription', {
+const Subscription: any = db.define('subscription', {
     answers: sequelize.STRING
 });
 
@@ -197,7 +197,7 @@ Group.belongsToMany(User, {as: "members", through: UserGroup, onDelete: 'CASCADE
 User.belongsToMany(Activity, {through: Subscription, onDelete: 'CASCADE'});
 
 // Relates an activity to a user through subscription as participants
-Activity.belongsToMany(User, {as: "participants",through: Subscription, onDelete: 'CASCADE'});
+Activity.belongsToMany(User, {as: "participants", through: Subscription, onDelete: 'CASCADE'});
 
 UserGroup.sync();
 Subscription.sync();

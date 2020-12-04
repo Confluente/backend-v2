@@ -45,7 +45,7 @@ Page.init(
         tableName: "page",
         sequelize,
     }
-)
+);
 
 Page.sync();
 

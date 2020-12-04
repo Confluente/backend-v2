@@ -43,7 +43,7 @@ Session.init(
         tableName: "session",
         sequelize,
     }
-)
+);
 
 Session.sync();
 

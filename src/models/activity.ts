@@ -111,28 +111,28 @@ Activity.init(
             allowNull: true,
         },
         date: {
-            type: new sequelize.DataType.DATE,
+            type: new sequelize.DataType.DATE(),
             allowNull: false,
         },
         startTime: {
-            type: new sequelize.DataType.TIME,
+            type: new sequelize.DataType.TIME(),
             allowNull: true,
         },
         endTime: {
-            type: new sequelize.DataType.TIME,
+            type: new sequelize.DataType.TIME(),
             allowNull: true,
         },
         canSubscribe: {
-            type: new sequelize.DataType.BOOLEAN,
+            type: new sequelize.DataType.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
         participationFee: {
-            type: new sequelize.DataType.DECIMAL,
+            type: new sequelize.DataType.DECIMAL(),
             allowNull: true,
         },
         numberOfQuestions: {
-            type: new sequelize.DataType.INTEGER,
+            type: new sequelize.DataType.INTEGER(),
             allowNull: true,
         },
         typeOfQuestion: {
@@ -156,16 +156,16 @@ Activity.init(
             allowNull: true,
         },
         subscriptionDeadline: {
-            type: new sequelize.DataType.DATE,
+            type: new sequelize.DataType.DATE(),
             allowNull: true,
         },
         published: {
-            type: new sequelize.DataType.BOOLEAN,
+            type: new sequelize.DataType.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
         hasCoverImage: {
-            type: new sequelize.DataType.BOOLEAN,
+            type: new sequelize.DataType.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
@@ -174,7 +174,7 @@ Activity.init(
         tableName: "activity",
         sequelize,
     }
-)
+);
 
 // Relates activities to a group that organizes the activity.
 Activity.Organizer = Activity.belongsTo(Group, {as: "Organizer", onDelete: 'CASCADE'});

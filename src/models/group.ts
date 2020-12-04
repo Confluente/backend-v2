@@ -47,7 +47,7 @@ Group.init(
             allowNull: false,
         },
         canOrganize: {
-            type: new sequelize.DataTypes.BOOLEAN,
+            type: new sequelize.DataTypes.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
@@ -64,7 +64,7 @@ Group.init(
         tableName: "group",
         sequelize,
     }
-)
+);
 
 Group.sync();
 

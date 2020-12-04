@@ -92,7 +92,7 @@
       }
     },
     "typedef": [
-      false,
+      true,
       "call-signature"
     ],
     "no-trailing-whitespace": false,

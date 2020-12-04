@@ -79,7 +79,7 @@ CompanyOpportunity.init(
         tableName: "company_opportunity",
         sequelize,
     }
-)
+);
 
 CompanyOpportunity.sync();
 
