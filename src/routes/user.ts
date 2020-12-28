@@ -5,8 +5,8 @@ import "../models/group";
 
 const express: any = require("express");
 const nodemailer: any = require("nodemailer");
-const Users: any = require("../models/user");
-const Groups: any = require("../models/group");
+const users: any = require("../models/user");
+const groups: any = require("../models/group");
 const permissions: any = require("../permissions");
 const authHelper: any = require("../helpers/authHelper");
 
@@ -29,7 +29,7 @@ router.route("/")
             if (!result) { res.sendStatus(403); }
 
             // If client has permission, find all users in database
-            Users.findAll({
+            users.findAll({
                 attributes: ["id", "displayName", "email", "isAdmin"],
                 order: [
                     ["id", "ASC"]
@@ -62,7 +62,7 @@ router.route("/")
         req.body.isAdmin = false;
 
         // Create new user in database
-        return Users.create(req.body).then(function(createdUser: User): void {
+        return users.create(req.body).then(function(createdUser: User): void {
             // Send approval email to email
             nodemailer.createTestAccount().then(function(): void {
 
@@ -108,7 +108,7 @@ router.route("/:id")
         if (user === null) { return res.send(403); }
 
         // Get user from database
-        Users.findByPk(req.params.id, {
+        users.findByPk(req.params.id, {
             attributes: ["id", "firstName", "lastName", "displayName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "isAdmin", "consentWithPortraitRight"],
         }).then(function(foundUser: User): void {
             // Return if user not found
@@ -136,7 +136,7 @@ router.route("/:id")
             if (!result) { return res.sendStatus(403); }
 
             // If permission, find all groups in the database, that the requested user is a member of.
-            Groups.findAll({
+            groups.findAll({
                 attributes: ["id", "fullName", "canOrganize"],
                 include: [
                     {
@@ -173,7 +173,7 @@ router.route("/:id")
             }
 
             // Find all groups that the user edited is currently a member of
-            Groups.findAll({
+            groups.findAll({
                 attributes: ["id", "fullName"],
                 include: [
                     {
@@ -194,7 +194,7 @@ router.route("/:id")
                 // Add all groups as stated in the request
                 req.body[1].forEach(function(groupData: any): void {
                     if (groupData.selected) {
-                        Groups.findByPk(groupData.id).then(function(specificGroup: Group): void {
+                        groups.findByPk(groupData.id).then(function(specificGroup: Group): void {
                             res.locals.user.addGroups(specificGroup, {through: {func: groupData.role}})
                                 .then(console.log);
                         });
@@ -249,7 +249,7 @@ router.route("/changePassword/:id")
             if (!result) { return res.sendStatus(403); }
 
             // Get user from database
-            Users.findByPk(req.params.id, {
+            users.findByPk(req.params.id, {
                 attributes: ["id", "displayName", "email", "isAdmin", "passwordHash", "passwordSalt"],
             }).then(function(foundUser: User): any {
                 // If user does not exist, send 404
@@ -303,7 +303,7 @@ router.route("/approve/:approvalString")
         }
 
         // Find the user whose approval string matches the url
-        Users.findOne({where: {approvingHash: approvalString}}).then(function(foundUser: User): any {
+        users.findOne({where: {approvingHash: approvalString}}).then(function(foundUser: User): any {
             if (!foundUser) {
                 // If the same link is clicked again in the email
                 res.writeHead(301, {
