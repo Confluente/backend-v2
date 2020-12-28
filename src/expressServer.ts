@@ -1,22 +1,22 @@
 import {Session} from "inspector";
 
-const path = require("path");
-const express = require("express");
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const schedule = require('node-schedule');
-const User = require('./models/user');
-const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
-const nodemailer = require("nodemailer");
-const log = require("./logger");
-const checkPermission = require("./permissions").check;
-const Session = require("./models/session");
+const path: any = require("path");
+const express: any = require("express");
+const morgan: any = require("morgan");
+const bodyParser: any = require("body-parser");
+const cookieParser: any = require("cookie-parser");
+const schedule: any = require('node-schedule');
+const User: any = require('./models/user');
+const Sequelize: any = require('sequelize');
+const Op: any = Sequelize.Op;
+const nodemailer: any = require("nodemailer");
+const log: any = require("./logger");
+const checkPermission: any = require("./permissions").check;
+const Session: any = require("./models/session");
 
 let webroot: any;
 
-var app = express();
+const app: any = express();
 
 // Set webroot dependent on whether running for tests, development, or production
 if (process.env.NODE_ENV === "test") {
@@ -29,19 +29,19 @@ if (process.env.NODE_ENV === "test") {
     webroot = path.resolve(__dirname, "../frontend/build");
     app.use(morgan("combined", {stream: require("fs").createWriteStream("./access.log", {flags: "a"})}));
 
-    app.use(function (req: any, res: any, next: () => void) {
-        log.info({req: req}, "express_request");
+    app.use(function(req: any, res: any, next: () => void): void {
+        log.info({req}, "express_request");
         next();
     });
 }
 
-app.use(bodyParser.json({limit: '10mb', extended: false}))
-app.use(bodyParser.urlencoded({limit: '10mb', extended: false}))
+app.use(bodyParser.json({limit: '10mb', extended: false}));
+app.use(bodyParser.urlencoded({limit: '10mb', extended: false}));
 app.use(cookieParser());
-app.use(function (req, res, next) {
+app.use(function(req: any, res: any, next: any): void {
     if (req.cookies.session) {
-        var token = Buffer.from(req.cookies.session, "base64");
-        Session.findOne({where: {token: token}}).then(function (session) {
+        const token: any = Buffer.from(req.cookies.session, "base64");
+        Session.findOne({where: {token}}).then(function(session: any): void {
             if (session) {
                 res.locals.session = session.dataValues;
             } else {
@@ -54,8 +54,8 @@ app.use(function (req, res, next) {
     }
 });
 
-// HTTPS Rerouting (only for live website version
-// app.use(function (req, res, next) {
+// // HTTPS Rerouting (only for live website version)
+// app.use(function(req: any, res: any, next: any): void {
 //     if (req.secure) {
 //         // request was via https, so do no special handling
 //         next();
@@ -70,10 +70,10 @@ app.use(function (req, res, next) {
 // });
 
 
-app.use(function (req, res, next) {
-    var user = res.locals.session ? res.locals.session.user : null;
+app.use(function(req: any, res: any, next: any): any {
+    const user: any = res.locals.session ? res.locals.session.user : null;
     checkPermission(user, {type: "PAGE_VIEW", value: req.path})
-        .then(function (hasPermission) {
+        .then(function(hasPermission: any): any {
             if (!hasPermission) {
                 if (user) {
                     return res.status(403).send();
@@ -91,14 +91,14 @@ app.use("/api/group", require("./routes/group"));
 app.use("/api/user", require("./routes/user"));
 app.use("/api/page", require("./routes/page"));
 app.use("/api/notifications", require("./routes/notifications"));
-app.use("/api/*", function (req, res) {
+app.use("/api/*", function(req: any, res: any): void {
     res.sendStatus(404);
 });
 
 app.use(express.static('public'));
 app.use(express.static(webroot));
 
-app.get("*", function (req, res, next) {
+app.get("*", function(req: any, res: any, next: any): any {
 
     if (req.originalUrl.includes(".")) {
         return res.sendStatus(404);
@@ -107,15 +107,14 @@ app.get("*", function (req, res, next) {
     res.sendFile("/index.html", {root: webroot});
 });
 
-app.use(function (err: Error, req, res, next) {
+app.use(function(err: Error, req: any, res: any, next: any): void {
     console.error(err);
-    //throw err;
 });
 
 // This function sends an email to the secretary of H.S.A. Confluente every week if
 // new users have registered on the website
-var secretary_email = schedule.scheduleJob('0 0 0 * * 7', function () {
-    var lastWeek = new Date();
+const secretary_email: any = schedule.scheduleJob('0 0 0 * * 7', function(): void {
+    const lastWeek: Date = new Date();
     lastWeek.setDate(lastWeek.getDate() - 7);
     User.findAll({
         attributes: ["displayName", "email", "track", "createdAt"],
@@ -124,19 +123,19 @@ var secretary_email = schedule.scheduleJob('0 0 0 * * 7', function () {
                 [Op.gte]: lastWeek
             }
         }
-    }).then(function (newUsers) {
+    }).then(function(newUsers: any): void {
         if (newUsers.length) {
             // new users in the last 7 days so send an email to secretary
-            var number_of_new_users = newUsers.length;
-            var data_of_new_users = "";
-            for (var i = 0; i < number_of_new_users; i++) {
+            const number_of_new_users: number = newUsers.length;
+            let data_of_new_users: string = "";
+            for (let i: number = 0; i < number_of_new_users; i++) {
                 data_of_new_users += "Name: " + newUsers[i].displayName;
                 data_of_new_users += ", Email: " + newUsers[i].email;
                 data_of_new_users += ", track: " + newUsers[i].track + "\n";
             }
 
-            nodemailer.createTestAccount().then(function () {
-                let transporter = nodemailer.createTransport({
+            nodemailer.createTestAccount().then(function(): void {
+                const transporter: any = nodemailer.createTransport({
                     service: 'gmail',
                     type: "SMTP",
                     host: "smtp.gmail.com",
@@ -151,13 +150,14 @@ var secretary_email = schedule.scheduleJob('0 0 0 * * 7', function () {
                     from: '"website" <web@hsaconfluente.nl>',
                     to: '"secretary of H.S.A. Confluente" <treasurer@hsaconfluente.nl>',
                     subject: "New members that registered on the website",
+                    // tslint:disable-next-line:max-line-length
                     text: "Heyhoi dear secretary \n \nIn the past week there have been " + number_of_new_users.toString() + " new registrations on the website. \n\nThe names and emails of the new registrations are \n" + data_of_new_users + " \nSincerely, \nThe website \nOn behalf of the Web Committee"
-                }).then(function (info: object) {
-                    console.log(info)
-                })
+                }).then(function(info: object): void {
+                    console.log(info);
+                });
             });
         }
-    })
+    });
 });
 
 

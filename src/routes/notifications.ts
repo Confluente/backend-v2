@@ -1,5 +1,9 @@
 import express = require("express");
-import User = require("../models/user");
+
+import "../models/user";
+
+import Users = require("../models/user");
+import {Express} from "express";
 
 const router: any = express.Router();
 
@@ -7,7 +11,7 @@ router.route("/portraitRight/:id")
     /**
      * Function for changing the consentWithPortraitRight attribute of a user
      */
-    .put(function(req: any, res: any): any {
+    .put(function(req: Express.Request, res: Express.Response): any {
         // Check if user is logged in
         const userId: number = res.locals.session ? res.locals.session.user : null;
 
@@ -15,7 +19,7 @@ router.route("/portraitRight/:id")
         if (parseInt(req.params.id, undefined) !== userId) { return res.sendStatus(403); }
 
         // Retrieve user from database
-        User.findByPk(userId).then(function(user: User): any {
+        Users.findByPk(userId).then(function(user: User): void {
             // Update user object in database
             user.update({consentWithPortraitRight: req.body.answer}).then(function(result: User): any {
                 res.send(user);
