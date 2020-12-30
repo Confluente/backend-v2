@@ -1,19 +1,19 @@
-import {Express} from "express";
-
+import {Request, Response} from "express";
 const express: any = require("express");
+
 const marked: any = require("marked");
 
 import {Page} from "../models/page";
 
 const permissions: any = require("../permissions");
 
-const router: Express.Router = express.Router();
+const router: any = express.Router();
 
 router.route("/:url([^\?]+)")
     /**
      * Gets a specific page from the database
      */
-    .get(function(req: Express.Request, res: Express.Response): any {
+    .get(function(req: Request, res: Response): any {
         Page.findOne({
             where: {
                 url: req.params.url
@@ -38,7 +38,7 @@ router.route("/:url([^\?]+)")
     /**
      * Edits a page
      */
-    .put(permissions.requireAll({type: "PAGE_MANAGE"}), function(req: Express.Request, res: Express.Response): any {
+    .put(permissions.requireAll({type: "PAGE_MANAGE"}), function(req: Request, res: Response): any {
 
         // Stores the edit parameters
         const values: any = req.body;
@@ -59,13 +59,13 @@ router.route("/:url([^\?]+)")
     /**
      * Deletes a page from the database
      */
-    .delete(permissions.requireAll({type: "PAGE_MANAGE"}), function(req: Express.Request, res: Express.Response): any {
+    .delete(permissions.requireAll({type: "PAGE_MANAGE"}), function(req: Request, res: Response): any {
         return Page.destroy({where: {url: req.params.url}}).then(function(result: any): any {
             return res.sendStatus(204);
         });
     });
 
-router.get("/:url/view", function(req: Express.Request, res: Express.Response): any {
+router.get("/:url/view", function(req: Request, res: Response): any {
     return Page.find({where: {url: req.params.url}}).then(function(foundPage: Page): any {
         if (!foundPage) { return res.redirect("/404.html"); }
         res.send(marked(foundPage.dataValues.content));
@@ -73,7 +73,7 @@ router.get("/:url/view", function(req: Express.Request, res: Express.Response): 
 });
 
 router.get("/", permissions.requireAll({type: "PAGE_MANAGE"}),
-    function(req: Express.Request, res: Express.Response): any {
+    function(req: Request, res: Response): any {
     return Page.findAll({
         attributes: ["url", "title", "content", "author"]
     }).then(function(foundPages: Page[]): void {
