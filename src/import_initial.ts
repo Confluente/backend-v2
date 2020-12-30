@@ -1,8 +1,9 @@
-import Q = require("q");
+import {Q} from 'q';
 
-import User = require("./models/user");
-import Group = require("./models/group");
-import Activity = require("./models/activity");
+import {Activity} from "./models/activity";
+import {User} from "./models/user";
+import {Group} from "./models/group";
+
 import fs = require('fs');
 
 if (!fs.existsSync("./data.sqlite")) {
