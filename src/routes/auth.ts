@@ -1,22 +1,21 @@
-import {Express} from "express";
+import {Express, Request, Response, Router} from "express";
 
 const express: any = require("express");
 
 import {User} from "../models/user";
 import {Group} from "../models/group";
-import {any} from "codelyzer/util/function";
 
 const users: any = require("../models/user");
 const groups: any = require("../models/group");
 const authHelper: any = require("../authHelper");
 
-const router: Express.Router = express.Router();
+const router: Router = express.Router();
 
 router.route("/")
     /**
      * Function for getting the profile of the user.
      */
-    .get(function(req: Express.Request, res: Express.Response, next: any): any {
+    .get(function(req: Request, res: Response, next: any): any {
         // Check whether the response has a session (handled by express)
         if (!res.locals.session) {
             return res.sendStatus(401);
@@ -47,7 +46,7 @@ router.route("/login")
     /**
      * Function for logging a user in.
      */
-    .post(function(req: Express.Request, res: Express.Response, next: any): any {
+    .post(function(req: Request, res: Response, next: any): any {
         // Check if both the email and password field were filled in
         if (!req.body.email || !req.body.password) {
             return res.sendStatus(400);

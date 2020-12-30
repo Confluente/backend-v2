@@ -1,15 +1,16 @@
+import {Request, Response, Router} from "express";
+
 import express = require("express");
 
 import {User} from '../models/user';
-import {Express} from "express";
 
-const router: any = express.Router();
+const router: Router = express.Router();
 
 router.route("/portraitRight/:id")
     /**
      * Function for changing the consentWithPortraitRight attribute of a user
      */
-    .put(function(req: Express.Request, res: Express.Response): any {
+    .put(function(req: Request, res: Response): any {
         // Check if user is logged in
         const userId: number = res.locals.session ? res.locals.session.user : null;
 

@@ -1,11 +1,11 @@
-import {Express} from "express";
+import {Express, Request, Response, Router} from "express";
 
 const express: any = require("express");
 
 import {Group} from "../models/group";
 import {User} from "../models/user";
 
-const router: Express.Router = express.Router();
+const router: Router = express.Router();
 
 router.route("/")
     .all(permissions.requireAll({type: "GROUP_MANAGE"}))
@@ -13,7 +13,7 @@ router.route("/")
     /**
      * Gets all groups from the database
      */
-    .get(function(req: Express.Request, res: Express.Response, next: any): void {
+    .get(function(req: Request, res: Response, next: any): void {
         Group.findAll({
             attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type", "createdAt"],
             order: [
@@ -28,7 +28,7 @@ router.route("/")
     /**
      * Creates a new group
      */
-    .post(function(req: Express.Request, res: Express.Response, next: void): any {
+    .post(function(req: Request, res: Response, next: any): any {
 
         // Checks if the client is logged in
         if (!res.locals.session) { return res.sendStatus(401); }
@@ -61,7 +61,7 @@ router.route("/:id")
     /**
      * Gets a specific group from the database and stores it in res.locals.group
      */
-    .all(function(req: Express.Request, res: Express.Response, next: any): any {
+    .all(function(req: Request, res: Response, next: any): any {
         Group.findByPk(req.params.id, {
             attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type", "createdAt"],
             include: [
@@ -86,7 +86,7 @@ router.route("/:id")
     /**
      * Sends group from the database to the client
      */
-    .get(function(req: Express.Request, res: Express.Response): any {
+    .get(function(req: Request, res: Response): any {
         // Check if client is logged in
         const user: number = res.locals.session ? res.locals.session.user : null;
 
@@ -104,7 +104,7 @@ router.route("/:id")
     /**
      * Edits a group in the database
      */
-    .put(function(req: Express.Request, res: Express.Response): any {
+    .put(function(req: Request, res: Response): any {
 
         // Check if client is logged in
         const user: number = res.locals.session ? res.locals.session.user : null;
@@ -144,7 +144,7 @@ router.route("/:id")
     /**
      * Deletes a group from the database
      */
-    .delete(function(req: Express.Request, res: Express.Response): any {
+    .delete(function(req: Request, res: Response): any {
 
         // Check if client is logged in
         const user: number = res.locals.session ? res.locals.session.user : null;
@@ -169,7 +169,7 @@ router.route("/type/:type")
     /**
      * Gets all groups of a certain type from the database
      */
-    .get(function(req: Express.Request, res: Express.Response): void {
+    .get(function(req: Request, res: Response): void {
         Group.findAll({
             attributes: ["id", "fullName", "displayName", "description", "email"],
             where: {type: req.params.type},
