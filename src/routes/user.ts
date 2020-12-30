@@ -1,9 +1,9 @@
-import {Express} from "express";
+import {Request, Response} from "express";
+const express: any = require("express");
 
 import {User} from "../models/user";
 import {Group} from "../models/group";
 
-const express: any = require("express");
 const nodemailer: any = require("nodemailer");
 const permissions: any = require("../permissions");
 const authHelper: any = require("../helpers/authHelper");
@@ -14,7 +14,7 @@ router.route("/")
     /**
      * Gets all users from the database
      */
-    .get(function(req: Express.Request, res: Express.Response, next: any): void {
+    .get(function(req: Request, res: Response): void {
         // Check if the client is logged in
         const userId: number = res.locals.session ? res.locals.session.user : null;
 
@@ -42,7 +42,7 @@ router.route("/")
     /**
      * Creates a new user in the database
      */
-    .post(function(req: Express.Request, res: Express.Response, next: any): any {
+    .post(function(req: Request, res: Response): any {
         // Check if required fields are filled in
         if (!req.body.displayName || !req.body.email || !req.body.password) {
             return res.sendStatus(400);
@@ -88,7 +88,7 @@ router.route("/")
                 });
             });
             res.status(201).send(createdUser);
-        }).catch(function(err: Error): void {
+        }).catch(function(): void {
             res.status(406).send("Account with identical email already exists");
         }).done();
     });
@@ -98,7 +98,7 @@ router.route("/:id")
     /**
      * Gets the user and stores it in res.locals.user
      */
-    .all(function(req: Express.Request, res: Express.Response, next: any): any {
+    .all(function(req: Request, res: Response, next: any): any {
         // Check if client has a session
         const user: number = res.locals.session ? res.locals.session.user : null;
 
@@ -124,7 +124,7 @@ router.route("/:id")
     /**
      * Get a specific user from the database and return to the client
      */
-    .get(function(req: Express.Request, res: Express.Response): any {
+    .get(function(req: Request, res: Response): any {
         // store user in variable
         const user: number = res.locals.session.user;
 
@@ -156,7 +156,7 @@ router.route("/:id")
     /**
      * Edit a user
      */
-    .put(function(req: Express.Request, res: Express.Response): any {
+    .put(function(req: Request, res: Response): any {
         // Store user in variable
         const user: number = res.locals.session.user;
 
@@ -214,7 +214,7 @@ router.route("/:id")
     /**
      * Delete user from the database
      */
-    .delete(function(req: Express.Request, res: Express.Response): any {
+    .delete(function(req: Request, res: Response): any {
         // Store user in variable
         const user: number = res.locals.session.user;
 
@@ -237,7 +237,7 @@ router.route("/changePassword/:id")
     /**
      * Change the password of a user
      */
-    .put(function(req: Express.Request, res: Express.Response): any {
+    .put(function(req: Request, res: Response): any {
         // Check if client has a session
         const user: number = res.locals.session ? res.locals.session.user : null;
 
@@ -291,7 +291,7 @@ router.route("/approve/:approvalString")
     /**
      * Function for approving a user account based on the approvalString
      */
-    .all(function(req: Express.Request, res: Express.Response): any {
+    .all(function(req: Request, res: Response): any {
         // Get the approval string
         const approvalString = req.params.approvalString;
 
