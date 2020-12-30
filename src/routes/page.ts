@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {Request, Response, Router} from "express";
 const express: any = require("express");
 
 const marked: any = require("marked");
@@ -7,7 +7,7 @@ import {Page} from "../models/page";
 
 const permissions: any = require("../permissions");
 
-const router: any = express.Router();
+const router: Router = express.Router();
 
 router.route("/:url([^\?]+)")
     /**

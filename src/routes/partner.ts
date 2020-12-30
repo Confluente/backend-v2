@@ -1,4 +1,4 @@
-import {Response, Request} from "express";
+import {Response, Request, Router} from "express";
 const express: any = require("express");
 
 import {CompanyOpportunity} from "../models/companyOpportunity";
@@ -7,7 +7,7 @@ import {User} from "../models/user";
 const permissions: any = require("../permissions");
 const companyOpportunities: any = require("../models/companyOpportunity");
 
-const router: any = express.Router();
+const router: Router = express.Router();
 
 router.route("/companyOpportunities")
     .get(function(req: Request, res: Response): void {

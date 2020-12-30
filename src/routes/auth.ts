@@ -1,5 +1,4 @@
-import {Express, Request, Response, Router} from "express";
-
+import {Request, Response, Router} from "express";
 const express: any = require("express");
 
 import {User} from "../models/user";
