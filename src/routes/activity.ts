@@ -18,7 +18,7 @@ import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../
 
 const router: Router = express.Router();
 
-const Op: any = sequelize.Op;
+import {Op} from 'sequelize';
 
 // path where the pictures of the activities are put in in frontend
 const pathToPictures: string = '../Frontend-Angular/src/assets/img/activities/';
