@@ -2,8 +2,8 @@ import {Express} from "express";
 
 const express: any = require("express");
 
-import "../models/user";
-import "../models/group";
+import {User} from "../models/user";
+import {Group} from "../models/group";
 import {any} from "codelyzer/util/function";
 
 const users: any = require("../models/user");

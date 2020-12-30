@@ -15,7 +15,7 @@ const digest_iterations = (process.env.NODE_ENV === "test") ? 1 : 100000;
  * @param salt                 Salt to be used in check.
  * @return Hash, or rejects
  */
-function getPasswordHash(password: string, salt: string): any {
+export function getPasswordHash(password: string, salt: string): any {
     return Q.Promise(function(resolve: any, reject: any) {
         crypto.pbkdf2(password, salt, digest_iterations, 256 / 8, 'sha256', function(err, hash) {
             if (err) {
@@ -32,7 +32,7 @@ function getPasswordHash(password: string, salt: string): any {
  * @param length                Length of the random string.
  * @return Salt characters
  */
-function generateSalt(length: number): string {
+export function generateSalt(length: number): string {
     return crypto.randomBytes(Math.ceil(length / 2))
         .toString('hex') /** convert to hexadecimal format */
         .slice(0, length);   /** return required number of characters */
@@ -44,7 +44,7 @@ function generateSalt(length: number): string {
  * @param salt                  Salt for which Hash is to be found
  * @return Hash
  */
-function getPasswordHashSync(password: string, salt: string): string {
+export function getPasswordHashSync(password: string, salt: string): string {
     return crypto.pbkdf2Sync(password, salt, digest_iterations, 256 / 8, 'sha256').toString();
 }
 
@@ -55,7 +55,7 @@ function getPasswordHashSync(password: string, salt: string): string {
  * @param password              Password of user.
  * @return user object if valid, otherwise null
  */
-function authenticate(email: string, password: string): any {
+export function authenticate(email: string, password: string): any {
     email = email.toLowerCase();
     return User.findOne({where: {email: email}}).then(function(user: User): any {
         if (!user) {
@@ -75,7 +75,7 @@ function authenticate(email: string, password: string): any {
  * @param ip                    IP address associated to user session.
  * @return session
  */
-function startSession(userId: number, ip: string): any {
+export function startSession(userId: number, ip: string): any {
     const session_lifetime = 7; // in days
     return getRandomBytes(32).then(function(bytes: any): any {
         console.log("new session made");
@@ -86,13 +86,4 @@ function startSession(userId: number, ip: string): any {
             expires: (new Date()).setDate(new Date().getDate() + session_lifetime)
         });
     });
-},
-
-
-module.exports = {
-    authenticate,
-    startSession,
-    getPasswordHash,
-    getPasswordHashSync,
-    generateSalt
-};
+}

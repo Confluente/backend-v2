@@ -3,14 +3,14 @@ import {Express} from "express";
 const express: any = require("express");
 const Q: any = require("q");
 const marked: any = require("marked");
-const Sequelize: any = require("sequelize");
+const sequelize: any = require("sequelize");
 const multer: any = require("multer");
 const mime: any = require('mime-types');
 const fs: any = require('fs');
 
-import "../models/group";
-import "../models/user";
-import "../models/activity";
+import {Group} from "../models/group";
+import {User} from "../models/user";
+import {Activity} from "../models/activity";
 
 const permissions: any = require("../permissions");
 const arrayHelper: any = require("../arrayHelper");
@@ -20,7 +20,7 @@ const users: any = require("../models/user");
 
 
 const router: Express.Router = express.Router();
-const Op: any = Sequelize.Op;
+const Op: any = sequelize.Op;
 
 // path where the pictures of the activities are put in in frontend
 const pathToPictures: string = '../Frontend-Angular/src/assets/img/activities/';
