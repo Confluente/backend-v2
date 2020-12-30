@@ -1,8 +1,8 @@
 import crypto = require("crypto");
 import Q = require("q");
 
-import User = require("../models/user");
-import Session = require("../models/session");
+import {User} from "../models/user";
+import {Session} from "../models/session";
 
 import getRandomBytes = Q.nfbind(crypto.randomBytes);
 
@@ -17,7 +17,8 @@ const digest_iterations = (process.env.NODE_ENV === "test") ? 1 : 100000;
  */
 export function getPasswordHash(password: string, salt: string): any {
     return Q.Promise(function(resolve: any, reject: any) {
-        crypto.pbkdf2(password, salt, digest_iterations, 256 / 8, 'sha256', function(err, hash) {
+        crypto.pbkdf2(password, salt, digest_iterations, 256 / 8, 'sha256',
+            function(err: Error | null, hash: Buffer): any {
             if (err) {
                 return reject(err);
             }
@@ -57,7 +58,7 @@ export function getPasswordHashSync(password: string, salt: string): string {
  */
 export function authenticate(email: string, password: string): any {
     email = email.toLowerCase();
-    return User.findOne({where: {email: email}}).then(function(user: User): any {
+    return User.findOne({where: {email}}).then(function(user: User): any {
         if (!user) {
             return {error: 406, data: "Email address not associated to any account"};
         }
@@ -81,7 +82,7 @@ export function startSession(userId: number, ip: string): any {
         console.log("new session made");
         return Session.create({
             user: userId,
-            ip: ip,
+            ip,
             token: bytes,
             expires: (new Date()).setDate(new Date().getDate() + session_lifetime)
         });
