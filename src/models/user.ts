@@ -172,38 +172,38 @@ User.init(
 );
 
 /**
- * UserGroup is the function relating users to groups via UserGroup.
+ * userGroup is the function relating users to groups via userGroup.
  * Function is the function that the user has in the group.
  */
-const UserGroup: any = db.define('user_group', {
+const userGroup: any = db.define('user_group', {
     func: sequelize.STRING
 });
 
 /**
- * Subscription is the function relating users to activities via subscriptions.
+ * subscription is the function relating users to activities via subscriptions.
  * Answers are the answers that the user gave to the questions of the form.
  */
-const Subscription: any = db.define('subscription', {
+const subscription: any = db.define('subscription', {
     answers: sequelize.STRING
 });
 
 // All relationships defined hereafter are onDelete 'CASCADE' to make sure that when an instance is deleted,
 // the relations that instance has to other models are also deleted.
 
-// Relates a user to a group through a UserGroup
-User.belongsToMany(Group, {through: UserGroup, onDelete: 'CASCADE'});
+// Relates a user to a group through a userGroup
+User.belongsToMany(Group, {through: userGroup, onDelete: 'CASCADE'});
 
-// Relates a group to a user through UserGroup as members
-Group.belongsToMany(User, {as: "members", through: UserGroup, onDelete: 'CASCADE'});
+// Relates a group to a user through userGroup as members
+Group.belongsToMany(User, {as: "members", through: userGroup, onDelete: 'CASCADE'});
 
 // Relates a user to an activity trough a subscription
-User.belongsToMany(Activity, {through: Subscription, onDelete: 'CASCADE'});
+User.belongsToMany(Activity, {through: subscription, onDelete: 'CASCADE'});
 
 // Relates an activity to a user through subscription as participants
-Activity.belongsToMany(User, {as: "participants", through: Subscription, onDelete: 'CASCADE'});
+Activity.belongsToMany(User, {as: "participants", through: subscription, onDelete: 'CASCADE'});
 
-UserGroup.sync();
-Subscription.sync();
+userGroup.sync();
+subscription.sync();
 User.sync();
 Group.sync();
 Activity.sync();
