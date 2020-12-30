@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {Request, Response, Router} from "express";
 const express: any = require("express");
 
 import {User} from "../models/user";
@@ -8,7 +8,7 @@ const nodemailer: any = require("nodemailer");
 const permissions: any = require("../permissions");
 const authHelper: any = require("../helpers/authHelper");
 
-const router: any = express.Router();
+const router: Router = express.Router();
 
 router.route("/")
     /**

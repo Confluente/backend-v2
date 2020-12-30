@@ -1,6 +1,6 @@
-import {Express} from "express";
-
+import {Request, Response, Router} from "express";
 const express: any = require("express");
+
 const Q: any = require("q");
 const marked: any = require("marked");
 const sequelize: any = require("sequelize");
@@ -19,7 +19,8 @@ const groups: any = require("../models/group");
 const users: any = require("../models/user");
 
 
-const router: Express.Router = express.Router();
+const router: Router = express.Router();
+
 const Op: any = sequelize.Op;
 
 // path where the pictures of the activities are put in in frontend
@@ -28,7 +29,7 @@ const pathToPictures: string = '../Frontend-Angular/src/assets/img/activities/';
 // Set The Storage Engine
 const storage: any = multer.diskStorage({
     destination: pathToPictures,
-    filename(req: Express.Request, file: any, cb: any): void {
+    filename(req: Request, file: any, cb: any): void {
         cb(null, req.params.id + "." + mime.extension(file.mimetype));
     }
 });
@@ -73,7 +74,7 @@ router.route("/")
     /**
      * Gets every activity in the database happening from today onwards
      */
-    .get(function(req: Express.Request, res: Express.Response, next: any): any {
+    .get(function(req: Request, res: Response, next: any): any {
         // Get all activities from the database
         activities.findAll({
             attributes: ["id", "name", "description", "location", "date", "startTime", "endTime", "published", "subscriptionDeadline", "canSubscribe", "hasCoverImage"],
@@ -136,7 +137,7 @@ router.route("/")
     /**
      * Creates a new activity.
      */
-    .post(function(req: Express.Request, res: Express.Response, next: any): any {
+    .post(function(req: Request, res: Response, next: any): any {
         // Check whether the client is logged in
         if (!res.locals.session) {
             return res.sendStatus(401);
@@ -187,7 +188,7 @@ router.route("/pictures/:id")
     /**
      * Checks permissions for handling pictures for activity
      */
-    .all(function(req: Express.Request, res: Express.Response, next: any): any {
+    .all(function(req: Request, res: Response, next: any): any {
         // check for people to be logged in
         if (!res.locals.session) {
             return res.sendStatus(401);
@@ -209,7 +210,7 @@ router.route("/pictures/:id")
     /**
      * Uploads a picture
      */
-    .post(function(req: Express.Request, res: Express.Response, next: any): void {
+    .post(function(req: Request, res: Response, next: any): void {
         upload(req, res, function(result: any): void {
             res.send();
         });
@@ -218,9 +219,10 @@ router.route("/pictures/:id")
     /**
      * Edits a picture
      */
-    .put(function(req: Express.Request, res: Express.Response, next: any): void {
+    .put(function(req: Request, res: Response, next: any): void {
         // delete old picture
-        deletePicture(req.params.id);
+        // TODO check if this casting works
+        deletePicture((req.params.id as unknown as number));
 
         upload(req, res, function(result: any): void {
             res.send({Successful: true});
@@ -234,7 +236,7 @@ router.route("/manage")
      * Gets all activities for the manage page.
      * @return List of activities that the client is allowed to edit
      */
-    .get(function(req: Express.Request, res: Express.Response, next: any): any {
+    .get(function(req: Request, res: Response, next: any): any {
         // Get all activities from the database
         activities.findAll({
             attributes: ["id", "name", "description", "location", "date", "startTime", "endTime", "published", "subscriptionDeadline"],
@@ -280,7 +282,7 @@ router.route("/subscriptions/:id")
     /*
      * Adds a subscription to a specific activity
      */
-    .post(function(req: Express.Request, res: Express.Response, next: any): any {
+    .post(function(req: Request, res: Response, next: any): any {
         // check if client is logged in
         const userId: number = res.locals.session ? res.locals.session.user : null;
 
@@ -313,7 +315,7 @@ router.route("/subscriptions/:id")
     /**
      * Deletes a subscription from an activity
      */
-    .delete(function(req: Express.Request, res: Express.Response): any {
+    .delete(function(req: Request, res: Response): any {
         // checking if client is logged in
         const userId: number = res.locals.session ? res.locals.session.user : null;
 
@@ -345,7 +347,7 @@ router.route("/:id")
     /**
      * Gets activity with id from database and stores it in res.locals.activity
      */
-    .all(function(req: Express.Request, res: Express.Response, next: any): void {
+    .all(function(req: Request, res: Response, next: any): void {
         // Getting specific activity from database
         activities.findByPk(req.params.id, {
             include: [{
@@ -373,7 +375,7 @@ router.route("/:id")
     /**
      * Sends specific activity to the client
      */
-    .get(function(req: Express.Request, res: Express.Response): any {
+    .get(function(req: Request, res: Response): any {
         // Check if client is logged in
         const user = res.locals.session ? res.locals.session.user : null;
 
@@ -431,7 +433,7 @@ router.route("/:id")
     /**
      * Edits a specific activity
      */
-    .put(function(req: Express.Request, res: Express.Response): void {
+    .put(function(req: Request, res: Response): void {
         // Check if client is logged in
         const userId: number = res.locals.session ? res.locals.session.user : null;
 
@@ -475,7 +477,7 @@ router.route("/:id")
     /*
      * Deletes a specific activity
      */
-    .delete(function(req: Express.Request, res: Express.Response): void {
+    .delete(function(req: Request, res: Response): void {
         // Check if the client is logged in
         const user = res.locals.session ? res.locals.session.user : null;
 

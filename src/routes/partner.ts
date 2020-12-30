@@ -1,17 +1,16 @@
-import {Express} from "express";
+import {Response, Request} from "express";
+const express: any = require("express");
 
 import {CompanyOpportunity} from "../models/companyOpportunity";
 import {User} from "../models/user";
 
-const express: any = require("express");
-
 const permissions: any = require("../permissions");
 const companyOpportunities: any = require("../models/companyOpportunity");
 
-const router: Express.Router = express.Router();
+const router: any = express.Router();
 
 router.route("/companyOpportunities")
-    .get(function(req: Express.Request, res: Express.Response): void {
+    .get(function(req: Request, res: Response): void {
         /**
          * Route for getting all companyOpportunities from the database.
          */
@@ -31,7 +30,7 @@ router.route("/companyOpportunities")
             });
         });
     })
-    .post(function(req: Express.Request, res: Express.Response): any {
+    .post(function(req: Request, res: Response): any {
         /**
          * Route for creating a company opportunity.
          */
@@ -54,7 +53,7 @@ router.route("/companyOpportunities")
     });
 
 router.route("/companyOpportunities/:id")
-    .all(function(req: Express.Request, res: Express.Response, next: any): void {
+    .all(function(req: Request, res: Response, next: any): void {
         companyOpportunities.findByPk(req.params.id).then(function(foundCompanyOpportunity: CompanyOpportunity): void {
             if (foundCompanyOpportunity === null) {
                 res.status(404).send({status: "Company opportunity could not be found in the database."});
@@ -64,7 +63,7 @@ router.route("/companyOpportunities/:id")
             }
         });
     })
-    .get(function(req: Express.Request, res: Express.Response): any {
+    .get(function(req: Request, res: Response): any {
         /**
          * Route for getting a specific company opportunity.
          */
@@ -78,7 +77,7 @@ router.route("/companyOpportunities/:id")
             res.send(res.locals.companyOpportunity);
         }).done();
     })
-    .put(function(req: Express.Request, res: Express.Response): any {
+    .put(function(req: Request, res: Response): any {
         /**
          * Route for editing a specific company opportunity.
          */
@@ -98,7 +97,7 @@ router.route("/companyOpportunities/:id")
             });
         });
     })
-    .delete(function(req: Express.Request, res: Express.Response): any {
+    .delete(function(req: Request, res: Response): any {
         /**
          * Route for deleting a company opportunity.
          */
@@ -119,7 +118,7 @@ router.route("/companyOpportunities/category/:category")
     /**
      * Gets all company opportunities of a certain category from the database.
      */
-    .get(function(req: Express.Request, res: Express.Response): void {
+    .get(function(req: Request, res: Response): void {
         companyOpportunities.findAll({
             where: {category: req.params.category}
         }).then(function(foundCompanyOpportunities: CompanyOpportunity[]): void {
