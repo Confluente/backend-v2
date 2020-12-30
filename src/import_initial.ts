@@ -1,4 +1,4 @@
-import {Q} from 'q';
+const Q: any = require("q");
 
 import {Activity} from "./models/activity";
 import {User} from "./models/user";

@@ -1,18 +1,19 @@
-import {Session} from "inspector";
-
 const path: any = require("path");
 const express: any = require("express");
 const morgan: any = require("morgan");
 const bodyParser: any = require("body-parser");
 const cookieParser: any = require("cookie-parser");
 const schedule: any = require('node-schedule');
-const User: any = require('./models/user');
-const Sequelize: any = require('sequelize');
-const Op: any = Sequelize.Op;
+const sequelize: any = require('sequelize');
+const Op: any = sequelize.Op;
 const nodemailer: any = require("nodemailer");
 const log: any = require("./logger");
 const checkPermission: any = require("./permissions").check;
-const Session: any = require("./models/session");
+
+// Import db models
+import {User} from "./models/user";
+import {Session} from "./models/session";
+
 
 let webroot: any;
 

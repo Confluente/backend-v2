@@ -4,7 +4,7 @@
  * @param array         Array of strings to be stringified
  * @returns             Stringified array, consisting of the input elements separated by #,#
  */
-function stringifyArrayOfStrings(array: string[]): string {
+export function stringifyArrayOfStrings(array: string[]): string {
     if (array.length === 0) { return ""; }
 
     let result: string = "";
@@ -22,7 +22,7 @@ function stringifyArrayOfStrings(array: string[]): string {
  * @param input_string      String to be destringified, with elements separated by #,#
  * @returns                 Array of string encoded in the input string
  */
-function destringifyStringifiedArrayOfStrings(input_string: string): string[] {
+export function destringifyStringifiedArrayOfStrings(input_string: string): string[] {
     if (input_string.length === 0) { return []; }
 
     return input_string.split("#,#");
@@ -34,7 +34,7 @@ function destringifyStringifiedArrayOfStrings(input_string: string): string[] {
  * @param array             Array of numbers to be stringified
  * @returns                 Stringified array, consisting of the input elements separated by #,#
  */
-function stringifyArrayOfNumbers(array: number[]): string {
+export function stringifyArrayOfNumbers(array: number[]): string {
     if (array.length === 0) { return ""; }
 
     let result: string = "";
@@ -52,7 +52,7 @@ function stringifyArrayOfNumbers(array: number[]): string {
  * @param input_string          String to be destringified, with numerical elements separated by #,#
  * @returns                     Array of numbers encoded in the input string
  */
-function destringifyStringifiedArrayOfNumbers(input_string: string): number[] {
+export function destringifyStringifiedArrayOfNumbers(input_string: string): number[] {
     if (input_string.length === 0) { return []; }
 
     const split_string: string[] = input_string.split("#,#");
@@ -64,12 +64,3 @@ function destringifyStringifiedArrayOfNumbers(input_string: string): number[] {
 
     return result;
 }
-
-
-module.exports = {
-    stringifyArrayOfStrings,
-    destringifyStringifiedArrayOfStrings,
-    stringifyArrayOfNumbers,
-    destringifyStringifiedArrayOfNumbers
-};
-

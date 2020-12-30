@@ -16,7 +16,7 @@ const fs = require('fs');
 let port: number = !Number.isNaN(Number(process.env.PORT)) ? Number(process.env.PORT) : 3000;
 
 // Start server
-httpServer.listen(port, function() {
+httpServer.listen(port, function(): any {
     log.info('Listening on port ' + port);
 });
 
