@@ -230,6 +230,7 @@ Q.all([
                 }
             }
         });
+        promises.push(promise);
     });
 
     return Q.all(promises);
