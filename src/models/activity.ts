@@ -1,4 +1,6 @@
-class Activity extends sequelize.Model {
+import {Group} from './group';
+
+export class Activity extends sequelize.Model {
     /**
      * Name of the activity.
      */
@@ -182,5 +184,3 @@ Activity.Organizer = Activity.belongsTo(Group, {as: "Organizer", onDelete: 'CASC
 Activity.sync();
 Group.sync();
 db.sync();
-
-module.exports = Activity;

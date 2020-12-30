@@ -1,4 +1,4 @@
-class CompanyOpportunity extends sequelize.Model {
+export class CompanyOpportunity extends sequelize.Model {
     /**
      * Title of the opportunity.
      */
@@ -82,5 +82,3 @@ CompanyOpportunity.init(
 );
 
 CompanyOpportunity.sync();
-
-module.exports = CompanyOpportunity;

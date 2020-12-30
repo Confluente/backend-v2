@@ -1,4 +1,4 @@
-class Group extends sequelize.Model {
+export class Group extends sequelize.Model {
     /**
      * Display name of the group (shorter than fullName but identifiable).
      */
@@ -67,5 +67,3 @@ Group.init(
 );
 
 Group.sync();
-
-module.exports = Group;

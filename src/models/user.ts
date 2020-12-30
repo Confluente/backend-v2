@@ -1,4 +1,7 @@
-class User extends sequelize.Model {
+import {Group} from './group';
+import {Activity} from "./activity";
+
+export class User extends sequelize.Model {
     /**
      * Email of the user.
      */
@@ -205,5 +208,3 @@ User.sync();
 Group.sync();
 Activity.sync();
 db.sync();
-
-module.exports = User;

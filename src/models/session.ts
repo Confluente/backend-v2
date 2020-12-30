@@ -1,4 +1,4 @@
-class Session extends sequelize.Model {
+export class Session extends sequelize.Model {
     /**
      * Token of the session.
      */
@@ -46,5 +46,3 @@ Session.init(
 );
 
 Session.sync();
-
-module.exports = Session;

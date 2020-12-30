@@ -1,4 +1,4 @@
-class Page extends sequelize.Model {
+export class Page extends sequelize.Model {
     /**
      * URL of the page.
      */
@@ -48,5 +48,3 @@ Page.init(
 );
 
 Page.sync();
-
-module.exports = Page;

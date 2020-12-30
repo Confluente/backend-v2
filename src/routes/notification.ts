@@ -1,8 +1,6 @@
 import express = require("express");
 
-import "../models/user";
-
-import users = require("../models/user");
+import {User} from '../models/user';
 import {Express} from "express";
 
 const router: any = express.Router();
@@ -19,7 +17,7 @@ router.route("/portraitRight/:id")
         if (parseInt(req.params.id, undefined) !== userId) { return res.sendStatus(403); }
 
         // Retrieve user from database
-        users.findByPk(userId).then(function(user: User): void {
+        User.findByPk(userId).then(function(user: User): void {
             // Update user object in database
             user.update({consentWithPortraitRight: req.body.answer}).then(function(result: User): any {
                 res.send(user);
