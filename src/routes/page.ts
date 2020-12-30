@@ -3,9 +3,8 @@ import {Express} from "express";
 const express: any = require("express");
 const marked: any = require("marked");
 
-import "../models/page";
+import {Page} from "../models/page";
 
-const pages: any = require("../models/page");
 const permissions: any = require("../permissions");
 
 const router: Express.Router = express.Router();
@@ -50,8 +49,8 @@ router.route("/:url([^\?]+)")
             throw new Error("Not implemented: change page.url");
         }
 
-        return pages.upsert(values).then(function(result: any): any {
-            return pages.findAll().then(function(foundPages: Page[]): any {
+        return Page.upsert(values).then(function(result: any): any {
+            return Page.findAll().then(function(foundPages: Page[]): any {
                 return res.status(201).send(foundPages);
             });
         });
@@ -61,13 +60,13 @@ router.route("/:url([^\?]+)")
      * Deletes a page from the database
      */
     .delete(permissions.requireAll({type: "PAGE_MANAGE"}), function(req: Express.Request, res: Express.Response): any {
-        return pages.destroy({where: {url: req.params.url}}).then(function(result: any): any {
+        return Page.destroy({where: {url: req.params.url}}).then(function(result: any): any {
             return res.sendStatus(204);
         });
     });
 
 router.get("/:url/view", function(req: Express.Request, res: Express.Response): any {
-    return pages.find({where: {url: req.params.url}}).then(function(foundPage: Page): any {
+    return Page.find({where: {url: req.params.url}}).then(function(foundPage: Page): any {
         if (!foundPage) { return res.redirect("/404.html"); }
         res.send(marked(foundPage.dataValues.content));
     });
@@ -75,7 +74,7 @@ router.get("/:url/view", function(req: Express.Request, res: Express.Response): 
 
 router.get("/", permissions.requireAll({type: "PAGE_MANAGE"}),
     function(req: Express.Request, res: Express.Response): any {
-    return pages.findAll({
+    return Page.findAll({
         attributes: ["url", "title", "content", "author"]
     }).then(function(foundPages: Page[]): void {
         res.send(foundPages);

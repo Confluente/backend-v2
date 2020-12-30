@@ -2,12 +2,8 @@ import {Express} from "express";
 
 const express: any = require("express");
 
-import "../models/group";
-import "../models/user";
-
-const users: any = require("../models/user");
-const groups: any = require("../models/group");
-const permissions: any = require("../permissions");
+import {Group} from "../models/group";
+import {User} from "../models/user";
 
 const router: Express.Router = express.Router();
 
@@ -18,7 +14,7 @@ router.route("/")
      * Gets all groups from the database
      */
     .get(function(req: Express.Request, res: Express.Response, next: any): void {
-        groups.findAll({
+        Group.findAll({
             attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type", "createdAt"],
             order: [
                 ["id", "ASC"]
@@ -52,7 +48,7 @@ router.route("/")
             if (!result) { return res.sendStatus(403); }
 
             // Create group in the database
-            return groups.create(req.body).then(function(createdGroup: Group): void {
+            return Group.create(req.body).then(function(createdGroup: Group): void {
                 // Send created group back to the client
                 res.status(201).send(result);
             }).catch(function(err: Error): void {
@@ -66,7 +62,7 @@ router.route("/:id")
      * Gets a specific group from the database and stores it in res.locals.group
      */
     .all(function(req: Express.Request, res: Express.Response, next: any): any {
-        groups.findByPk(req.params.id, {
+        Group.findByPk(req.params.id, {
             attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type", "createdAt"],
             include: [
                 {
@@ -132,7 +128,7 @@ router.route("/:id")
 
                 // add all new group members
                 req.body[1].forEach(function(new_group_member: any): any {
-                    users.findByPk(new_group_member.id).then(function(newUser: User): void {
+                    User.findByPk(new_group_member.id).then(function(newUser: User): void {
                         newUser.addGroups(res.locals.group, {through: {func: new_group_member.func}}).then(console.log);
                     });
                 });
@@ -174,7 +170,7 @@ router.route("/type/:type")
      * Gets all groups of a certain type from the database
      */
     .get(function(req: Express.Request, res: Express.Response): void {
-        groups.findAll({
+        Group.findAll({
             attributes: ["id", "fullName", "displayName", "description", "email"],
             where: {type: req.params.type},
             order: [

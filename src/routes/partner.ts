@@ -1,7 +1,7 @@
 import {Express} from "express";
 
-import "../models/companyOpportunity";
-import "../models/user";
+import {CompanyOpportunity} from "../models/companyOpportunity";
+import {User} from "../models/user";
 
 const express: any = require("express");
 
