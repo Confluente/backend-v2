@@ -1,6 +1,4 @@
-import {Request, Response, Router} from "express";
-
-const express: any = require("express");
+import express, {Request, Response, Router} from "express";
 
 import {Group} from "../models/group";
 import {User} from "../models/user";

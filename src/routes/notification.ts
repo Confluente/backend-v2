@@ -1,6 +1,4 @@
-import {Request, Response, Router} from "express";
-
-import express = require("express");
+import express, {Request, Response, Router} from "express";
 
 import {User} from '../models/user';
 

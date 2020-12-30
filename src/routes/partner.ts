@@ -1,5 +1,4 @@
-import {Response, Request, Router} from "express";
-const express: any = require("express");
+import express, {Response, Request, Router} from "express";
 
 import {CompanyOpportunity} from "../models/companyOpportunity";
 import {User} from "../models/user";

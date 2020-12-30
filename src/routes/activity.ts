@@ -1,12 +1,10 @@
-import {Request, Response, Router} from "express";
-const express: any = require("express");
+import express, {Request, Response, Router} from "express";
 
-const Q: any = require("q");
-const marked: any = require("marked");
-const sequelize: any = require("sequelize");
-const multer: any = require("multer");
-const mime: any = require('mime-types');
-const fs: any = require('fs');
+import Q from 'q';
+import marked from 'marked';
+import multer, {diskStorage, FileFilterCallback} from 'multer';
+import mime from 'mime-types';
+import fs from 'fs';
 
 import {Group} from "../models/group";
 import {User} from "../models/user";
@@ -24,7 +22,7 @@ import {Op} from 'sequelize';
 const pathToPictures: string = '../Frontend-Angular/src/assets/img/activities/';
 
 // Set The Storage Engine
-const storage: any = multer.diskStorage({
+const storage: any = diskStorage({
     destination: pathToPictures,
     filename(req: Request, file: any, cb: any): void {
         cb(null, req.params.id + "." + mime.extension(file.mimetype));
@@ -35,7 +33,7 @@ const storage: any = multer.diskStorage({
 const upload = multer({
     storage,
     limits: {fileSize: 1000000}, // 1 MB
-    fileFilter(req: Express.Request, file: File, cb: any): void {
+    fileFilter(req: Request, file: Express.Multer.File, cb: FileFilterCallback): void {
         checkFileType(file, cb);
     }
 }).single("image");
