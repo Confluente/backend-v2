@@ -13,11 +13,8 @@ import {User} from "../models/user";
 import {Activity} from "../models/activity";
 
 const permissions: any = require("../permissions");
-const arrayHelper: any = require("../arrayHelper");
-const activities: any = require("../models/activity");
-const groups: any = require("../models/group");
-const users: any = require("../models/user");
 
+import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../helpers/arrayHelper";
 
 const router: Router = express.Router();
 
@@ -76,7 +73,7 @@ router.route("/")
      */
     .get(function(req: Request, res: Response, next: any): any {
         // Get all activities from the database
-        activities.findAll({
+        Activity.findAll({
             attributes: ["id", "name", "description", "location", "date", "startTime", "endTime", "published", "subscriptionDeadline", "canSubscribe", "hasCoverImage"],
             order: [
                 ["date", "ASC"]
@@ -129,7 +126,7 @@ router.route("/")
                 });
 
                 // Send activities to the client
-                res.send(activities);
+                res.send(promisedActivities);
             }).done();
         });
     })
@@ -163,18 +160,18 @@ router.route("/")
             // Change all lists database strings
             if (activity.canSubscribe) {
                 // transform lists to strings
-                activity.typeOfQuestion = arrayHelper.stringifyArrayOfStrings(activity.typeOfQuestion);
-                activity.questionDescriptions = arrayHelper.stringifyArrayOfStrings(activity.questionDescriptions);
-                activity.formOptions = arrayHelper.stringifyArrayOfStrings(activity.options);
-                activity.required = arrayHelper.stringifyArrayOfStrings(activity.required);
-                activity.privacyOfQuestions = arrayHelper.stringifyArrayOfStrings(activity.privacyOfQuestions);
+                activity.typeOfQuestion = stringifyArrayOfStrings(activity.typeOfQuestion);
+                activity.questionDescriptions = stringifyArrayOfStrings(activity.questionDescriptions);
+                activity.formOptions = stringifyArrayOfStrings(activity.options);
+                activity.required = stringifyArrayOfStrings(activity.required);
+                activity.privacyOfQuestions = stringifyArrayOfStrings(activity.privacyOfQuestions);
             }
 
             // Set organizerId
             activity.OrganizerId = activity.organizer;
 
             // Create activity in database
-            return activities.create(activity).then(function(createdActivity: Activity): void {
+            return Activity.create(activity).then(function(createdActivity: Activity): void {
                 // Send new activity back to the client
                 res.status(201).send(createdActivity);
             }).catch(function(err: Error): void {
@@ -238,7 +235,7 @@ router.route("/manage")
      */
     .get(function(req: Request, res: Response, next: any): any {
         // Get all activities from the database
-        activities.findAll({
+        Activity.findAll({
             attributes: ["id", "name", "description", "location", "date", "startTime", "endTime", "published", "subscriptionDeadline"],
             order: [
                 ["date", "ASC"]
@@ -250,7 +247,7 @@ router.route("/manage")
             }]
         }).then(function(foundActivities: Activity[]): void {
             // For every activity, check if the client is allowed to edit it
-            const promises = activities.map(function(singleActivity: Activity): any {
+            const promises = foundActivities.map(function(singleActivity: Activity): any {
                 return permissions.check(res.locals.session.user, {
                     type: "ACTIVITY_EDIT",
                     value: singleActivity.id
@@ -272,7 +269,7 @@ router.route("/manage")
                 });
 
                 // Send activities to the client
-                res.send(activities);
+                res.send(promisedActivities);
             }).done();
         });
     });
@@ -290,7 +287,7 @@ router.route("/subscriptions/:id")
         if (userId == null) { return res.status(403).send({status: "Not logged in"}); }
 
         // Get activity from database
-        activities.findByPk(req.params.id, {
+        Activity.findByPk(req.params.id, {
             include: [{
                 model: Group,
                 as: "Organizer",
@@ -298,10 +295,10 @@ router.route("/subscriptions/:id")
             }]
         }).then(function(foundActivity: Activity): any {
             // format answer string
-            const answerString = arrayHelper.stringifyArrayOfStrings(req.body);
+            const answerString = stringifyArrayOfStrings(req.body);
 
             // add relation
-            return users.findByPk(userId).then(function(foundUser: User): void {
+            return User.findByPk(userId).then(function(foundUser: User): void {
                 foundUser.addActivity(foundActivity, {through: {answers: answerString}})
                     .then(function(result: Activity): any {
 
@@ -323,7 +320,7 @@ router.route("/subscriptions/:id")
         if (userId == null) { return res.status(403).send({status: "Not logged in"}); }
 
         // Get activity from database
-        activities.findByPk(req.params.id, {
+        Activity.findByPk(req.params.id, {
             include: [{
                 model: User,
                 as: "participants"
@@ -349,7 +346,7 @@ router.route("/:id")
      */
     .all(function(req: Request, res: Response, next: any): void {
         // Getting specific activity from database
-        activities.findByPk(req.params.id, {
+        Activity.findByPk(req.params.id, {
             include: [{
                 model: Group,
                 as: "Organizer",
@@ -394,20 +391,15 @@ router.route("/:id")
             if (activity.canSubscribe) {
                 // split strings into lists
                 activity.participants.forEach(function(participant: any): void {
-                    participant.subscription.answers = arrayHelper
-                        .destringifyStringifiedArrayOfStrings(participant.subscription.answers);
+                    participant.subscription.answers =
+                        destringifyStringifiedArrayOfStrings(participant.subscription.answers);
                 });
 
-                activity.typeOfQuestion = arrayHelper
-                    .destringifyStringifiedArrayOfStrings(activity.typeOfQuestion);
-                activity.questionDescriptions = arrayHelper
-                    .destringifyStringifiedArrayOfStrings(activity.questionDescriptions);
-                activity.formOptions = arrayHelper
-                    .destringifyStringifiedArrayOfStrings(activity.formOptions);
-                activity.required = arrayHelper
-                    .destringifyStringifiedArrayOfStrings(activity.required);
-                activity.privacyOfQuestions = arrayHelper
-                    .destringifyStringifiedArrayOfStrings(activity.privacyOfQuestions);
+                activity.typeOfQuestion = destringifyStringifiedArrayOfStrings(activity.typeOfQuestion);
+                activity.questionDescriptions = destringifyStringifiedArrayOfStrings(activity.questionDescriptions);
+                activity.formOptions = destringifyStringifiedArrayOfStrings(activity.formOptions);
+                activity.required = destringifyStringifiedArrayOfStrings(activity.required);
+                activity.privacyOfQuestions = destringifyStringifiedArrayOfStrings(activity.privacyOfQuestions);
                 const newOptions: string[][] = [];
                 activity.formOptions.forEach(function(question: string): void {
                     newOptions.push(question.split('#;#'));
@@ -446,23 +438,18 @@ router.route("/:id")
             if (!result) { return res.sendStatus(403); }
 
             // Get the organizing group from the database
-            groups.findOne({where: {fullName: req.body.organizer}}).then(function(foundGroup: Group): any {
+            Group.findOne({where: {fullName: req.body.organizer}}).then(function(foundGroup: Group): any {
                 req.body.OrganizerId = foundGroup.id;
                 req.body.Organizer = foundGroup;
 
                 // Update the activity in the database
                 if (req.body.canSubscribe) {
                     // formatting the subscription form into strings for the database
-                    req.body.typeOfQuestion = arrayHelper
-                        .stringifyArrayOfStrings(req.body.typeOfQuestion);
-                    req.body.questionDescriptions = arrayHelper
-                        .stringifyArrayOfStrings(req.body.questionDescriptions);
-                    req.body.formOptions = arrayHelper
-                        .stringifyArrayOfStrings(req.body.formOptions);
-                    req.body.required = arrayHelper
-                        .stringifyArrayOfStrings(req.body.required);
-                    req.body.privacyOfQuestions = arrayHelper
-                        .stringifyArrayOfStrings(req.body.privacyOfQuestions);
+                    req.body.typeOfQuestion = stringifyArrayOfStrings(req.body.typeOfQuestion);
+                    req.body.questionDescriptions = stringifyArrayOfStrings(req.body.questionDescriptions);
+                    req.body.formOptions = stringifyArrayOfStrings(req.body.formOptions);
+                    req.body.required = stringifyArrayOfStrings(req.body.required);
+                    req.body.privacyOfQuestions = stringifyArrayOfStrings(req.body.privacyOfQuestions);
                 }
 
                 return res.locals.activity.update(req.body).then(function(updatedActivity: Activity): void {
