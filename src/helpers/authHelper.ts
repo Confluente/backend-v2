@@ -16,7 +16,7 @@ const digest_iterations = (process.env.NODE_ENV === "test") ? 1 : 100000;
  * @return Hash, or rejects
  */
 export function getPasswordHash(password: string, salt: string): any {
-    return Q.Promise(function(resolve: any, reject: any) {
+    return Q.Promise(function(resolve: any, reject: any): any {
         crypto.pbkdf2(password, salt, digest_iterations, 256 / 8, 'sha256',
             function(err: Error | null, hash: Buffer): any {
             if (err) {
