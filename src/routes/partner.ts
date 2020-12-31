@@ -39,7 +39,7 @@ router.route("/companyOpportunities")
                 res.status(403).send("You do not have permissions to create a company opportunity");
             }
 
-            return companyOpportunities.create(req.body)
+            return CompanyOpportunity.create(req.body)
                 .then(function(createdCompanyOpportunity: CompanyOpportunity): void {
                 res.status(201).send(createdCompanyOpportunity);
             }).catch(function(err: Error): void {
@@ -52,7 +52,7 @@ router.route("/companyOpportunities")
 
 router.route("/companyOpportunities/:id")
     .all(function(req: Request, res: Response, next: any): void {
-        companyOpportunities.findByPk(req.params.id).then(function(foundCompanyOpportunity: CompanyOpportunity): void {
+        CompanyOpportunity.findByPk(req.params.id).then(function(foundCompanyOpportunity: CompanyOpportunity): void {
             if (foundCompanyOpportunity === null) {
                 res.status(404).send({status: "Company opportunity could not be found in the database."});
             } else {
