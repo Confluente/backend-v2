@@ -4,6 +4,8 @@ const httpServer = require('http').createServer(app);
 const https = require('https');
 const fs = require('fs');
 
+process.env.PORT = "80";
+
 // Set port server
 const port: number = !Number.isNaN(Number(process.env.PORT)) ? Number(process.env.PORT) : 3000;
 
