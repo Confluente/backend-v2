@@ -1,11 +1,11 @@
 import express, {Request, Response} from "express";
-const path: any = require("path");
-const morgan: any = require("morgan");
-const bodyParser: any = require("body-parser");
-const cookieParser: any = require("cookie-parser");
-const schedule: any = require('node-schedule');
+import path from 'path';
+import morgan from 'morgan';
+import {json, urlencoded} from "body-parser";
+import cookieParser from 'cookie-parser';
+import {scheduleJob} from 'node-schedule';
 import {Op} from "sequelize";
-const nodemailer: any = require("nodemailer");
+import {createTestAccount, createTransport} from 'nodemailer';
 const log: any = require("./logger");
 const checkPermission: any = require("./permissions").check;
 
@@ -35,8 +35,8 @@ if (process.env.NODE_ENV === "test") {
     });
 }
 
-app.use(bodyParser.json({limit: '10mb', extended: false}));
-app.use(bodyParser.urlencoded({limit: '10mb', extended: false}));
+app.use(json({limit: '10mb', extended: false}));
+app.use(urlencoded({limit: '10mb', extended: false}));
 app.use(cookieParser());
 app.use(function(req: any, res: any, next: any): void {
     if (req.cookies.session) {
@@ -121,7 +121,7 @@ app.use(function(err: Error, req: any, res: any, next: any): void {
 
 // This function sends an email to the secretary of H.S.A. Confluente every week if
 // new users have registered on the website
-const secretary_email: any = schedule.scheduleJob('0 0 0 * * 7', function(): void {
+const secretary_email: any = scheduleJob('0 0 0 * * 7', function(): void {
     const lastWeek: Date = new Date();
     lastWeek.setDate(lastWeek.getDate() - 7);
     User.findAll({
@@ -142,11 +142,10 @@ const secretary_email: any = schedule.scheduleJob('0 0 0 * * 7', function(): voi
                 data_of_new_users += ", track: " + newUsers[i].track + "\n";
             }
 
-            nodemailer.createTestAccount().then(function(): void {
-                const transporter: any = nodemailer.createTransport({
+            createTestAccount().then(function(): void {
+                // TODO check if this works
+                const transporter: any = createTransport({
                     service: 'gmail',
-                    type: "SMTP",
-                    host: "smtp.gmail.com",
                     secure: true,
                     // Never fill this password in and add it to git! Only filled in locally or on the server!
                     auth: {
