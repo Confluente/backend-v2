@@ -1,19 +1,11 @@
-let log = require('./logger');
-let expressServer = require('./expressServer');
-let httpServer = require('http').createServer(expressServer);
+import {log} from "./logger";
+import {app} from './expressServer';
+const httpServer = require('http').createServer(app);
 const https = require('https');
 const fs = require('fs');
 
-// Only for live website version
-// var httpsServer = https.createServer({
-//     key: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/privkey.pem'),
-//     cert: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/cert.pem'),
-//     ca: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/fullchain.pem')
-// }, expressServer);
-
-
 // Set port server
-let port: number = !Number.isNaN(Number(process.env.PORT)) ? Number(process.env.PORT) : 3000;
+const port: number = !Number.isNaN(Number(process.env.PORT)) ? Number(process.env.PORT) : 3000;
 
 // Start server
 httpServer.listen(port, function(): any {
@@ -21,6 +13,14 @@ httpServer.listen(port, function(): any {
 });
 
 // Only for live website version
-// httpsServer.listen(443, function() {
-//     log.info('Listening...')
-// });
+if (process.env.NODE_ENV === "production") {
+    const httpsServer = https.createServer({
+        key: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/privkey.pem'),
+        cert: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/cert.pem'),
+        ca: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/fullchain.pem')
+    }, app);
+
+    httpsServer.listen(443, function(): void {
+        log.info('Listening...');
+    });
+}

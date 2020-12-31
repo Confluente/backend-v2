@@ -1,4 +1,4 @@
-let bunyan = require('bunyan');
+import bunyan from 'bunyan';
 
 function reqSerializer(req: { connection: any; method: any; url: any; headers: any; }): any {
     if (!req || !req.connection) {
@@ -14,7 +14,7 @@ function reqSerializer(req: { connection: any; method: any; url: any; headers: a
     };
 }
 
-let logger = bunyan.createLogger({
+export let log = bunyan.createLogger({
     name: 'gb24Backend',
     serializers: {
         err: bunyan.stdSerializers.err,
@@ -22,5 +22,3 @@ let logger = bunyan.createLogger({
     },
     env: process.env.NODE_ENV
 });
-
-module.exports = logger;
