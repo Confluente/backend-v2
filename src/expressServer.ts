@@ -13,19 +13,19 @@ const checkPermission: any = require("./permissions").check;
 import {User} from "./models/user";
 import {Session} from "./models/session";
 
+process.env.NODE_ENV = "development";
 
 let webroot: any;
 
-const app: any = express();
+export const app: any = express();
 
 // Set webroot dependent on whether running for tests, development, or production
 if (process.env.NODE_ENV === "test") {
     console.log("NODE_ENV=test");
     webroot = path.resolve(__dirname, "www");
-} else if (process.env.NODE_ENV === "dev") {
-    app.use(morgan("dev"));
-    webroot = path.resolve(__dirname, "../frontend/src");
-} else {
+} else if (process.env.NODE_ENV === "development") {
+    console.log("Running in DEVELOPMENT mode!");
+} else { // Running in production
     webroot = path.resolve(__dirname, "../frontend/build");
     app.use(morgan("combined", {stream: require("fs").createWriteStream("./access.log", {flags: "a"})}));
 
@@ -54,20 +54,27 @@ app.use(function(req: any, res: any, next: any): void {
     }
 });
 
-// // HTTPS Rerouting (only for live website version)
-// app.use(function(req: any, res: any, next: any): void {
-//     if (req.secure) {
-//         // request was via https, so do no special handling
-//         next();
-//     } else {
-//         // acme challenge is used for certificate verification for HTTPS
-//         if (req.url === "/.well-known/acme-challenge/w4MANzrt6vOUT2NSDTvramIFdtMMTJXnxiNiyJPlPTg") {
-//             res.redirect('http://hsaconfluente.nl/www/w4MANzrt6vOUT2NSDTvramIFdtMMTJXnxiNiyJPlPTg');
-//         }
-//         res.redirect('https://' + req.headers.host + req.url);
-//         // request was via http, so redirect to https
-//     }
-// });
+// HTTPS Rerouting (only for production website version)
+if (process.env.NODE_ENV === "production") {
+    app.use(function (req, res, next) {
+        if (req.secure) {
+            // request was via https, so do no special handling
+            next();
+        } else {
+            // acme challenge is used for certificate verification for HTTPS
+            if (req.url === "/.well-known/acme-challenge/nPHb2tBcwnLHnTBGzHTtjYZVgoucfI5mLLKrkU4JUFM") {
+                res.redirect('http://hsaconfluente.nl/assets/documents/acme');
+            }
+
+            if (req.url === "/.well-known/acme-challenge/VSV0B332eYswinjUwESM_9jNY59Se17kCryEzUo28eE") {
+                res.redirect('http://hsaconfluente.nl/assets/documents/acme2');
+            }
+
+            res.redirect('https://' + req.headers.host + req.url);
+            // request was via http, so redirect to https
+        }
+    });
+}
 
 
 app.use(function(req: any, res: any, next: any): any {
@@ -95,8 +102,9 @@ app.use("/api/*", function(req: any, res: any): void {
     res.sendStatus(404);
 });
 
-app.use(express.static('public'));
-app.use(express.static(webroot));
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(webroot));
+}
 
 app.get("*", function(req: any, res: any, next: any): any {
 
@@ -159,6 +167,3 @@ const secretary_email: any = schedule.scheduleJob('0 0 0 * * 7', function(): voi
         }
     });
 });
-
-
-module.exports = app;
