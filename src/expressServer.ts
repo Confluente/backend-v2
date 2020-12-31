@@ -1,5 +1,5 @@
+import express, {Request, Response} from "express";
 const path: any = require("path");
-const express: any = require("express");
 const morgan: any = require("morgan");
 const bodyParser: any = require("body-parser");
 const cookieParser: any = require("cookie-parser");
@@ -56,7 +56,7 @@ app.use(function(req: any, res: any, next: any): void {
 
 // HTTPS Rerouting (only for production website version)
 if (process.env.NODE_ENV === "production") {
-    app.use(function (req, res, next) {
+    app.use(function(req: Request, res: Response, next: any): any {
         if (req.secure) {
             // request was via https, so do no special handling
             next();
