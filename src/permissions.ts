@@ -23,8 +23,8 @@ function check(user: User | number, scope: any): boolean {
             resolve(user);
         }
     }).then(function(dbUser: User): boolean {
-        // return user.role.permissions[scope];
 
+        // Determine rule based on context
         switch (scope.type) {
             case "PAGE_VIEW":
                 return dbUser.role.PAGE_VIEW;
