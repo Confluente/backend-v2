@@ -35,7 +35,8 @@ if (process.env.NODE_ENV === "test") {
     });
 }
 
-app.use(json({limit: '10mb', extended: false}));
+// TODO check if the json thingy works
+app.use(json({limit: '10mb'}));
 app.use(urlencoded({limit: '10mb', extended: false}));
 app.use(cookieParser());
 app.use(function(req: any, res: any, next: any): void {
