@@ -4,7 +4,6 @@ import {CompanyOpportunity} from "../models/companyOpportunity";
 import {User} from "../models/user";
 
 const permissions: any = require("../permissions");
-const companyOpportunities: any = require("../models/companyOpportunity");
 
 const router: Router = express.Router();
 
@@ -19,7 +18,7 @@ router.route("/companyOpportunities")
                 res.status(403).send("You do not have the permissions to view internships");
             }
 
-            companyOpportunities.findAll({
+            CompanyOpportunity.findAll({
                 order: [
                     ["id", "ASC"]
                 ]
@@ -118,7 +117,7 @@ router.route("/companyOpportunities/category/:category")
      * Gets all company opportunities of a certain category from the database.
      */
     .get(function(req: Request, res: Response): void {
-        companyOpportunities.findAll({
+        CompanyOpportunity.findAll({
             where: {category: req.params.category}
         }).then(function(foundCompanyOpportunities: CompanyOpportunity[]): void {
             res.send(foundCompanyOpportunities);
