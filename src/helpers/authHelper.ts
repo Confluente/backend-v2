@@ -1,13 +1,9 @@
-import crypto = require("crypto");
-import Q = require("q");
-
+import q, {Promise} from "q";
+import {pbkdf2, pbkdf2Sync, randomBytes} from "crypto";
 import {User} from "../models/user";
 import {Session} from "../models/session";
 
-import getRandomBytes = Q.nfbind(crypto.randomBytes);
-
 const digest_iterations = (process.env.NODE_ENV === "test") ? 1 : 100000;
-
 
 /**
  * Asynchronous function returning Hash of password based on password and salt.
@@ -16,8 +12,8 @@ const digest_iterations = (process.env.NODE_ENV === "test") ? 1 : 100000;
  * @return Hash, or rejects
  */
 export function getPasswordHash(password: string, salt: string): any {
-    return Q.Promise(function(resolve: any, reject: any): any {
-        crypto.pbkdf2(password, salt, digest_iterations, 256 / 8, 'sha256',
+    return Promise(function(resolve: any, reject: any): any {
+        pbkdf2(password, salt, digest_iterations, 256 / 8, 'sha256',
             function(err: Error | null, hash: Buffer): any {
             if (err) {
                 return reject(err);
@@ -34,7 +30,7 @@ export function getPasswordHash(password: string, salt: string): any {
  * @return Salt characters
  */
 export function generateSalt(length: number): string {
-    return crypto.randomBytes(Math.ceil(length / 2))
+    return randomBytes(Math.ceil(length / 2))
         .toString('hex') /** convert to hexadecimal format */
         .slice(0, length);   /** return required number of characters */
 }
@@ -46,7 +42,7 @@ export function generateSalt(length: number): string {
  * @return Hash
  */
 export function getPasswordHashSync(password: string, salt: string): string {
-    return crypto.pbkdf2Sync(password, salt, digest_iterations, 256 / 8, 'sha256').toString();
+    return pbkdf2Sync(password, salt, digest_iterations, 256 / 8, 'sha256').toString();
 }
 
 
@@ -78,7 +74,7 @@ export function authenticate(email: string, password: string): any {
  */
 export function startSession(userId: number, ip: string): any {
     const session_lifetime = 7; // in days
-    return getRandomBytes(32).then(function(bytes: any): any {
+    return q.nfbind(randomBytes)(32).then(function(bytes: any): any {
         console.log("new session made");
         return Session.create({
             user: userId,
