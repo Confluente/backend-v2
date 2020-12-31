@@ -6,7 +6,8 @@ import cookieParser from 'cookie-parser';
 import {scheduleJob} from 'node-schedule';
 import {Op} from "sequelize";
 import {createTestAccount, createTransport} from 'nodemailer';
-const log: any = require("./logger");
+import {log} from "./logger";
+
 const checkPermission: any = require("./permissions").check;
 
 // Import db models

@@ -4,7 +4,7 @@ import {Activity} from "./models/activity";
 import {User} from "./models/user";
 import {Group} from "./models/group";
 
-import fs = require('fs');
+import fs from 'fs';
 
 if (!fs.existsSync("./data.sqlite")) {
     // database does not yet exist! great :)
