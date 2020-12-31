@@ -1,7 +1,6 @@
 import express, {Request, Response, Router} from "express";
 
-const marked: any = require("marked");
-
+import marked from "marked";
 import {Page} from "../models/page";
 
 const permissions: any = require("../permissions");

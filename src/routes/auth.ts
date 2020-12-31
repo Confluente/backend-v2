@@ -2,10 +2,7 @@ import express, {Request, Response, Router} from "express";
 
 import {User} from "../models/user";
 import {Group} from "../models/group";
-
-const users: any = require("../models/user");
-const groups: any = require("../models/group");
-const authHelper: any = require("../authHelper");
+import {authenticate, startSession} from "../helpers/authHelper";
 
 const router: Router = express.Router();
 
@@ -20,7 +17,7 @@ router.route("/")
         }
 
         // find the user of the session in the database
-        users.findByPk(res.locals.session.user, {
+        User.findByPk(res.locals.session.user, {
             attributes: ["id", "email", "displayName", "isAdmin", "consentWithPortraitRight"],
             include: [{
                 model: Group,
@@ -57,7 +54,7 @@ router.route("/login")
         };
 
         // authenticate user
-        authHelper.authenticate(req.body.email, req.body.password).then(function(foundUser: User): any {
+        authenticate(req.body.email, req.body.password).then(function(foundUser: User): any {
             // check if error occurred
             if (foundUser.error === 406) {
                 return res.status(406).send(foundUser);
@@ -71,7 +68,7 @@ router.route("/login")
             res.locals.user = foundUser;
 
             // start a new session and send that session back to the client
-            return authHelper.startSession(foundUser.id, req.ip)
+            return startSession(foundUser.id, req.ip)
                 .then(function(session: any): void {
                     res.cookie('session', session.token.toString("base64"), { expires: session.expires });
                     res.status(200).send({});
