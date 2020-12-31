@@ -3,9 +3,10 @@ import express, {Request, Response, Router} from "express";
 import {User} from "../models/user";
 import {Group} from "../models/group";
 
-const nodemailer: any = require("nodemailer");
 const permissions: any = require("../permissions");
-const authHelper: any = require("../helpers/authHelper");
+
+import {generateSalt, getPasswordHashSync} from "../helpers/authHelper";
+import {createTestAccount, createTransport} from "nodemailer";
 
 const router: Router = express.Router();
 
@@ -48,9 +49,9 @@ router.route("/")
         }
 
         // generate approvingHash, passwordSalt and passwordHash
-        req.body.approvingHash = authHelper.generateSalt(24);
-        req.body.passwordSalt = authHelper.generateSalt(16);
-        req.body.passwordHash = authHelper.getPasswordHashSync(req.body.password, req.body.passwordSalt);
+        req.body.approvingHash = generateSalt(24);
+        req.body.passwordSalt = generateSalt(16);
+        req.body.passwordHash = getPasswordHashSync(req.body.password, req.body.passwordSalt);
 
         // Delete password permanently
         delete req.body.password;
@@ -61,12 +62,11 @@ router.route("/")
         // Create new user in database
         return User.create(req.body).then(function(createdUser: User): void {
             // Send approval email to email
-            nodemailer.createTestAccount().then(function(): void {
+            createTestAccount().then(function(): void {
 
-                const transporter: any = nodemailer.createTransport({
+                // TODO test if this works?? Same as in expressServer
+                const transporter: any = createTransport({
                     service: 'gmail',
-                    type: "SMTP",
-                    host: "smtp.gmail.com",
                     secure: true,
                     // Never fill this password in and add it to git! Only filled in locally or on the server!
                     auth: {
@@ -254,11 +254,11 @@ router.route("/changePassword/:id")
                     return res.status(404).send({status: "Not Found"});
                 } else {
                     // Get the hash of the (original) password the user put
-                    const inputtedPasswordHash: Uint8Array =
-                        authHelper.getPasswordHashSync(req.body.password, foundUser.passwordSalt);
+                    const inputtedPasswordHash: string =
+                        getPasswordHashSync(req.body.password, foundUser.passwordSalt);
 
                     // Check if it is indeed the correct password
-                    if (Buffer.compare(inputtedPasswordHash, foundUser.passwordHash) !== 0) {
+                    if (inputtedPasswordHash === foundUser.passwordHash) {
                         return res.status(406).send({status: "Not equal passwords"});
                     }
 
@@ -268,8 +268,8 @@ router.route("/changePassword/:id")
                     }
 
                     // Generate new salt and hash
-                    const passwordSalt: string = authHelper.generateSalt(16); // Create salt of 16 characters
-                    const passwordHash: string = authHelper.getPasswordHashSync(req.body.passwordNew, passwordSalt);
+                    const passwordSalt: string = generateSalt(16); // Create salt of 16 characters
+                    const passwordHash: string = getPasswordHashSync(req.body.passwordNew, passwordSalt);
 
                     // Update user in database with new password and hash
                     return foundUser.update({
@@ -309,7 +309,7 @@ router.route("/approve/:approvalString")
                 res.send();
             }
 
-            foundUser.update({approved: true, approvingHash: authHelper.generateSalt(23)})
+            foundUser.update({approved: true, approvingHash: generateSalt(23)})
                 .then(function(result: any): void {
                 res.writeHead(301, {
                     location: '/completed_registration'
