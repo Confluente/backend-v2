@@ -1,4 +1,6 @@
-export class Group extends sequelize.Model {
+import {Model, DataTypes} from "sequelize";
+
+export class Group extends Model {
     /**
      * Display name of the group (shorter than fullName but identifiable).
      */
@@ -33,30 +35,30 @@ export class Group extends sequelize.Model {
 Group.init(
     {
         displayName: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         fullName: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             unique: true,
             allowNull: false,
             primaryKey: true,
         },
         description: {
-            type: new sequelize.DataTypes.STRING(2048),
+            type: new DataTypes.STRING(2048),
             allowNull: false,
         },
         canOrganize: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
         email: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         type: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
     },

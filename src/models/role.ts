@@ -1,4 +1,6 @@
-export class Role extends sequelize.Model {
+import {Model, DataTypes} from "sequelize";
+
+export class Role extends Model {
     /**
      * Name of the role.
      */
@@ -63,109 +65,111 @@ export class Role extends sequelize.Model {
 Role.init(
     {
         name: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             unique: true,
             primaryKey: true,
             allowNull: false,
         },
         PAGE_VIEW: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         PAGE_MANAGE: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         USER_CREATE: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         USER_VIEW_ALL: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         USER_MANAGE: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         CHANGE_ALL_PASSWORDS: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         ROLE_VIEW: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         ROLE_MANAGE: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         GROUP_VIEW: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         GROUP_MANAGE: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         GROUP_ORGANIZE_WITH_ALL: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         ACTIVITY_VIEW_PUBLISHED: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         ACTIVITY_VIEW_ALL_UNPUBLISHED: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
         ACTIVITY_MANAGE: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             unique: false,
             primaryKey: false,
             allowNull: false,
             defaultValue: false,
         },
+    }, {
+
     }
 );
 

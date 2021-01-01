@@ -1,4 +1,6 @@
-export class Page extends sequelize.Model {
+import {Model, DataTypes} from "sequelize";
+
+export class Page extends Model {
     /**
      * URL of the page.
      */
@@ -23,21 +25,21 @@ export class Page extends sequelize.Model {
 Page.init(
     {
         url: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             unique: true,
             primaryKey: true,
             allowNull: false,
         },
         title: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         content: {
-            type: new sequelize.DataTypes.TEXT(),
+            type: new DataTypes.TEXT(),
             allowNull: false,
         },
         author: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
     },

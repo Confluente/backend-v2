@@ -1,4 +1,6 @@
-export class CompanyOpportunity extends sequelize.Model {
+import {Model, DataTypes} from "sequelize";
+
+export class CompanyOpportunity extends Model {
     /**
      * Title of the opportunity.
      */
@@ -43,35 +45,35 @@ export class CompanyOpportunity extends sequelize.Model {
 CompanyOpportunity.init(
     {
         title: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         companyName: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         description: {
-            type: new sequelize.DataTypes.STRING(8192),
+            type: new DataTypes.STRING(8192),
             allowNull: false,
         },
         imageUrl: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         contactEmail: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         link: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         educationLevel: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         category: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
     },
