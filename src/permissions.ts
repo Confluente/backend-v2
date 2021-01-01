@@ -18,18 +18,16 @@ export function check(user: User | number, scope: any): Promise<boolean> {
         if (!user) {
             // User undefined
             loggedIn = false;
-            resolve();
+            const imposterRole: Role = Role.findOne({where: {
+                    name: 'Not logged in'
+                }});
+            resolve({role: imposterRole});
         } else if (typeof user === 'number') {
             resolve(User.findByPk(user));
         } else {
             resolve(user);
         }
     }).then(function(dbUser: User): boolean {
-        if (!loggedIn) {
-            dbUser.role = Role.findOne({where: {
-                name: 'Not logged in'
-            }});
-        }
 
         // Determine rule based on context
         switch (scope.type) {
