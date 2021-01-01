@@ -183,7 +183,8 @@ Activity.init(
 );
 
 // Relates activities to a group that organizes the activity.
-Activity.Organizer = Activity.belongsTo(Group, {as: "Organizer", onDelete: 'CASCADE'});
+// TODO check if this does not break stuff
+Activity.belongsTo(Group, {as: "Organizer", onDelete: 'CASCADE'});
 
 Activity.sync();
 Group.sync();
