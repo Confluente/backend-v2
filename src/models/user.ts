@@ -122,7 +122,7 @@ User.init(
             allowNull: true,
         },
         honorsGeneration: {
-            type: new DataTypes.INTEGER(32),
+            type: DataTypes.INTEGER,
             allowNull: true,
         },
         honorsMembership: {
