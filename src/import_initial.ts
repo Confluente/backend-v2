@@ -122,7 +122,7 @@ const roles = [
         ROLE_VIEW: false,
         ROLE_MANAGE: false,
         // Groups
-        GROUP_VIEW: false,
+        GROUP_VIEW: true,
         GROUP_MANAGE: false,
         GROUP_ORGANIZE_WITH_ALL: false,
         // Activities
