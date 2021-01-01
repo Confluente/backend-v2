@@ -123,60 +123,60 @@ Activity.init(
             allowNull: true,
         },
         endTime: {
-            type: new sequelize.DataType.TIME(),
+            type: new DataTypes.TIME(),
             allowNull: true,
         },
         canSubscribe: {
-            type: new sequelize.DataType.BOOLEAN(),
+            type: new DataTypes.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
         participationFee: {
-            type: new sequelize.DataType.DECIMAL(),
+            type: new DataTypes.DECIMAL(),
             allowNull: true,
         },
         numberOfQuestions: {
-            type: new sequelize.DataType.INTEGER(),
+            type: new DataTypes.INTEGER(),
             allowNull: true,
         },
         typeOfQuestion: {
-            type: new sequelize.DataType.STRING(1024),
+            type: new DataTypes.STRING(1024),
             allowNull: true,
         },
         questionDescriptions: {
-            type: new sequelize.DataType.STRING(8192),
+            type: new DataTypes.STRING(8192),
             allowNull: true,
         },
         formOptions: {
-            type: new sequelize.DataType.STRING(8192),
+            type: new DataTypes.STRING(8192),
             allowNull: true,
         },
         required: {
-            type: new sequelize.DataType.STRING(8192),
+            type: new DataTypes.STRING(8192),
             allowNull: true,
         },
         privacyOfQuestions: {
-            type: new sequelize.DataType.STRING(8192),
+            type: new DataTypes.STRING(8192),
             allowNull: true,
         },
         subscriptionDeadline: {
-            type: new sequelize.DataType.DATE(),
+            type: new DataTypes.DATE(),
             allowNull: true,
         },
         published: {
-            type: new sequelize.DataType.BOOLEAN(),
+            type: new DataTypes.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
         hasCoverImage: {
-            type: new sequelize.DataType.BOOLEAN(),
+            type: new DataTypes.BOOLEAN(),
             allowNull: false,
             defaultValue: false,
         },
     },
     {
         tableName: "activity",
-        sequelize,
+        Sequelize,
     }
 );
 
