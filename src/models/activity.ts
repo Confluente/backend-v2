@@ -1,4 +1,7 @@
-import {Model, DataTypes} from "sequelize";
+import {Sequelize, Model, DataTypes} from "sequelize";
+
+import {db} from './db';
+const sequelize: Sequelize = db;
 
 import {Group} from './group';
 
@@ -115,28 +118,28 @@ Activity.init(
             allowNull: true,
         },
         date: {
-            type: new DataTypes.DATE(),
+            type: DataTypes.DATE,
             allowNull: false,
         },
         startTime: {
-            type: new DataTypes.TIME(),
+            type: DataTypes.TIME,
             allowNull: true,
         },
         endTime: {
-            type: new DataTypes.TIME(),
+            type: DataTypes.TIME,
             allowNull: true,
         },
         canSubscribe: {
-            type: new DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
         participationFee: {
-            type: new DataTypes.DECIMAL(),
+            type: DataTypes.DECIMAL,
             allowNull: true,
         },
         numberOfQuestions: {
-            type: new DataTypes.INTEGER(),
+            type: DataTypes.INTEGER,
             allowNull: true,
         },
         typeOfQuestion: {
@@ -160,23 +163,23 @@ Activity.init(
             allowNull: true,
         },
         subscriptionDeadline: {
-            type: new DataTypes.DATE(),
+            type: DataTypes.DATE,
             allowNull: true,
         },
         published: {
-            type: new DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
         hasCoverImage: {
-            type: new DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
     },
     {
+        sequelize,
         tableName: "activity",
-        Sequelize,
     }
 );
 
