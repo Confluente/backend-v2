@@ -1,4 +1,4 @@
-import {Sequelize, Model, DataTypes} from "sequelize";
+import {Sequelize, Model, DataTypes, BelongsToManyAddAssociationMixin} from "sequelize";
 import {db} from './db';
 const sequelize: Sequelize = db;
 
@@ -87,6 +87,9 @@ export class User extends Model {
      * The hash link via which the account can be approved
      */
     public approvingHash!: string;
+
+    public addGroup!: BelongsToManyAddAssociationMixin<Group, string>;
+    public addActivity!: BelongsToManyAddAssociationMixin<Activity, number>;
 }
 
 User.init(
