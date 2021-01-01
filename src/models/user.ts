@@ -1,5 +1,6 @@
 import {Group} from './group';
 import {Activity} from "./activity";
+import {Role} from "./role";
 
 export class User extends sequelize.Model {
     /**
@@ -74,11 +75,6 @@ export class User extends sequelize.Model {
     public passwordSalt!: any;
 
     /**
-     * Whether the user is an admin.
-     */
-    public isAdmin!: boolean;
-
-    /**
      * Whether the account of the user is approved
      */
     public approved!: boolean;
@@ -150,11 +146,6 @@ User.init(
             type: new sequelize.DataTypes.BLOB(),
             allowNull: false,
         },
-        isAdmin: {
-            type: new sequelize.DataTypes.BOOLEAN(),
-            allowNull: false,
-            defaultValue: false,
-        },
         approved: {
             type: new sequelize.DataTypes.BOOLEAN(),
             allowNull: false,
@@ -202,9 +193,13 @@ User.belongsToMany(Activity, {through: subscription, onDelete: 'CASCADE'});
 // Relates an activity to a user through subscription as participants
 Activity.belongsToMany(User, {as: "participants", through: subscription, onDelete: 'CASCADE'});
 
+// User is assigned a single role
+User.hasOne(Role);
+
 userGroup.sync();
 subscription.sync();
 User.sync();
 Group.sync();
 Activity.sync();
+Role.sync();
 db.sync();
