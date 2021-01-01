@@ -1,6 +1,6 @@
-const sequelize = require("sequelize");
+import {Sequelize} from 'sequelize';
+
 const storage = (process.env.NODE_ENV === "test") ? ":memory:" : "data.sqlite";
 
-const db = new sequelize("sequel", null, null, {dialect: "sqlite", logging: null, storage});
+export const db = new Sequelize("sequel", null, null, {dialect: "sqlite", logging: null, storage});
 
-module.exports = db;

@@ -1,6 +1,8 @@
+import {Model, DataTypes} from "sequelize";
+
 import {Group} from './group';
 
-export class Activity extends sequelize.Model {
+export class Activity extends Model {
     /**
      * Name of the activity.
      */
@@ -101,23 +103,23 @@ export class Activity extends sequelize.Model {
 Activity.init(
     {
         name: {
-            type: new sequelize.DataType.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         description: {
-            type: new sequelize.DataType.STRING(8192),
+            type: new DataTypes.STRING(8192),
             allowNull: false,
         },
         location: {
-            type: new sequelize.DataType.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: true,
         },
         date: {
-            type: new sequelize.DataType.DATE(),
+            type: new DataTypes.DATE(),
             allowNull: false,
         },
         startTime: {
-            type: new sequelize.DataType.TIME(),
+            type: new DataTypes.TIME(),
             allowNull: true,
         },
         endTime: {

@@ -2,7 +2,9 @@ import {Group} from './group';
 import {Activity} from "./activity";
 import {Role} from "./role";
 
-export class User extends sequelize.Model {
+import {Model} from "sequelize";
+
+export class User extends Model {
     /**
      * Email of the user.
      */
