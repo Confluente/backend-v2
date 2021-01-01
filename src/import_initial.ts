@@ -148,8 +148,8 @@ const users = [
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
         RoleId: 1,
-        // groups: [10],
-        // functions: ["Chair"]
+        groups: [10],
+        functions: ["Chair"]
     },
     {
         id: 2,
@@ -383,7 +383,7 @@ all([
     const promises: any[] = [];
 
     users.forEach(function(userData: any): void {
-        const promise = User.findByPk(userData.id).then(function(user: User): void {
+        const promise = User.findByPk(userData.email).then(function(user: User): void {
             if (!userData.functions || !userData.groups) {
             } else if (userData.functions.length !== userData.groups.length) {
             } else {
