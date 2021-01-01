@@ -118,7 +118,7 @@ router.route("/:id")
                 attributes: ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE",
                     "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "ACTIVITY_VIEW_PUBLISHED",
                     "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"],
-            }).then(function(role: Role): void {
+            }).then(function(role: Role): any {
                 // Return if role not found
                 if (role === null) {
                     res.status(404).send({status: "Not Found"});
