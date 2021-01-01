@@ -10,7 +10,8 @@ import fs from 'fs';
 if (!fs.existsSync("./data.sqlite")) {
     // database does not yet exist! great :)
 } else {
-    throw new Error("Delete the database (data.sqlite) before generating a new one");
+    fs.unlinkSync("./data.sqlite");
+    // throw new Error("Delete the database (data.sqlite) before generating a new one");
 }
 
 // Standard roles
@@ -132,7 +133,6 @@ const roles = [
     }
 ];
 
-
 // Initial accounts
 const users = [
     {
@@ -245,7 +245,8 @@ const groups: any[] = [
         fullName: "H.S.A. Confluente",
         canOrganize: true,
         email: "board@hsaconfluente.nl",
-        type: "Board"
+        type: "Board",
+        description: "Non empty Description"
     },
     {
         id: 2,
@@ -253,7 +254,8 @@ const groups: any[] = [
         fullName: "H.S.A. Confluente Advisory Board",
         canOrganize: false,
         email: "board@hsaconfluente.nl",
-        type: "Board"
+        type: "Board",
+        description: "Group for the Advisory Board."
     },
     {
         id: 3,
@@ -362,8 +364,6 @@ const activities: any[] = [
         OrganizerId: 3
     }
 ];
-
-
 
 // Import initial administrator and initial group to database
 all([
