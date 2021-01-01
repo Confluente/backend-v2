@@ -1,8 +1,10 @@
+import {Sequelize, Model, DataTypes} from "sequelize";
+import {db} from './db';
+const sequelize: Sequelize = db;
+
 import {Group} from './group';
 import {Activity} from "./activity";
 import {Role} from "./role";
-
-import {Model} from "sequelize";
 
 export class User extends Model {
     /**
@@ -90,71 +92,71 @@ export class User extends Model {
 User.init(
     {
         email: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             unique: true,
             allowNull: false,
             primaryKey: true,
         },
         firstName: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         lastName: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         displayName: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         major: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: true,
         },
         address: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: true,
         },
         track: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: true,
         },
         honorsGeneration: {
-            type: new sequelize.DataTypes.INTEGER(32),
+            type: new DataTypes.INTEGER(32),
             allowNull: true,
         },
         honorsMembership: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         campusCardNumber: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: true,
         },
         mobilePhoneNumber: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         consentWithPortraitRight: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
         passwordHash: {
-            type: new sequelize.DataTypes.BLOB(),
+            type: DataTypes.BLOB,
             allowNull: false,
         },
         passwordSalt: {
-            type: new sequelize.DataTypes.BLOB(),
+            type: DataTypes.BLOB,
             allowNull: false,
         },
         approved: {
-            type: new sequelize.DataTypes.BOOLEAN(),
+            type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
         approvingHash: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
     },
@@ -169,7 +171,7 @@ User.init(
  * Function is the function that the user has in the group.
  */
 const userGroup: any = db.define('user_group', {
-    func: sequelize.STRING
+    func: DataTypes.STRING
 });
 
 /**
@@ -177,7 +179,7 @@ const userGroup: any = db.define('user_group', {
  * Answers are the answers that the user gave to the questions of the form.
  */
 const subscription: any = db.define('subscription', {
-    answers: sequelize.STRING
+    answers: DataTypes.STRING
 });
 
 // All relationships defined hereafter are onDelete 'CASCADE' to make sure that when an instance is deleted,

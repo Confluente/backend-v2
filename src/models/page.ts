@@ -1,4 +1,6 @@
-import {Model, DataTypes} from "sequelize";
+import {Sequelize, Model, DataTypes} from "sequelize";
+import {db} from './db';
+const sequelize: Sequelize = db;
 
 export class Page extends Model {
     /**

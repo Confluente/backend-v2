@@ -1,3 +1,7 @@
+import {Sequelize, Model, DataTypes} from "sequelize";
+import {db} from './db';
+const sequelize: Sequelize = db;
+
 export class Session extends sequelize.Model {
     /**
      * Token of the session.

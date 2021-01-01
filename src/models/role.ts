@@ -1,4 +1,6 @@
-import {Model, DataTypes} from "sequelize";
+import {Sequelize, Model, DataTypes} from "sequelize";
+import {db} from './db';
+const sequelize: Sequelize = db;
 
 export class Role extends Model {
     /**
@@ -169,7 +171,8 @@ Role.init(
             defaultValue: false,
         },
     }, {
-
+        tableName: "role",
+        sequelize,
     }
 );
 
