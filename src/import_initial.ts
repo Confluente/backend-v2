@@ -1,4 +1,4 @@
-const Q: any = require("q");
+import {all} from 'q';
 
 import {Activity} from "./models/activity";
 import {User} from "./models/user";
@@ -197,7 +197,7 @@ const activities: any[] = [
 
 
 // Import initial administrator and initial group to database
-Q.all([
+all([
     User.bulkCreate(users).then(function(result: any): void {
         console.log("Created users");
     }),
@@ -233,7 +233,7 @@ Q.all([
         promises.push(promise);
     });
 
-    return Q.all(promises);
+    return all(promises);
 }).then(function(): void {
     console.log("Done!");
 }).done();
