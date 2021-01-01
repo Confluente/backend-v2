@@ -88,6 +88,7 @@ export class User extends Model {
      */
     public approvingHash!: string;
 
+    // TODO make nice comments
     public addGroup!: BelongsToManyAddAssociationMixin<Group, string>;
     public addActivity!: BelongsToManyAddAssociationMixin<Activity, number>;
 }
