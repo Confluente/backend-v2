@@ -1,4 +1,5 @@
-const Q = require("q");
+import {Promise, all} from "q";
+import {Request, Response} from "express";
 
 import {User} from "./models/user";
 import {Group} from "./models/group";
@@ -10,9 +11,9 @@ import {Activity} from "./models/activity";
  * @param scope         Type of permission requested.
  * @returns boolean
  */
-export function check(user: User | number, scope: any): boolean {
+export function check(user: User | number, scope: any): Promise<boolean> {
     let loggedIn = true;
-    return Q.Promise(function(resolve, reject) {
+    return Promise(function(resolve, reject): any {
         if (!user) {
             // User undefined
             loggedIn = false;
@@ -89,30 +90,31 @@ export function check(user: User | number, scope: any): boolean {
     });
 }
 
-export function all(promises) {
-    return Q.all(promises).then(function (results) {
-        return results.every(function (e) {
+export function allPromises(promises: Promise<any>[]): any {
+    return all(promises).then(function(results: any): any {
+        return results.every(function(e: any): any {
             return e;
         });
     });
 }
 
 
-export function requireAll(scopes) {
+export function requireAll(scopes: any): any {
     if (!scopes.length) {
         scopes = [scopes];
     }
-    return function (req, res, next) {
-        var user = res.locals.session ? res.locals.session.user : null;
-        var promises = scopes.map(function (scope) {
+
+    return function(req: Request, res: Response, next: any): any {
+        const user = res.locals.session ? res.locals.session.user : null;
+        const promises = scopes.map(function(scope: string): Promise<boolean> {
             return check(user, scope);
         });
-        all(promises).then(function (result) {
+        all(promises).then(function(result: any): any {
             if (!result) {
                 return res.sendStatus(403);
             }
             return next();
-        }).fail(function (err) {
+        }).fail(function(err: Error): void {
             next(err);
         }).done();
     };

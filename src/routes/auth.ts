@@ -3,6 +3,7 @@ import express, {Request, Response, Router} from "express";
 import {User} from "../models/user";
 import {Group} from "../models/group";
 import {authenticate, startSession} from "../helpers/authHelper";
+import {Role} from "../models/role";
 
 const router: Router = express.Router();
 
@@ -18,18 +19,19 @@ router.route("/")
 
         // find the user of the session in the database
         User.findByPk(res.locals.session.user, {
-            attributes: ["id", "email", "displayName", "isAdmin", "consentWithPortraitRight"],
+            attributes: ["id", "email", "displayName", "consentWithPortraitRight"],
             include: [{
                 model: Group,
                 attributes: ["id", "displayName", "fullname", "description", "canOrganize", "email"]
-            }]
+            }, Role]
         }).then(function(foundUser: User): void {
             // get the datavalues of the user
             const profile: any = foundUser.dataValues;
 
             // set whether the user can organize activities
-            profile.canOrganize = profile.isAdmin || profile.groups.some(function(groupOfUser: Group): boolean {
-                return groupOfUser.canOrganize;
+            profile.canOrganize = profile.role.ACTIVITY_MANAGE || profile.groups.some(
+                function(groupOfUser: Group): boolean {
+                    return groupOfUser.canOrganize;
             });
 
             // send the profile back the client
