@@ -4,6 +4,7 @@ import {Request, Response} from "express";
 import {User} from "./models/user";
 import {Group} from "./models/group";
 import {Activity} from "./models/activity";
+import {Role} from "./models/role";
 
 /**
  * Checks whether user has required permissions for a given scope
@@ -24,6 +25,11 @@ export function check(user: User | number, scope: any): Promise<boolean> {
             resolve(user);
         }
     }).then(function(dbUser: User): boolean {
+        if (!loggedIn) {
+            dbUser.role = Role.findOne({where: {
+                name: 'Not logged in'
+            }});
+        }
 
         // Determine rule based on context
         switch (scope.type) {
