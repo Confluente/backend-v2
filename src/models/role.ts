@@ -1,5 +1,3 @@
-import {stringifyDictionaryOfBooleans} from "../helpers/dictionaryHelper";
-
 export class Role extends sequelize.Model {
     /**
      * Name of the role.

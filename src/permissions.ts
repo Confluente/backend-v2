@@ -10,7 +10,7 @@ import {Activity} from "./models/activity";
  * @param scope         Type of permission requested.
  * @returns boolean
  */
-function check(user: User | number, scope: any): boolean {
+export function check(user: User | number, scope: any): boolean {
     let loggedIn = true;
     return Q.Promise(function(resolve, reject) {
         if (!user) {
@@ -89,7 +89,7 @@ function check(user: User | number, scope: any): boolean {
     });
 }
 
-function all(promises) {
+export function all(promises) {
     return Q.all(promises).then(function (results) {
         return results.every(function (e) {
             return e;
@@ -98,7 +98,7 @@ function all(promises) {
 }
 
 
-function requireAll(scopes) {
+export function requireAll(scopes) {
     if (!scopes.length) {
         scopes = [scopes];
     }
@@ -117,9 +117,3 @@ function requireAll(scopes) {
         }).done();
     };
 }
-
-module.exports = {
-    all: all,
-    check: check,
-    requireAll: requireAll
-};
