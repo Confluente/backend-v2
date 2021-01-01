@@ -2,7 +2,7 @@ import {Sequelize, Model, DataTypes} from "sequelize";
 import {db} from './db';
 const sequelize: Sequelize = db;
 
-export class Session extends sequelize.Model {
+export class Session extends Model {
     /**
      * Token of the session.
      */
@@ -27,19 +27,19 @@ export class Session extends sequelize.Model {
 Session.init(
     {
         token: {
-            type: new sequelize.DataTypes.BLOB(),
+            type: DataTypes.BLOB,
             allowNull: false,
         },
         user: {
-            type: new sequelize.DataTypes.BLOB(),
+            type: DataTypes.BLOB,
             allowNull: false,
         },
         ip: {
-            type: new sequelize.DataTypes.STRING(128),
+            type: new DataTypes.STRING(128),
             allowNull: false,
         },
         expires: {
-            type: new sequelize.DataTypes.DATE(),
+            type: DataTypes.DATE,
             allowNull: false,
         }
     },
