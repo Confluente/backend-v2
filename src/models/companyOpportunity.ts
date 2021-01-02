@@ -1,88 +1,52 @@
-import {Sequelize, Model, DataTypes} from "sequelize";
-import {db} from './db';
-const sequelize: Sequelize = db;
+import {Table, Column, Model, DataType} from 'sequelize-typescript';
 
+@Table
 export class CompanyOpportunity extends Model {
     /**
      * Title of the opportunity.
      */
+    @Column(DataType.STRING(128))
     public title!: string;
 
     /**
      * Name of the company.
      */
+    @Column(DataType.STRING(128))
     public companyName!: string;
 
     /**
      * Description of the opportunity.
      */
+    @Column(DataType.STRING(8192))
     public description!: string;
 
     /**
      * Link to the image of the company.
      */
+    @Column(DataType.STRING(128))
     public imageUrl!: string;
 
     /**
      * Email to contact if you want the opportunity.
      */
+    @Column(DataType.STRING(128))
     public contactEmail!: string;
 
     /**
      * Link to the opportunity on the website of the company.
      */
+    @Column(DataType.STRING(128))
     public link!: string;
 
     /**
      * Level of education needed for the opportunity
      */
+    @Column(DataType.STRING(128))
     public educationLevel!: string;
 
     /**
      * Category of the opportunity
      */
+    @Column(DataType.STRING(128))
     public category!: string;
 }
-
-CompanyOpportunity.init(
-    {
-        title: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        companyName: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        description: {
-            type: new DataTypes.STRING(8192),
-            allowNull: false,
-        },
-        imageUrl: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        contactEmail: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        link: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        educationLevel: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        category: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-    },
-    {
-        tableName: "company_opportunity",
-        sequelize,
-    }
-);
-
-CompanyOpportunity.sync();
