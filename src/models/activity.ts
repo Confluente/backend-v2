@@ -1,4 +1,4 @@
-import {Sequelize, Table, Column, Model, HasMany, DataType} from 'sequelize-typescript';
+import {Table, Column, Model, DataType, AllowNull, Default} from 'sequelize-typescript';
 
 import {Group} from './group';
 
@@ -10,12 +10,14 @@ export class Activity extends Model {
      * Name of the activity.
      */
     @Column(DataType.STRING(128))
+    @AllowNull(false)
     public name!: string;
 
     /**
      * Description of the activity.
      */
     @Column(DataType.STRING(8192))
+    @AllowNull(false)
     public description!: string;
 
     /**
@@ -28,6 +30,7 @@ export class Activity extends Model {
      * Date of the activity.
      */
     @Column(DataType.DATE)
+    @AllowNull(false)
     public date!: any;
 
     /**
@@ -46,6 +49,8 @@ export class Activity extends Model {
      * canSubscribes stores whether members can subscribe to the activity.
      */
     @Column(DataType.BOOLEAN)
+    @AllowNull(false)
+    @Default(false)
     public canSubscribe!: boolean;
 
     /**
@@ -111,15 +116,19 @@ export class Activity extends Model {
      * Stores whether the activity is published.
      */
     @Column(DataType.BOOLEAN)
+    @AllowNull(false)
+    @Default(false)
     public published!: boolean;
 
     /**
      * Stores whether the activity has a cover image
      */
     @Column(DataType.BOOLEAN)
+    @AllowNull(false)
+    @Default(false)
     public hasCoverImage!: boolean;
 }
 
 // Relates activities to a group that organizes the activity.
-// TODO implement this with seq-ts
+// TODO redo this
 Activity.belongsTo(Group, {as: "Organizer", onDelete: 'CASCADE'});
