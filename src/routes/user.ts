@@ -29,7 +29,7 @@ router.route("/")
             // If client has permission, find all users in database
             User.findAll({
                 attributes: ["id", "displayName", "email"],
-                include: Role,
+                include: [User.associations.role],
                 order: [
                     ["id", "ASC"]
                 ]
@@ -112,7 +112,7 @@ router.route("/:id")
         // Get user from database
         User.findByPk(req.params.id, {
             attributes: ["id", "firstName", "lastName", "displayName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "consentWithPortraitRight"],
-            include: Role
+            include: [User.associations.role],
         }).then(function(foundUser: User): void {
             // Return if user not found
             if (foundUser === null) {
@@ -192,6 +192,9 @@ router.route("/:id")
                 // Remove all existing group relations from the database
                 for (const foundGroup of foundGroups) {
                     foundGroup.members[0].user_group.destroy();
+                    foundGroup.getUsers().then(function(members: User[]): void {
+                        members[0]
+                    });
                 }
 
                 // Add all groups as stated in the request
@@ -254,7 +257,7 @@ router.route("/changePassword/:id")
             // Get user from database
             User.findByPk(req.params.id, {
                 attributes: ["id", "displayName", "email", "passwordHash", "passwordSalt"],
-                include: Role
+                include: [User.associations.role]
             }).then(function(foundUser: User): any {
                 // If user does not exist, send 404
                 if (foundUser === null) {

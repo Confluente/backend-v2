@@ -1,4 +1,10 @@
-import {Sequelize, Model, DataTypes, BelongsToManyAddAssociationMixin} from "sequelize";
+import {
+    Sequelize,
+    Model,
+    DataTypes,
+    BelongsToManyAddAssociationMixin,
+    BelongsToManyGetAssociationsMixin, HasOneSetAssociationMixin, HasOneGetAssociationMixin, Association
+} from "sequelize";
 import {db} from './db';
 const sequelize: Sequelize = db;
 
@@ -7,8 +13,21 @@ import {Activity} from "./activity";
 import {Role} from "./role";
 
 export class User extends Model {
+
+    // TODO make nice comments
+    // Maybe add activity?
+    public static associations: {
+        role: Association<User, Role>;
+        groups: Association<User, Group>;
+    };
+
     /**
-     * Email of the user.
+     * Database id of the user.
+     */
+    public id!: number;
+
+    /**
+     * PK: Email of the user.
      */
     public email!: string;
 
@@ -89,12 +108,21 @@ export class User extends Model {
     public approvingHash!: string;
 
     // TODO make nice comments
-    public addGroup!: BelongsToManyAddAssociationMixin<Group, string>;
+    public getGroups!: BelongsToManyGetAssociationsMixin<Group>;
+    public addGroup!: BelongsToManyAddAssociationMixin<Group, Group['fullName'], userGroup>;
     public addActivity!: BelongsToManyAddAssociationMixin<Activity, number>;
+    public getRole!: HasOneGetAssociationMixin<Role>;
+    public setRole!: HasOneSetAssociationMixin<Role, string>;
 }
 
 User.init(
     {
+        id: {
+            type: DataTypes.INTEGER.UNSIGNED,
+            autoIncrement: true,
+            unique: true,
+            allowNull: false
+        },
         email: {
             type: new DataTypes.STRING(128),
             unique: true,
@@ -190,7 +218,7 @@ const subscription: any = db.define('subscription', {
 // the relations that instance has to other models are also deleted.
 
 // Relates a user to a group through a userGroup
-User.belongsToMany(Group, {through: userGroup, onDelete: 'CASCADE'});
+User.belongsToMany(Group, {as: "groups", through: 'user_group', onDelete: 'CASCADE'});
 
 // Relates a group to a user through userGroup as members
 Group.belongsToMany(User, {as: "members", through: userGroup, onDelete: 'CASCADE'});
@@ -202,7 +230,7 @@ User.belongsToMany(Activity, {through: subscription, onDelete: 'CASCADE'});
 Activity.belongsToMany(User, {as: "participants", through: subscription, onDelete: 'CASCADE'});
 
 // User is assigned a single role
-User.hasOne(Role);
+User.hasOne(Role, {as: "role"});
 
 userGroup.sync();
 subscription.sync();

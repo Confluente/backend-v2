@@ -1,8 +1,20 @@
-import {Sequelize, Model, DataTypes} from "sequelize";
+import {
+    Sequelize,
+    Model,
+    DataTypes,
+    BelongsToManyAddAssociationMixin,
+    BelongsToManyGetAssociationsMixin, Association
+} from "sequelize";
 import {db} from './db';
+import {User} from "./user";
 const sequelize: Sequelize = db;
 
 export class Group extends Model {
+
+    public static associations: {
+        members: Association<Group, User>;
+    };
+
     /**
      * Display name of the group (shorter than fullName but identifiable).
      */
@@ -32,6 +44,9 @@ export class Group extends Model {
      * The type of the group.
      */
     public type!: string;
+
+    public addUser!: BelongsToManyAddAssociationMixin<User, string>;
+    public getUsers!: BelongsToManyGetAssociationsMixin<User>;
 }
 
 Group.init(
