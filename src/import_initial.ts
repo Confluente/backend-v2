@@ -388,7 +388,7 @@ all([
             } else if (userData.functions.length !== userData.groups.length) {
             } else {
                 for (let i = 0; i < userData.functions.length; i++) {
-                    user.addGroup(userData.groups[i], {through: {func: userData.functions[i]}});
+                    user.$add(User. ,userData.groups[i], {through: {func: userData.functions[i]}});
                 }
             }
 

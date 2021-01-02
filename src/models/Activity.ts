@@ -1,12 +1,13 @@
 import {Table, Column, Model, DataType, AllowNull, Default, BelongsToMany, BelongsTo} from 'sequelize-typescript';
 
 import {Group} from './Group';
-import {Subscription, User} from "./User";
+import {User} from "./User";
+import {Subscription} from "./Subscription";
 
 @Table({
     timestamps: false
 })
-export class Activity extends Model {
+export class Activity extends Model<Activity> {
     /**
      * Name of the activity.
      */

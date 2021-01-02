@@ -1,7 +1,7 @@
 import {AllowNull, Column, DataType, Model, Table} from "sequelize-typescript";
 
 @Table({timestamps: false})
-export class Session extends Model {
+export class Session extends Model<Session> {
 
     /**
      * Token of the session.

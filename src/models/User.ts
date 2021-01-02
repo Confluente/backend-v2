@@ -3,7 +3,7 @@ import {
     AutoIncrement, BelongsToMany,
     Column,
     DataType,
-    Default, ForeignKey, HasOne,
+    Default, HasOne,
     Model,
     PrimaryKey,
     Table,
@@ -17,7 +17,7 @@ import {Subscription} from "./Subscription";
 import {UserGroup} from "./UserGroup";
 
 @Table({timestamps: false})
-export class User extends Model {
+export class User extends Model<User> {
 
     /**
      * Database id of the user.

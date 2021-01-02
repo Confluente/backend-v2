@@ -1,7 +1,7 @@
 import {Table, Column, Model, DataType, AllowNull} from 'sequelize-typescript';
 
 @Table({timestamps: false})
-export class CompanyOpportunity extends Model {
+export class CompanyOpportunity extends Model<CompanyOpportunity> {
     /**
      * Title of the opportunity.
      */

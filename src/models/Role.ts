@@ -1,7 +1,7 @@
 import {AllowNull, Column, DataType, Default, Model, PrimaryKey, Table, Unique} from "sequelize-typescript";
 
 @Table({timestamps: false})
-export class Role extends Model {
+export class Role extends Model<Role> {
 
     /**
      * Name of the role.

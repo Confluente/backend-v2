@@ -1,7 +1,7 @@
 import {Table, Column, Model, DataType, AllowNull, PrimaryKey, Unique} from 'sequelize-typescript';
 
 @Table({timestamps: false})
-export class Page extends Model {
+export class Page extends Model<Page> {
     /**
      * URL of the page.
      */

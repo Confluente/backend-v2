@@ -8,7 +8,7 @@ import {User} from "./User";
  */
 // TODO add comments to this :)
 @Table({timestamps: false})
-export  class Subscription extends Model {
+export  class Subscription extends Model<Subscription> {
 
     @Column(DataType.INTEGER.UNSIGNED)
     @ForeignKey(() => User)

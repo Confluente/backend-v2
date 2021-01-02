@@ -1,8 +1,9 @@
 import {Table, Column, Model, DataType, AllowNull, PrimaryKey, Unique, BelongsToMany} from 'sequelize-typescript';
-import {User, UserGroup} from "./User";
+import {User} from "./User";
+import {UserGroup} from "./UserGroup";
 
 @Table({timestamps: false})
-export class Group extends Model {
+export class Group extends Model<Group> {
 
     /**
      * Display name of the group (shorter than fullName but identifiable).
