@@ -1,7 +1,7 @@
 import express, {Request, Response, Router} from "express";
 
-import {Group} from "../models/Group";
-import {User} from "../models/User";
+import {Group} from "../models/group.model";
+import {User} from "../models/user.model";
 
 import {requireAll, check} from "../permissions";
 

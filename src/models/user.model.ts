@@ -10,11 +10,11 @@ import {
     Unique
 } from "sequelize-typescript";
 
-import {Group} from './Group';
-import {Activity} from "./Activity";
-import {Role} from "./Role";
-import {Subscription} from "./Subscription";
-import {UserGroup} from "./UserGroup";
+import {Group} from './group.model';
+import {Activity} from "./activity.model";
+import {Role} from "./role.model";
+import {Subscription} from "./subscription.model";
+import {UserGroup} from "./usergroup.model";
 
 @Table({timestamps: false})
 export class User extends Model<User> {
@@ -22,34 +22,34 @@ export class User extends Model<User> {
     /**
      * Database id of the user.
      */
-    @Column(DataType.INTEGER.UNSIGNED)
     @AutoIncrement
     @Unique
     @AllowNull(false)
+    @Column(DataType.INTEGER.UNSIGNED)
     public id!: number;
 
     /**
      * Email of the user.
      */
     // TODO Check if we cant better have the db id as the primary key?
-    @Column(DataType.STRING(128))
     @PrimaryKey
     @Unique
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public email!: string;
 
     /**
      * First name of the user.
      */
-    @Column(DataType.STRING(128))
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public firstName!: string;
 
     /**
      * Last name of the user.
      */
-    @Column(DataType.STRING(128))
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public lastName!: string;
 
     /**
@@ -57,8 +57,8 @@ export class User extends Model<User> {
      * Usually concatenation of first name and last name
      */
         // TODO delete this, and just make a function for get Display Name or smth
-    @Column(DataType.STRING(128))
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public displayName!: string;
 
     /**
@@ -88,8 +88,8 @@ export class User extends Model<User> {
     /**
      * Stores what kind of membership the user has
      */
-    @Column(DataType.STRING(128))
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public honorsMembership!: string;
 
     /**
@@ -107,38 +107,38 @@ export class User extends Model<User> {
     /**
      * Whether the user gave consent regarding portrait right.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public consentWithPortraitRight!: boolean;
 
     /**
      * Hash of the password of the user.
      */
-    @Column(DataType.BLOB)
     @AllowNull(false)
+    @Column(DataType.BLOB)
     public passwordHash!: any;
 
     /**
      * Salt of the password of the user.
      */
-    @Column(DataType.BLOB)
     @AllowNull(false)
+    @Column(DataType.BLOB)
     public passwordSalt!: any;
 
     /**
      * Whether the account of the user is approved
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public approved!: boolean;
 
     /**
      * The hash link via which the account can be approved
      */
-    @Column(DataType.STRING(128))
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public approvingHash!: string;
 
     // TODO add nice comments

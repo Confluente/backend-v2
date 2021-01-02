@@ -1,6 +1,6 @@
 import {Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
-import {Activity} from "./Activity";
-import {User} from "./User";
+import {Activity} from "./activity.model";
+import {User} from "./user.model";
 
 /**
  * subscription is the function relating users to activities via subscriptions.
@@ -10,12 +10,12 @@ import {User} from "./User";
 @Table({timestamps: false})
 export  class Subscription extends Model<Subscription> {
 
-    @Column(DataType.INTEGER.UNSIGNED)
     @ForeignKey(() => User)
+    @Column(DataType.INTEGER.UNSIGNED)
     userId: number;
 
-    @Column(DataType.INTEGER.UNSIGNED)
     @ForeignKey(() => Activity)
+    @Column(DataType.INTEGER.UNSIGNED)
     activityId: number;
 
     @Column(DataType.STRING(8192))

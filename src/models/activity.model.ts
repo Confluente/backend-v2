@@ -1,8 +1,8 @@
 import {Table, Column, Model, DataType, AllowNull, Default, BelongsToMany, BelongsTo} from 'sequelize-typescript';
 
-import {Group} from './Group';
-import {User} from "./User";
-import {Subscription} from "./Subscription";
+import {Group} from './group.model';
+import {User} from "./user.model";
+import {Subscription} from "./subscription.model";
 
 @Table({
     timestamps: false
@@ -11,15 +11,15 @@ export class Activity extends Model<Activity> {
     /**
      * Name of the activity.
      */
-    @Column(DataType.STRING(128))
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public name!: string;
 
     /**
      * Description of the activity.
      */
-    @Column(DataType.STRING(8192))
     @AllowNull(false)
+    @Column(DataType.STRING(8192))
     public description!: string;
 
     /**
@@ -31,8 +31,8 @@ export class Activity extends Model<Activity> {
     /**
      * Date of the activity.
      */
-    @Column(DataType.DATE)
     @AllowNull(false)
+    @Column(DataType.DATE)
     public date!: any;
 
     /**
@@ -50,9 +50,9 @@ export class Activity extends Model<Activity> {
     /**
      * canSubscribes stores whether members can subscribe to the activity.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public canSubscribe!: boolean;
 
     /**
@@ -117,17 +117,17 @@ export class Activity extends Model<Activity> {
     /**
      * Stores whether the activity is published.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public published!: boolean;
 
     /**
      * Stores whether the activity has a cover image
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public hasCoverImage!: boolean;
 
     // TODO add comments
@@ -139,4 +139,3 @@ export class Activity extends Model<Activity> {
     @BelongsTo(() => Group)
     public organizer: Group;
 }
-

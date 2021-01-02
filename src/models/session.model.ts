@@ -6,29 +6,29 @@ export class Session extends Model<Session> {
     /**
      * Token of the session.
      */
-    @Column(DataType.BLOB)
     @AllowNull(false)
+    @Column(DataType.BLOB)
     public token!: any;
 
     /**
      * Id of the user of the session.
      */
     // TODO check if this really should be a blob?? Robin is confused
-    @Column(DataType.BLOB)
     @AllowNull(false)
+    @Column(DataType.BLOB)
     public user!: number;
 
     /**
      * IP address of the user.
      */
-    @Column(DataType.STRING(128))
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public ip!: string;
 
     /**
      * Expiration date of the session.
      */
-    @Column(DataType.BLOB)
     @AllowNull(false)
+    @Column(DataType.BLOB)
     public expires!: any;
 }

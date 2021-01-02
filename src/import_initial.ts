@@ -1,9 +1,9 @@
 import {all} from 'q';
 
-import {Activity} from "./models/Activity";
-import {User} from "./models/User";
-import {Group} from "./models/Group";
-import {Role} from "./models/Role";
+import {Activity} from "./models/activity.model";
+import {User} from "./models/user.model";
+import {Group} from "./models/group.model";
+import {Role} from "./models/role.model";
 
 import fs from 'fs';
 
@@ -388,7 +388,7 @@ all([
             } else if (userData.functions.length !== userData.groups.length) {
             } else {
                 for (let i = 0; i < userData.functions.length; i++) {
-                    user.$add(User. ,userData.groups[i], {through: {func: userData.functions[i]}});
+                    user.$add('groups' , userData.groups[i], {through: {func: userData.functions[i]}});
                 }
             }
 
@@ -397,7 +397,7 @@ all([
             } else if (userData.activities && userData.activities.length === userData.answers.length) {
                 for (let i = 0; i < userData.activities.length; i++) {
                     Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
-                        user.addActivity(activity, {through: {answers: userData.answers[i]}});
+                        user.$add('activities' , activity, {through: {answers: userData.answers[i]}});
                     });
                 }
             }

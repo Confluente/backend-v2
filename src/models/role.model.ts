@@ -6,97 +6,97 @@ export class Role extends Model<Role> {
     /**
      * Name of the role.
      */
-    @Column(DataType.STRING(128))
     @Unique
     @PrimaryKey
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public name!: string;
 
     /**
      * Permission to view pages.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public PAGE_VIEW!: boolean;
 
     /**
      * Permission to manage pages.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public PAGE_MANAGE!: boolean;
 
     /**
      * Permission to create users.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public USER_CREATE!: boolean;
 
     /**
      * Permission to view all users.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public USER_VIEW_ALL!: boolean;
 
     /**
      * Permission to manage users.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public USER_MANAGE!: boolean;
 
     /**
      * Permission to change the passwords of all accounts.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public CHANGE_ALL_PASSWORDS!: boolean;
 
     /**
      * Permission to view roles.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public ROLE_VIEW!: boolean;
 
     /**
      * Permission to manage roles.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public ROLE_MANAGE!: boolean;
 
     /**
      * Permission to view published activities.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public ACTIVITY_VIEW_PUBLISHED!: boolean;
 
     /**
      * Permission to view all unpublished activities.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public ACTIVITY_VIEW_ALL_UNPUBLISHED!: boolean;
 
     /**
      * Permission to manage activities.
      */
-    @Column(DataType.BOOLEAN)
     @AllowNull(false)
     @Default(false)
+    @Column(DataType.BOOLEAN)
     public ACTIVITY_MANAGE!: boolean;
 }

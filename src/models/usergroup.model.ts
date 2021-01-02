@@ -1,6 +1,6 @@
 import {AllowNull, Column, DataType, Default, ForeignKey, Model, Table} from "sequelize-typescript";
-import {Group} from "./Group";
-import {User} from "./User";
+import {Group} from "./group.model";
+import {User} from "./user.model";
 
 /**
  * userGroup is the function relating users to groups via userGroup.
@@ -10,18 +10,18 @@ import {User} from "./User";
 @Table({timestamps: false})
 export class UserGroup extends Model<UserGroup> {
 
-    @Column(DataType.INTEGER.UNSIGNED)
     @ForeignKey(() => User)
     @AllowNull(false)
+    @Column(DataType.INTEGER.UNSIGNED)
     userId: number;
 
-    @Column(DataType.INTEGER.UNSIGNED)
     @ForeignKey(() => Group)
     @AllowNull(false)
+    @Column(DataType.INTEGER.UNSIGNED)
     groupId: number;
 
-    @Column(DataType.STRING(128))
     @AllowNull(false)
     @Default("member")
+    @Column(DataType.STRING(128))
     func: string;
 }
