@@ -1,53 +1,63 @@
-import {Sequelize, Model, DataTypes} from "sequelize";
-import {db} from './db';
-const sequelize: Sequelize = db;
+import {Sequelize, Table, Column, Model, HasMany, DataType} from 'sequelize-typescript';
 
 import {Group} from './group';
 
+@Table({
+    timestamps: false
+})
 export class Activity extends Model {
     /**
      * Name of the activity.
      */
+    @Column(DataType.STRING(128))
     public name!: string;
 
     /**
      * Description of the activity.
      */
+    @Column(DataType.STRING(8192))
     public description!: string;
 
     /**
      * Location of the activity.
      */
+    @Column(DataType.STRING(128))
     public location!: string | null;
 
     /**
      * Date of the activity.
      */
+    @Column(DataType.DATE)
     public date!: any;
 
     /**
      * Start time of the activity.
      */
+    @Column(DataType.TIME)
     public startTime!: any | null;
 
     /**
      * End time of the activity.
      */
+    @Column(DataType.TIME)
     public endTime!: any | null;
 
     /**
      * canSubscribes stores whether members can subscribe to the activity.
      */
+    @Column(DataType.BOOLEAN)
     public canSubscribe!: boolean;
 
     /**
      * Participation fee of the activity.
      */
+    @Column(DataType.DECIMAL)
     public participationFee!: number | null;
 
     /**
      * Number of questions in the subscription form.
      */
+    @Column(DataType.INTEGER.UNSIGNED)
     public numberOfQuestions!: number | null;
 
     /**
@@ -55,6 +65,7 @@ export class Activity extends Model {
      * For every question the string stores whether the question is text, multiple choice or checkboxes.
      * Types are separated by #,# delimiter.
      */
+    @Column(DataType.STRING(1024))
     public typeOfQuestion!: string | null;
 
     /**
@@ -62,6 +73,7 @@ export class Activity extends Model {
      * For every question the string stores the description (actual question).
      * Descriptions are separated by #,# delimiter.
      */
+    @Column(DataType.STRING(8192))
     public questionDescriptions!: string | null;
 
     /**
@@ -70,6 +82,7 @@ export class Activity extends Model {
      * Options of different questions are separated by #,#.
      * Options for the same question are separated by #;#.
      */
+    @Column(DataType.STRING(8192))
     public formOptions!: string | null;
 
     /**
@@ -77,6 +90,7 @@ export class Activity extends Model {
      * For every question the string stores true or false.
      * Separated by #,#.
      */
+    @Column(DataType.STRING(8192))
     public required!: string | null;
 
     /**
@@ -84,108 +98,28 @@ export class Activity extends Model {
      * For every question the string stores true or false.
      * Separated by #,#.
      */
+    @Column(DataType.STRING(8192))
     public privacyOfQuestions!: string | null;
 
     /**
      * Subscription deadline of the activity.
      */
+    @Column(DataType.TIME)
     public subscriptionDeadline!: object | null;
 
     /**
      * Stores whether the activity is published.
      */
+    @Column(DataType.BOOLEAN)
     public published!: boolean;
 
     /**
      * Stores whether the activity has a cover image
      */
+    @Column(DataType.BOOLEAN)
     public hasCoverImage!: boolean;
 }
 
-Activity.init(
-    {
-        name: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        description: {
-            type: new DataTypes.STRING(8192),
-            allowNull: false,
-        },
-        location: {
-            type: new DataTypes.STRING(128),
-            allowNull: true,
-        },
-        date: {
-            type: DataTypes.DATE,
-            allowNull: false,
-        },
-        startTime: {
-            type: DataTypes.TIME,
-            allowNull: true,
-        },
-        endTime: {
-            type: DataTypes.TIME,
-            allowNull: true,
-        },
-        canSubscribe: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
-        participationFee: {
-            type: DataTypes.DECIMAL,
-            allowNull: true,
-        },
-        numberOfQuestions: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        typeOfQuestion: {
-            type: new DataTypes.STRING(1024),
-            allowNull: true,
-        },
-        questionDescriptions: {
-            type: new DataTypes.STRING(8192),
-            allowNull: true,
-        },
-        formOptions: {
-            type: new DataTypes.STRING(8192),
-            allowNull: true,
-        },
-        required: {
-            type: new DataTypes.STRING(8192),
-            allowNull: true,
-        },
-        privacyOfQuestions: {
-            type: new DataTypes.STRING(8192),
-            allowNull: true,
-        },
-        subscriptionDeadline: {
-            type: DataTypes.DATE,
-            allowNull: true,
-        },
-        published: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
-        hasCoverImage: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
-    },
-    {
-        sequelize,
-        tableName: "activity",
-    }
-);
-
 // Relates activities to a group that organizes the activity.
-// TODO check if this does not break stuff
+// TODO implement this with seq-ts
 Activity.belongsTo(Group, {as: "Organizer", onDelete: 'CASCADE'});
-
-Activity.sync();
-Group.sync();
-db.sync();
