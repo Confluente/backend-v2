@@ -48,12 +48,12 @@ export class CompanyOpportunity extends Model<CompanyOpportunity> {
      * Level of education needed for the opportunity
      */
     @AllowNull(false)
+    @Column(DataType.STRING(128))
     public educationLevel!: string;
 
     /**
      * Category of the opportunity
      */
-    @Column(DataType.STRING(128))
     @AllowNull(false)
     @Column(DataType.STRING(128))
     public category!: string;

@@ -4,8 +4,16 @@ import {Activity} from "./models/activity.model";
 import {User} from "./models/user.model";
 import {Group} from "./models/group.model";
 import {Role} from "./models/role.model";
+import {db} from "./db";
+
 
 import fs from 'fs';
+
+import {CompanyOpportunity} from "./models/company.opportunity.model";
+import {Page} from "./models/page.model";
+import {Session} from "./models/session.model";
+import {Subscription} from "./models/subscription.model";
+import {UserGroup} from "./models/usergroup.model";
 
 if (!fs.existsSync("./data.sqlite")) {
     // database does not yet exist! great :)
@@ -13,6 +21,8 @@ if (!fs.existsSync("./data.sqlite")) {
     fs.unlinkSync("./data.sqlite");
     // throw new Error("Delete the database (data.sqlite) before generating a new one");
 }
+
+db.addModels([Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup]);
 
 // Standard roles
 const roles = [

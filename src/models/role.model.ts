@@ -1,4 +1,5 @@
-import {AllowNull, Column, DataType, Default, Model, PrimaryKey, Table, Unique} from "sequelize-typescript";
+import {AllowNull, Column, DataType, Default, ForeignKey, Model, PrimaryKey, Table, Unique} from "sequelize-typescript";
+import {User} from "./user.model";
 
 @Table({timestamps: false})
 export class Role extends Model<Role> {
@@ -9,6 +10,7 @@ export class Role extends Model<Role> {
     @Unique
     @PrimaryKey
     @AllowNull(false)
+    @ForeignKey(() => User)
     @Column(DataType.STRING(128))
     public name!: string;
 

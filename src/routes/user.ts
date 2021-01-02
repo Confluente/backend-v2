@@ -193,7 +193,7 @@ router.route("/:id")
                 for (const foundGroup of foundGroups) {
                     foundGroup.members[0].user_group.destroy();
                     foundGroup.getUsers().then(function(members: User[]): void {
-                        members[0]
+                        members[0];
                     });
                 }
 

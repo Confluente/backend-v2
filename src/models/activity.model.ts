@@ -1,4 +1,13 @@
-import {Table, Column, Model, DataType, AllowNull, Default, BelongsToMany, BelongsTo} from 'sequelize-typescript';
+import {
+    Table,
+    Column,
+    Model,
+    DataType,
+    AllowNull,
+    Default,
+    BelongsToMany,
+    HasOne
+} from 'sequelize-typescript';
 
 import {Group} from './group.model';
 import {User} from "./user.model";
@@ -8,6 +17,7 @@ import {Subscription} from "./subscription.model";
     timestamps: false
 })
 export class Activity extends Model<Activity> {
+
     /**
      * Name of the activity.
      */
@@ -136,6 +146,6 @@ export class Activity extends Model<Activity> {
 
     // TODO change uses of this (was first capitalized)
     // TODO maybe change to HasOne relationship, as i feel like that makes more sense
-    @BelongsTo(() => Group)
+    @HasOne(() => Group)
     public organizer: Group;
 }

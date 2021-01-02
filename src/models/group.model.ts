@@ -1,9 +1,27 @@
-import {Table, Column, Model, DataType, AllowNull, PrimaryKey, Unique, BelongsToMany} from 'sequelize-typescript';
+import {
+    Table,
+    Column,
+    Model,
+    DataType,
+    AllowNull,
+    PrimaryKey,
+    Unique,
+    BelongsToMany,
+    ForeignKey, AutoIncrement
+} from 'sequelize-typescript';
 import {User} from "./user.model";
 import {UserGroup} from "./usergroup.model";
+import {Activity} from "./activity.model";
 
 @Table({timestamps: false})
 export class Group extends Model<Group> {
+
+    @AllowNull(false)
+    @AutoIncrement
+    @Unique
+    @ForeignKey(() => Activity)
+    @Column(DataType.INTEGER)
+    public id!: number;
 
     /**
      * Display name of the group (shorter than fullName but identifiable).
