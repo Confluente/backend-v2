@@ -134,6 +134,7 @@ export class Activity extends Model {
     public participants: User[];
 
     // TODO change uses of this (was first capitalized)
+    // TODO maybe change to HasOne relationship, as i feel like that makes more sense
     @BelongsTo(() => Group)
     public organizer: Group;
 }
