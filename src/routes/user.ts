@@ -1,8 +1,8 @@
 import express, {Request, Response, Router} from "express";
 
-import {User} from "../models/user";
-import {Group} from "../models/group";
-import {Role} from "../models/role";
+import {User} from "../models/User";
+import {Group} from "../models/Group";
+import {Role} from "../models/Role";
 
 const permissions: any = require("../permissions");
 import {generateSalt, getPasswordHashSync} from "../helpers/authHelper";

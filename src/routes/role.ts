@@ -1,6 +1,6 @@
 import express, {Router, Request, Response} from "express";
 
-import {Role} from "../models/role";
+import {Role} from "../models/Role";
 
 import {check} from "../permissions";
 

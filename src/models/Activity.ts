@@ -1,7 +1,7 @@
 import {Table, Column, Model, DataType, AllowNull, Default, BelongsToMany, BelongsTo} from 'sequelize-typescript';
 
-import {Group} from './group';
-import {Subscription, User} from "./user";
+import {Group} from './Group';
+import {Subscription, User} from "./User";
 
 @Table({
     timestamps: false

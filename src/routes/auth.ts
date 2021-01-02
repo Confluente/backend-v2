@@ -1,9 +1,9 @@
 import express, {Request, Response, Router} from "express";
 
-import {User} from "../models/user";
-import {Group} from "../models/group";
+import {User} from "../models/User";
+import {Group} from "../models/Group";
 import {authenticate, startSession} from "../helpers/authHelper";
-import {Role} from "../models/role";
+import {Role} from "../models/Role";
 
 const router: Router = express.Router();
 

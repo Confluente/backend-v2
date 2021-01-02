@@ -10,9 +10,11 @@ import {
     Unique
 } from "sequelize-typescript";
 
-import {Group} from './group';
-import {Activity} from "./activity";
-import {Role} from "./role";
+import {Group} from './Group';
+import {Activity} from "./Activity";
+import {Role} from "./Role";
+import {Subscription} from "./Subscription";
+import {UserGroup} from "./UserGroup";
 
 @Table({timestamps: false})
 export class User extends Model {
@@ -148,48 +150,4 @@ export class User extends Model {
 
     @HasOne(() => Role)
     public role: Role;
-}
-
-/**
- * userGroup is the function relating users to groups via userGroup.
- * Function is the function that the user has in the group.
- */
-// TODO add comments to this :)
-@Table({timestamps: false})
-export class UserGroup extends Model {
-
-    @Column(DataType.INTEGER.UNSIGNED)
-    @ForeignKey(() => User)
-    @AllowNull(false)
-    userId: number;
-
-    @Column(DataType.INTEGER.UNSIGNED)
-    @ForeignKey(() => Group)
-    @AllowNull(false)
-    groupId: number;
-
-    @Column(DataType.STRING(128))
-    @AllowNull(false)
-    @Default("member")
-    func: string;
-}
-
-/**
- * subscription is the function relating users to activities via subscriptions.
- * Answers are the answers that the user gave to the questions of the form.
- */
-// TODO add comments to this :)
-@Table({timestamps: false})
-export  class Subscription extends Model {
-
-    @Column(DataType.INTEGER.UNSIGNED)
-    @ForeignKey(() => User)
-    userId: number;
-
-    @Column(DataType.INTEGER.UNSIGNED)
-    @ForeignKey(() => Activity)
-    activityId: number;
-
-    @Column(DataType.STRING(8192))
-    answers: string;
 }

@@ -1,9 +1,9 @@
 import {all} from 'q';
 
-import {Activity} from "./models/activity";
-import {User} from "./models/user";
-import {Group} from "./models/group";
-import {Role} from "./models/role";
+import {Activity} from "./models/Activity";
+import {User} from "./models/User";
+import {Group} from "./models/Group";
+import {Role} from "./models/Role";
 
 import fs from 'fs';
 

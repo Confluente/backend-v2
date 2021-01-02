@@ -1,7 +1,7 @@
 import express, {Response, Request, Router} from "express";
 
-import {CompanyOpportunity} from "../models/companyOpportunity";
-import {User} from "../models/user";
+import {CompanyOpportunity} from "../models/CompanyOpportunity";
+import {User} from "../models/User";
 
 const permissions: any = require("../permissions");
 
