@@ -1,6 +1,7 @@
-import {Table, Column, Model, DataType, AllowNull, Default} from 'sequelize-typescript';
+import {Table, Column, Model, DataType, AllowNull, Default, BelongsToMany, BelongsTo} from 'sequelize-typescript';
 
 import {Group} from './group';
+import {Subscription, User} from "./user";
 
 @Table({
     timestamps: false
@@ -127,8 +128,13 @@ export class Activity extends Model {
     @AllowNull(false)
     @Default(false)
     public hasCoverImage!: boolean;
+
+    // TODO add comments
+    @BelongsToMany(() => User, () => Subscription)
+    public participants: User[];
+
+    // TODO change uses of this (was first capitalized)
+    @BelongsTo(() => Group)
+    public organizer: Group;
 }
 
-// Relates activities to a group that organizes the activity.
-// TODO redo this
-Activity.belongsTo(Group, {as: "Organizer", onDelete: 'CASCADE'});

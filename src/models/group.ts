@@ -1,4 +1,5 @@
-import {Table, Column, Model, DataType, AllowNull, PrimaryKey, Unique} from 'sequelize-typescript';
+import {Table, Column, Model, DataType, AllowNull, PrimaryKey, Unique, BelongsToMany} from 'sequelize-typescript';
+import {User, UserGroup} from "./user";
 
 @Table({timestamps: false})
 export class Group extends Model {
@@ -46,4 +47,8 @@ export class Group extends Model {
     @Column(DataType.STRING(128))
     @AllowNull(false)
     public type!: string;
+
+    // TODO add comment
+    @BelongsToMany(() => User, () => UserGroup)
+    public members: User[];
 }

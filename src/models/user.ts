@@ -1,9 +1,9 @@
 import {
     AllowNull,
-    AutoIncrement,
+    AutoIncrement, BelongsToMany,
     Column,
     DataType,
-    Default,
+    Default, ForeignKey, HasOne,
     Model,
     PrimaryKey,
     Table,
@@ -138,38 +138,58 @@ export class User extends Model {
     @Column(DataType.STRING(128))
     @AllowNull(false)
     public approvingHash!: string;
+
+    // TODO add nice comments
+    @BelongsToMany(() => Group, () => UserGroup)
+    public groups: Group[];
+
+    @BelongsToMany(() => Activity, () => Subscription)
+    public activities: Activity[];
+
+    @HasOne(() => Role)
+    public role: Role;
 }
 
 /**
  * userGroup is the function relating users to groups via userGroup.
  * Function is the function that the user has in the group.
  */
-const userGroup: any = db.define('user_group', {
-    func: DataTypes.STRING
-});
+// TODO add comments to this :)
+@Table({timestamps: false})
+export class UserGroup extends Model {
+
+    @Column(DataType.INTEGER.UNSIGNED)
+    @ForeignKey(() => User)
+    @AllowNull(false)
+    userId: number;
+
+    @Column(DataType.INTEGER.UNSIGNED)
+    @ForeignKey(() => Group)
+    @AllowNull(false)
+    groupId: number;
+
+    @Column(DataType.STRING(128))
+    @AllowNull(false)
+    @Default("member")
+    func: string;
+}
 
 /**
  * subscription is the function relating users to activities via subscriptions.
  * Answers are the answers that the user gave to the questions of the form.
  */
-const subscription: any = db.define('subscription', {
-    answers: DataTypes.STRING
-});
+// TODO add comments to this :)
+@Table({timestamps: false})
+export  class Subscription extends Model {
 
-// All relationships defined hereafter are onDelete 'CASCADE' to make sure that when an instance is deleted,
-// the relations that instance has to other models are also deleted.
+    @Column(DataType.INTEGER.UNSIGNED)
+    @ForeignKey(() => User)
+    userId: number;
 
-// Relates a user to a group through a userGroup
-User.belongsToMany(Group, {as: "groups", through: 'user_group', onDelete: 'CASCADE'});
+    @Column(DataType.INTEGER.UNSIGNED)
+    @ForeignKey(() => Activity)
+    activityId: number;
 
-// Relates a group to a user through userGroup as members
-Group.belongsToMany(User, {as: "members", through: userGroup, onDelete: 'CASCADE'});
-
-// Relates a user to an activity trough a subscription
-User.belongsToMany(Activity, {through: subscription, onDelete: 'CASCADE'});
-
-// Relates an activity to a user through subscription as participants
-Activity.belongsToMany(User, {as: "participants", through: subscription, onDelete: 'CASCADE'});
-
-// User is assigned a single role
-User.hasOne(Role, {as: "role"});
+    @Column(DataType.STRING(8192))
+    answers: string;
+}
