@@ -1,202 +1,144 @@
 import {
-    Sequelize,
+    AllowNull,
+    AutoIncrement,
+    Column,
+    DataType,
+    Default,
     Model,
-    DataTypes,
-    BelongsToManyAddAssociationMixin,
-    BelongsToManyGetAssociationsMixin, HasOneSetAssociationMixin, HasOneGetAssociationMixin, Association
-} from "sequelize";
-import {db} from './db';
-const sequelize: Sequelize = db;
+    PrimaryKey,
+    Table,
+    Unique
+} from "sequelize-typescript";
 
 import {Group} from './group';
 import {Activity} from "./activity";
 import {Role} from "./role";
 
+@Table({timestamps: false})
 export class User extends Model {
-
-    // TODO make nice comments
-    // Maybe add activity?
-    public static associations: {
-        role: Association<User, Role>;
-        groups: Association<User, Group>;
-    };
 
     /**
      * Database id of the user.
      */
+    @Column(DataType.INTEGER.UNSIGNED)
+    @AutoIncrement
+    @Unique
+    @AllowNull(false)
     public id!: number;
 
     /**
-     * PK: Email of the user.
+     * Email of the user.
      */
+    // TODO Check if we cant better have the db id as the primary key?
+    @Column(DataType.STRING(128))
+    @PrimaryKey
+    @Unique
+    @AllowNull(false)
     public email!: string;
 
     /**
      * First name of the user.
      */
+    @Column(DataType.STRING(128))
+    @AllowNull(false)
     public firstName!: string;
 
     /**
      * Last name of the user.
      */
+    @Column(DataType.STRING(128))
+    @AllowNull(false)
     public lastName!: string;
 
     /**
      * Display name of the user.
      * Usually concatenation of first name and last name
      */
+        // TODO delete this, and just make a function for get Display Name or smth
+    @Column(DataType.STRING(128))
+    @AllowNull(false)
     public displayName!: string;
 
     /**
      * Major of the user
      */
+    @Column(DataType.STRING(128))
     public major!: string | null;
 
     /**
      * Stores the address of the user.
      */
+    @Column(DataType.STRING(128))
     public address!: string | null;
 
     /**
      * Honors track of the user.
      */
+    @Column(DataType.STRING(128))
     public track!: string | null;
 
     /**
      * Year that the user started with honors.
      */
+    @Column(DataType.INTEGER)
     public honorsGeneration!: number | null;
     
     /**
      * Stores what kind of membership the user has
      */
+    @Column(DataType.STRING(128))
+    @AllowNull(false)
     public honorsMembership!: string;
 
     /**
      * Campus card number of the user.
      */
+    @Column(DataType.STRING(128))
     public campusCardNumber!: string | null;
 
     /**
      * Mobile phone number of the user.
      */
+    @Column(DataType.STRING(128))
     public mobilePhoneNumber!: string | null;
 
     /**
      * Whether the user gave consent regarding portrait right.
      */
+    @Column(DataType.BOOLEAN)
+    @AllowNull(false)
+    @Default(false)
     public consentWithPortraitRight!: boolean;
 
     /**
      * Hash of the password of the user.
      */
+    @Column(DataType.BLOB)
+    @AllowNull(false)
     public passwordHash!: any;
 
     /**
      * Salt of the password of the user.
      */
+    @Column(DataType.BLOB)
+    @AllowNull(false)
     public passwordSalt!: any;
 
     /**
      * Whether the account of the user is approved
      */
+    @Column(DataType.BOOLEAN)
+    @AllowNull(false)
+    @Default(false)
     public approved!: boolean;
 
     /**
      * The hash link via which the account can be approved
      */
+    @Column(DataType.STRING(128))
+    @AllowNull(false)
     public approvingHash!: string;
-
-    // TODO make nice comments
-    public getGroups!: BelongsToManyGetAssociationsMixin<Group>;
-    public addGroup!: BelongsToManyAddAssociationMixin<Group, Group['fullName'], userGroup>;
-    public addActivity!: BelongsToManyAddAssociationMixin<Activity, number>;
-    public getRole!: HasOneGetAssociationMixin<Role>;
-    public setRole!: HasOneSetAssociationMixin<Role, string>;
 }
-
-User.init(
-    {
-        id: {
-            type: DataTypes.INTEGER.UNSIGNED,
-            autoIncrement: true,
-            unique: true,
-            allowNull: false
-        },
-        email: {
-            type: new DataTypes.STRING(128),
-            unique: true,
-            allowNull: false,
-            primaryKey: true,
-        },
-        firstName: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        lastName: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        displayName: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        major: {
-            type: new DataTypes.STRING(128),
-            allowNull: true,
-        },
-        address: {
-            type: new DataTypes.STRING(128),
-            allowNull: true,
-        },
-        track: {
-            type: new DataTypes.STRING(128),
-            allowNull: true,
-        },
-        honorsGeneration: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        honorsMembership: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        campusCardNumber: {
-            type: new DataTypes.STRING(128),
-            allowNull: true,
-        },
-        mobilePhoneNumber: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        consentWithPortraitRight: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
-        passwordHash: {
-            type: DataTypes.BLOB,
-            allowNull: false,
-        },
-        passwordSalt: {
-            type: DataTypes.BLOB,
-            allowNull: false,
-        },
-        approved: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
-        approvingHash: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-    },
-    {
-        tableName: "user",
-        sequelize,
-    }
-);
 
 /**
  * userGroup is the function relating users to groups via userGroup.
@@ -231,11 +173,3 @@ Activity.belongsToMany(User, {as: "participants", through: subscription, onDelet
 
 // User is assigned a single role
 User.hasOne(Role, {as: "role"});
-
-userGroup.sync();
-subscription.sync();
-User.sync();
-Group.sync();
-Activity.sync();
-Role.sync();
-db.sync();

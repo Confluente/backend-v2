@@ -1,54 +1,34 @@
-import {Sequelize, Model, DataTypes} from "sequelize";
-import {db} from './db';
-const sequelize: Sequelize = db;
+import {Table, Column, Model, DataType, AllowNull, PrimaryKey, Unique} from 'sequelize-typescript';
 
+@Table({timestamps: false})
 export class Page extends Model {
     /**
      * URL of the page.
      */
+    @Column(DataType.STRING(128))
+    @PrimaryKey
+    @Unique
+    @AllowNull(false)
     public url!: string;
 
     /**
      * Title of the page.
      */
+    @Column(DataType.STRING(128))
+    @AllowNull(false)
     public title!: string;
 
     /**
      * Content of the page in text format.
      */
+    @Column(DataType.TEXT)
+    @AllowNull(false)
     public content!: any;
 
     /**
      * Author of the page.
      */
+    @Column(DataType.STRING(128))
+    @AllowNull(false)
     public author!: string;
 }
-
-Page.init(
-    {
-        url: {
-            type: new DataTypes.STRING(128),
-            unique: true,
-            primaryKey: true,
-            allowNull: false,
-        },
-        title: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-        content: {
-            type: new DataTypes.TEXT(),
-            allowNull: false,
-        },
-        author: {
-            type: new DataTypes.STRING(128),
-            allowNull: false,
-        },
-    },
-    {
-        tableName: "page",
-        sequelize,
-    }
-);
-
-Page.sync();

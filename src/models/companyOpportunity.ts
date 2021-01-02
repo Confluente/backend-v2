@@ -1,6 +1,6 @@
 import {Table, Column, Model, DataType, AllowNull} from 'sequelize-typescript';
 
-@Table
+@Table({timestamps: false})
 export class CompanyOpportunity extends Model {
     /**
      * Title of the opportunity.
