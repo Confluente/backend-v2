@@ -58,9 +58,9 @@ export function authenticate(email: string, password: string): any {
         if (!user) {
             return {error: 406, data: "Email address not associated to any account"};
         }
-        return getPasswordHash(password, user.dataValues.passwordSalt)
+        return getPasswordHash(password, user.passwordSalt)
             .then(function(hash: string): any {
-                return (hash === user.dataValues.passwordHash) ? user : {error: 406, data: "Password incorrect"};
+                return (hash === user.passwordHash) ? user : {error: 406, data: "Password incorrect"};
             });
     });
 }
