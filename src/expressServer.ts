@@ -11,8 +11,8 @@ import {log} from "./logger";
 const checkPermission: any = require("./permissions").check;
 
 // Import db models
-import {User} from "./models/user.model";
-import {Session} from "./models/session.model";
+import {User} from "./models/database/user.model";
+import {Session} from "./models/database/session.model";
 
 process.env.NODE_ENV = "development";
 

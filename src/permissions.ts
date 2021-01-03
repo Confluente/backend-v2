@@ -1,10 +1,10 @@
 import {Promise, all} from "q";
 import {Request, Response} from "express";
 
-import {User} from "./models/user.model";
-import {Group} from "./models/group.model";
-import {Activity} from "./models/activity.model";
-import {Role} from "./models/role.model";
+import {User} from "./models/database/user.model";
+import {Group} from "./models/database/group.model";
+import {Activity} from "./models/database/activity.model";
+import {Role} from "./models/database/role.model";
 
 /**
  * Checks whether user has required permissions for a given scope
