@@ -74,7 +74,7 @@ export class Activity extends Model<Activity> {
     /**
      * Number of questions in the subscription form.
      */
-    @Column(DataType.INTEGER.UNSIGNED)
+    @Column(DataType.INTEGER)
     public numberOfQuestions!: number | null;
 
     /**

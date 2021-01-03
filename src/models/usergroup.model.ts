@@ -12,12 +12,12 @@ export class UserGroup extends Model<UserGroup> {
 
     @ForeignKey(() => User)
     @AllowNull(false)
-    @Column(DataType.INTEGER.UNSIGNED)
+    @Column(DataType.INTEGER)
     userId: number;
 
     @ForeignKey(() => Group)
     @AllowNull(false)
-    @Column(DataType.INTEGER.UNSIGNED)
+    @Column(DataType.INTEGER)
     groupId: number;
 
     @AllowNull(false)

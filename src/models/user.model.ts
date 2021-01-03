@@ -16,7 +16,9 @@ import {Role} from "./role.model";
 import {Subscription} from "./subscription.model";
 import {UserGroup} from "./usergroup.model";
 
-@Table({timestamps: false})
+@Table({
+    timestamps: false
+})
 export class User extends Model<User> {
 
     /**
@@ -25,7 +27,7 @@ export class User extends Model<User> {
     @AutoIncrement
     @Unique
     @AllowNull(false)
-    @Column(DataType.INTEGER.UNSIGNED)
+    @Column(DataType.INTEGER)
     public id!: number;
 
     /**

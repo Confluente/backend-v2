@@ -11,11 +11,11 @@ import {User} from "./user.model";
 export  class Subscription extends Model<Subscription> {
 
     @ForeignKey(() => User)
-    @Column(DataType.INTEGER.UNSIGNED)
+    @Column(DataType.INTEGER)
     userId: number;
 
     @ForeignKey(() => Activity)
-    @Column(DataType.INTEGER.UNSIGNED)
+    @Column(DataType.INTEGER)
     activityId: number;
 
     @Column(DataType.STRING(8192))
