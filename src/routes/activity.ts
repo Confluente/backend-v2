@@ -125,7 +125,7 @@ router.route("/")
 
                 // For each activity in activities, enable markdown for description
                 promisedActivities = promisedActivities.map(function(singleActivity: Activity): Activity {
-                    singleActivity.dataValues.description_html = marked(singleActivity.description || "");
+                    singleActivity.description_html = marked(singleActivity.description || "");
                     return singleActivity;
                 });
 
@@ -303,7 +303,7 @@ router.route("/subscriptions/:id")
 
             // add relation
             return User.findByPk(userId).then(function(foundUser: User): void {
-                foundUser.addActivity(foundActivity, {through: {answers: answerString}})
+                foundUser.$add('activity', foundActivity, {through: {answers: answerString}})
                     .then(function(result: Activity): any {
 
                     // Send relation back to the client
@@ -331,9 +331,10 @@ router.route("/subscriptions/:id")
             }]
         }).then(function(foundActivity: Activity): any {
             // looping through all subscriptions to find the one of the user that requested the delete
-            for (const participant of foundActivity.dataValues.participants) {
-                if (participant.dataValues.id === userId) {
-                    participant.dataValues.subscription.destroy();
+            for (const participant of foundActivity.participants) {
+                if (participant.id === userId) {
+                    // TODO check if this works?
+                    participant.$remove('activity', foundActivity);
                 }
             }
 

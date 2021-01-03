@@ -19,4 +19,4 @@ import {Subscription} from "./models/subscription.model";
 import {User} from "./models/user.model";
 import {UserGroup} from "./models/usergroup.model";
 
-db.addModels([Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup]);
+// db.addModels([Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup]);

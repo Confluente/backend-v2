@@ -16,9 +16,7 @@ import {Role} from "./role.model";
 import {Subscription} from "./subscription.model";
 import {UserGroup} from "./usergroup.model";
 
-@Table({
-    timestamps: false
-})
+@Table({timestamps: false})
 export class User extends Model<User> {
 
     /**
