@@ -34,7 +34,7 @@ router.route("/companyOpportunities")
          */
         const user: User = res.locals.session ? res.locals.session.user : null;
         permissions.check(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: req.params.id})
-            .then(function(result: boolean): CompanyOpportunity {
+            .then(function(result: boolean): any {
             if (!result) {
                 res.status(403).send("You do not have permissions to create a company opportunity");
             }

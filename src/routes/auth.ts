@@ -26,7 +26,7 @@ router.route("/")
             }, Role]
         }).then(function(foundUser: User): void {
             // get the datavalues of the user
-            const profile: any = foundUser.dataValues;
+            const profile: User = foundUser;
 
             // set whether the user can organize activities
             profile.canOrganize = profile.role.ACTIVITY_MANAGE || profile.groups.some(
@@ -58,6 +58,7 @@ router.route("/login")
         // authenticate user
         authenticate(req.body.email, req.body.password).then(function(foundUser: User): any {
             // check if error occurred
+            // TODO figure out how to fix this?
             if (foundUser.error === 406) {
                 return res.status(406).send(foundUser);
             }

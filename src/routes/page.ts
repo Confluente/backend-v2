@@ -64,9 +64,9 @@ router.route("/:url([^\?]+)")
     });
 
 router.get("/:url/view", function(req: Request, res: Response): any {
-    return Page.find({where: {url: req.params.url}}).then(function(foundPage: Page): any {
+    return Page.findOne({where: {url: req.params.url}}).then(function(foundPage: Page): any {
         if (!foundPage) { return res.redirect("/404.html"); }
-        res.send(marked(foundPage.dataValues.content));
+        res.send(marked(foundPage.content));
     });
 });
 

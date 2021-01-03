@@ -19,6 +19,7 @@ router.route("/portraitRight/:id")
         User.findByPk(userId).then(function(user: User): void {
             // Update user object in database
             user.update({consentWithPortraitRight: req.body.answer}).then(function(result: User): any {
+                // TODO should this not be result?
                 res.send(user);
             });
         });

@@ -123,13 +123,14 @@ router.route("/:id")
 
                 // remove all current group members
                 for (const member of updatedGroup.members) {
-                    member.user_group.destroy();
+                    member.$remove('groups', updatedGroup);
                 }
 
                 // add all new group members
                 req.body[1].forEach(function(new_group_member: any): any {
                     User.findByPk(new_group_member.id).then(function(newUser: User): void {
-                        newUser.addGroups(res.locals.group, {through: {func: new_group_member.func}}).then(console.log);
+                        newUser.$add('groups', res.locals.group, {through: {func: new_group_member.func}})
+                            .then(console.log);
                     });
                 });
 

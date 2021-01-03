@@ -191,10 +191,11 @@ router.route("/:id")
             }).then(function(foundGroups: Group[]): any {
                 // Remove all existing group relations from the database
                 for (const foundGroup of foundGroups) {
-                    foundGroup.members[0].user_group.destroy();
-                    foundGroup.getUsers().then(function(members: User[]): void {
-                        members[0];
-                    });
+                    // Check if this does what it should do
+                    // OLD CODE
+                    // foundGroup.members[0].user_group.destroy();
+                    foundGroup.members[0].$remove('groups', foundGroup);
+
                 }
 
                 // Add all groups as stated in the request
