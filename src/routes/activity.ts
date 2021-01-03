@@ -6,9 +6,9 @@ import multer, {diskStorage, FileFilterCallback} from 'multer';
 import mime from 'mime-types';
 import fs from 'fs';
 
-import {Group} from "../models/group.model";
-import {User} from "../models/user.model";
-import {Activity} from "../models/activity.model";
+import {Group} from "../models/database/group.model";
+import {User} from "../models/database/user.model";
+import {Activity} from "../models/database/activity.model";
 
 const permissions: any = require("../permissions");
 

@@ -1,7 +1,7 @@
 import q, {Promise} from "q";
 import {pbkdf2, pbkdf2Sync, randomBytes} from "crypto";
-import {User} from "../models/user.model";
-import {Session} from "../models/session.model";
+import {User} from "../models/database/user.model";
+import {Session} from "../models/database/session.model";
 
 const digest_iterations = (process.env.NODE_ENV === "test") ? 1 : 100000;
 

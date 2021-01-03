@@ -1,19 +1,19 @@
 import {all} from 'q';
 
-import {Activity} from "./models/activity.model";
-import {User} from "./models/user.model";
-import {Group} from "./models/group.model";
-import {Role} from "./models/role.model";
+import {Activity} from "./models/database/activity.model";
+import {User} from "./models/database/user.model";
+import {Group} from "./models/database/group.model";
+import {Role} from "./models/database/role.model";
 import {db} from "./db";
 
 
 import fs from 'fs';
 
-import {CompanyOpportunity} from "./models/company.opportunity.model";
-import {Page} from "./models/page.model";
-import {Session} from "./models/session.model";
-import {Subscription} from "./models/subscription.model";
-import {UserGroup} from "./models/usergroup.model";
+import {CompanyOpportunity} from "./models/database/company.opportunity.model";
+import {Page} from "./models/database/page.model";
+import {Session} from "./models/database/session.model";
+import {Subscription} from "./models/database/subscription.model";
+import {UserGroup} from "./models/database/usergroup.model";
 
 if (!fs.existsSync("./data.sqlite")) {
     // database does not yet exist! great :)
@@ -22,7 +22,7 @@ if (!fs.existsSync("./data.sqlite")) {
     // throw new Error("Delete the database (data.sqlite) before generating a new one");
 }
 
-db.addModels([Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup]);
+// db.addModels([Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup]);
 
 // Standard roles
 const roles = [
