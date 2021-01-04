@@ -1,4 +1,10 @@
+import {Role} from "../database/role.model";
+
 export class RoleWeb {
+
+    constructor(role: Role) {
+        
+    }
 
     /**
      * Name of the role.
