@@ -23,7 +23,6 @@ router.route("/companyOpportunities")
                     ["id", "ASC"]
                 ]
             }).then(function(results: CompanyOpportunity[]): void {
-                console.log(results);
                 res.send(results);
             });
         });
