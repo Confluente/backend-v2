@@ -8,9 +8,9 @@ import {UserWeb} from "./user.web.model";
 // TODO add comments to this :)
 export  class SubscriptionWeb {
 
-    user: UserWeb;
+    user!: UserWeb;
 
-    activity: ActivityWeb;
+    activity!: ActivityWeb;
 
-    answers: string;
+    answers!: string;
 }

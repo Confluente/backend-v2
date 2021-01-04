@@ -12,7 +12,7 @@ export class UserWeb {
     /**
      * Email of the user.
      */
-    public email: string;
+    public email!: string;
 
     /**
      * First name of the user.

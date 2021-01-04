@@ -8,9 +8,9 @@ import {GroupWeb} from "./group.web.model";
 // TODO add comments to this :)
 export class UserGroupWeb {
 
-    user: UserWeb;
+    user!: UserWeb;
 
-    group: GroupWeb;
+    group!: GroupWeb;
 
-    func: string;
+    func!: string;
 }

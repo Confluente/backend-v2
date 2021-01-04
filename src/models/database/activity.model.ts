@@ -49,13 +49,13 @@ export class Activity extends Model<Activity> {
      * Start time of the activity.
      */
     @Column(DataType.TIME)
-    public startTime!: any | null;
+    public startTime: any | null;
 
     /**
      * End time of the activity.
      */
     @Column(DataType.TIME)
-    public endTime!: any | null;
+    public endTime: any | null;
 
     /**
      * canSubscribes stores whether members can subscribe to the activity.
@@ -69,13 +69,13 @@ export class Activity extends Model<Activity> {
      * Participation fee of the activity.
      */
     @Column(DataType.DECIMAL)
-    public participationFee!: number | null;
+    public participationFee: number | null;
 
     /**
      * Number of questions in the subscription form.
      */
     @Column(DataType.INTEGER)
-    public numberOfQuestions!: number | null;
+    public numberOfQuestions: number | null;
 
     /**
      * Type of questions in the subscription form.
@@ -83,7 +83,7 @@ export class Activity extends Model<Activity> {
      * Types are separated by #,# delimiter.
      */
     @Column(DataType.STRING(1024))
-    public typeOfQuestion!: string | null;
+    public typeOfQuestion: string | null;
 
     /**
      * Questions of the subscription form.
@@ -91,7 +91,7 @@ export class Activity extends Model<Activity> {
      * Descriptions are separated by #,# delimiter.
      */
     @Column(DataType.STRING(8192))
-    public questionDescriptions!: string | null;
+    public questionDescriptions: string | null;
 
     /**
      * Options for multiple choice and checkbox questions in form.
@@ -100,7 +100,7 @@ export class Activity extends Model<Activity> {
      * Options for the same question are separated by #;#.
      */
     @Column(DataType.STRING(8192))
-    public formOptions!: string | null;
+    public formOptions: string | null;
 
     /**
      * Which questions are required.
@@ -108,7 +108,7 @@ export class Activity extends Model<Activity> {
      * Separated by #,#.
      */
     @Column(DataType.STRING(8192))
-    public required!: string | null;
+    public required: string | null;
 
     /**
      * Which questions are private (answers of private questions do not show to everyone).
@@ -116,13 +116,13 @@ export class Activity extends Model<Activity> {
      * Separated by #,#.
      */
     @Column(DataType.STRING(8192))
-    public privacyOfQuestions!: string | null;
+    public privacyOfQuestions: string | null;
 
     /**
      * Subscription deadline of the activity.
      */
     @Column(DataType.TIME)
-    public subscriptionDeadline!: object | null;
+    public subscriptionDeadline: object | null;
 
     /**
      * Stores whether the activity is published.
