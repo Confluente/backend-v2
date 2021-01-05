@@ -2,9 +2,8 @@ import {Model} from "sequelize-typescript";
 
 export abstract class AbstractWebModel {
 
-    public static getArrayOfWebModelsFromArrayOfDbModels
-            <A extends AbstractWebModel, B extends Model>(dbModels: B[]): A[] {
-        const transformed: A[] = [];
+    public static getArrayOfWebModelsFromArrayOfDbModels<B extends Model>(dbModels: B[]): AbstractWebModel[] {
+        const transformed: AbstractWebModel[] = [];
 
         for (const obj of dbModels) {
             transformed.push(this.getWebModelFromDbModel(obj));
@@ -13,7 +12,7 @@ export abstract class AbstractWebModel {
         return transformed;
     }
 
-    public static getWebModelFromDbModel<A extends AbstractWebModel, B extends Model>(dBModel: B): A {
+    public static getWebModelFromDbModel<B extends Model>(dBModel: B): AbstractWebModel {
         throw new Error("Not implemented for concrete class");
     }
 }

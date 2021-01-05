@@ -126,12 +126,12 @@ export class ActivityWeb extends AbstractWebModel {
     public organizer: GroupWeb;
 
     // TODO Add comments
-    public static getWebModelFromDbModel<A extends AbstractWebModel = ActivityWeb>(dbActivity: Model): A & ActivityWeb {
+    public static getWebModelFromDbModel(dbActivity: Model): ActivityWeb {
         let webActivity = new ActivityWeb();
         webActivity = copyMatchingSourceKeyValues(webActivity, dbActivity);
 
         webActivity.description_html = marked(webActivity.description || "");
 
-        return webActivity as unknown as A & ActivityWeb;
+        return webActivity;
     }
 }
