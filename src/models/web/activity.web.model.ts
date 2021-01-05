@@ -3,10 +3,13 @@ import marked from "marked";
 import {SubscriptionWeb} from "./subscription.web.model";
 import {GroupWeb} from "./group.web.model";
 import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {AbstractWebModel} from "./abstract.web.model";
+import {Model} from "sequelize-typescript";
 
 enum questionType {"☰ text", "◉ multiple choice", "☑ checkboxes"}
 
-export class ActivityWeb {
+// TODO check comments on this model
+export class ActivityWeb extends AbstractWebModel {
 
     /**
      * ID of the activity
@@ -123,24 +126,12 @@ export class ActivityWeb {
     public organizer: GroupWeb;
 
     // TODO Add comments
-    public static getWebModelFromDbModel(dbActivity: Activity): ActivityWeb {
+    public static getWebModelFromDbModel<A extends AbstractWebModel = ActivityWeb>(dbActivity: Model): A & ActivityWeb {
         let webActivity = new ActivityWeb();
         webActivity = copyMatchingSourceKeyValues(webActivity, dbActivity);
 
         webActivity.description_html = marked(webActivity.description || "");
 
-
-
-        return webActivity;
-    }
-
-    public static arrayOfActivityToWeb(activities: Activity[]): ActivityWeb[] {
-        const transformedActivities: ActivityWeb[] = [];
-
-        for (const activity of activities) {
-            transformedActivities.push(this.getWebModelFromDbModel(activity));
-        }
-
-        return transformedActivities;
+        return webActivity as unknown as A & ActivityWeb;
     }
 }

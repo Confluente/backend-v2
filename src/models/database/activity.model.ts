@@ -1,12 +1,11 @@
 import {
     Table,
     Column,
-    Model,
     DataType,
     AllowNull,
     Default,
     BelongsToMany,
-    HasOne
+    HasOne, Model
 } from 'sequelize-typescript';
 
 import {Group} from './group.model';
@@ -16,7 +15,7 @@ import {Subscription} from "./subscription.model";
 @Table({
     timestamps: false
 })
-export class Activity extends Model<Activity> {
+export class Activity extends Model {
 
     /**
      * Name of the activity.
