@@ -1,6 +1,9 @@
 import {UserWeb} from "./user.web.model";
+import {AbstractWebModel} from "./abstract.web.model";
+import {Model} from "sequelize-typescript";
+import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
 
-export class GroupWeb {
+export class GroupWeb extends AbstractWebModel {
 
     /**
      * Database ID of the group
@@ -40,4 +43,10 @@ export class GroupWeb {
 
     // TODO add comment
     public members!: UserWeb[];
+
+    public static getWebModelFromDbModel(dbGroup: Model): GroupWeb {
+        let webGroup = copyMatchingSourceKeyValues(new GroupWeb(), dbGroup);
+
+        return webGroup;
+    }
 }

@@ -1,10 +1,10 @@
 import {Role} from "../database/role.model";
+import {Mode} from "fs";
+import {Model} from "sequelize-typescript";
+import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {AbstractWebModel} from "./abstract.web.model";
 
-export class RoleWeb {
-
-    constructor(role: Role) {
-        
-    }
+export class RoleWeb extends AbstractWebModel {
 
     /**
      * Name of the role.
@@ -65,4 +65,8 @@ export class RoleWeb {
      * Permission to manage activities.
      */
     public ACTIVITY_MANAGE!: boolean;
+
+    public static getWebModelFromDbModel(dbRole: Model): RoleWeb {
+        return copyMatchingSourceKeyValues(new RoleWeb(), dbRole);
+    }
 }

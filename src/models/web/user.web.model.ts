@@ -1,8 +1,11 @@
 import {RoleWeb} from "./role.web.mode";
 import {UserGroupWeb} from "./usergroup.web.model";
 import {SubscriptionWeb} from "./subscription.web.model";
+import {AbstractWebModel} from "./abstract.web.model";
+import {Model} from "sequelize-typescript";
+import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
 
-export class UserWeb {
+export class UserWeb extends AbstractWebModel {
 
     /**
      * Database id of the user.
@@ -87,4 +90,10 @@ export class UserWeb {
     public activities: SubscriptionWeb[];
 
     public role: RoleWeb;
+
+    public static getWebModelFromDbModel(dbUser: Model): UserWeb {
+        let webUser = copyMatchingSourceKeyValues(new UserWeb(), dbUser);
+
+        return webUser;
+    }
 }
