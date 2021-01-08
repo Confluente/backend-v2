@@ -69,5 +69,5 @@ export class Group extends Model<Group> {
 
     // TODO add comment
     @BelongsToMany(() => User, () => UserGroup)
-    public members: User[];
+    public members: Array<User & {UserGroup: UserGroup}>;
 }

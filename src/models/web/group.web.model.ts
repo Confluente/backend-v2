@@ -2,6 +2,8 @@ import {UserWeb} from "./user.web.model";
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model} from "sequelize-typescript";
 import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {UserGroupWeb} from "./usergroup.web.model";
+import {Group} from "../database/group.model";
 
 export class GroupWeb extends AbstractWebModel {
 
@@ -42,10 +44,12 @@ export class GroupWeb extends AbstractWebModel {
     public type!: string;
 
     // TODO add comment
-    public members!: UserWeb[];
+    public members!: UserGroupWeb[];
 
     public static getWebModelFromDbModel(dbGroup: Model): GroupWeb {
         let webGroup = copyMatchingSourceKeyValues(new GroupWeb(), dbGroup);
+
+        for (const user of (dbGroup as Group).members)
 
         return webGroup;
     }

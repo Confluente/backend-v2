@@ -143,10 +143,10 @@ export class User extends Model<User> {
 
     // TODO add nice comments
     @BelongsToMany(() => Group, () => UserGroup)
-    public groups: Group[];
+    public groups: Array<Group & {UserGroup: UserGroup}>;
 
     @BelongsToMany(() => Activity, () => Subscription)
-    public activities: Activity[];
+    public activities: Array<Activity & {Subscript: Subscription}>;
 
     @HasOne(() => Role)
     public role: Role;
