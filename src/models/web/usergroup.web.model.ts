@@ -8,6 +8,12 @@ import {GroupWeb} from "./group.web.model";
 // TODO add comments to this :)
 export class UserGroupWeb {
 
+    constructor(user: UserWeb, group: GroupWeb, func: string) {
+        this.user = user;
+        this.group = group;
+        this.func = func;
+    }
+
     user!: UserWeb;
 
     group!: GroupWeb;
