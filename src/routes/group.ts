@@ -4,6 +4,7 @@ import {Group} from "../models/database/group.model";
 import {User} from "../models/database/user.model";
 
 import {requireAll, check} from "../permissions";
+import {GroupWeb} from "../models/web/group.web.model";
 
 const router: Router = express.Router();
 
@@ -20,8 +21,12 @@ router.route("/")
                 ["id", "ASC"]
             ]
         }).then(function(foundGroups: Group[]): void {
+
+            // Transform dbGroups to webGroups
+            const groups = GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
+
             // Sends the groups back to the client
-            res.send(foundGroups);
+            res.send(groups);
         });
     })
 
@@ -96,8 +101,11 @@ router.route("/:id")
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
 
+            // Transform dbGroup to webGroup
+            const group = GroupWeb.getWebModelFromDbModel(res.locals.group);
+
             // Send group to client
-            res.send(res.locals.group);
+            res.send(group);
         }).done();
     })
 
@@ -178,7 +186,10 @@ router.route("/type/:type")
                 ["id", "ASC"]
             ]
         }).then(function(foundGroups: Group[]): void {
-            res.send(foundGroups);
+            // Transform dbGroups to webGroups
+            const groups = GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
+
+            res.send(groups);
         });
     });
 module.exports = router;
