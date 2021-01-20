@@ -63,7 +63,11 @@ router.route("/:url([^\?]+)")
 router.get("/:url/view", function(req: Request, res: Response): any {
     return Page.findOne({where: {url: req.params.url}}).then(function(foundPage: Page): any {
         if (!foundPage) { return res.redirect("/404.html"); }
-        res.send(marked(foundPage.content));
+
+        // Transform dbPage to webPage
+        const page = PageWeb.getWebModelFromDbModel(foundPage);
+
+        res.send(page);
     });
 });
 
@@ -72,7 +76,11 @@ router.get("/", permissions.requireAll({type: "PAGE_MANAGE"}),
     return Page.findAll({
         attributes: ["url", "title", "content", "author"]
     }).then(function(foundPages: Page[]): void {
-        res.send(foundPages);
+        
+        // Transform dbPages to webPages
+        const pages = PageWeb.getArrayOfWebModelsFromArrayOfDbModels(foundPages);
+
+        res.send(pages);
     });
 });
 
