@@ -38,7 +38,7 @@ router.route("/")
                 // Send the roles back to the client
                 res.send(roles);
             });
-        }).done();
+        });
     })
 
     /**
@@ -97,7 +97,7 @@ router.route("/:id")
                     res.send(role);
                 }
             });
-        }).done();
+        });
     })
 
     /**

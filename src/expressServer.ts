@@ -95,7 +95,7 @@ app.use(function(req: any, res: any, next: any): any {
 });
 
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/activities", require("./routes/activities"));
+app.use("/api/activities", require("./routes/activity"));
 app.use("/api/group", require("./routes/group"));
 app.use("/api/user", require("./routes/user"));
 app.use("/api/page", require("./routes/page"));

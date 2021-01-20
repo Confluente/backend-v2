@@ -59,7 +59,7 @@ router.route("/")
             }).catch(function(err: Error): void {
                 console.error(err);
             });
-        }).done();
+        });
     });
 
 router.route("/:id")
@@ -106,7 +106,7 @@ router.route("/:id")
 
             // Send group to client
             res.send(group);
-        }).done();
+        });
     })
 
     /**
