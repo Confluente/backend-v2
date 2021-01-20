@@ -76,7 +76,7 @@ router.get("/", permissions.requireAll({type: "PAGE_MANAGE"}),
     return Page.findAll({
         attributes: ["url", "title", "content", "author"]
     }).then(function(foundPages: Page[]): void {
-        
+
         // Transform dbPages to webPages
         const pages = PageWeb.getArrayOfWebModelsFromArrayOfDbModels(foundPages);
 

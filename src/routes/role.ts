@@ -3,6 +3,7 @@ import express, {Router, Request, Response} from "express";
 import {Role} from "../models/database/role.model";
 
 import {check} from "../permissions";
+import {RoleWeb} from "../models/web/role.web.mode";
 
 const router: Router = express.Router();
 
@@ -30,7 +31,10 @@ router.route("/")
                 order: [
                     ["id", "ASC"]
                 ]
-            }).then(function(roles: Role[]): void {
+            }).then(function(foundRoles: Role[]): void {
+                // Transform dbRoles to webRoles
+                const roles = RoleWeb.getArrayOfWebModelsFromArrayOfDbModels(foundRoles);
+
                 // Send the roles back to the client
                 res.send(roles);
             });
@@ -81,11 +85,14 @@ router.route("/:id")
                 attributes: ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE",
                     "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "ACTIVITY_VIEW_PUBLISHED",
                     "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"],
-            }).then(function(role: Role): void {
+            }).then(function(foundRole: Role): void {
                 // Return if role not found
-                if (role === null) {
+                if (foundRole === null) {
                     res.status(404).send({status: "Not Found"});
                 } else {
+                    // Transform dbRole into webRole
+                    const role = RoleWeb.getWebModelFromDbModel(foundRole);
+
                     // Return the role
                     res.send(role);
                 }
