@@ -7,6 +7,8 @@ import {Role} from "../models/database/role.model";
 const permissions: any = require("../permissions");
 import {generateSalt, getPasswordHashSync} from "../helpers/authHelper";
 import {createTestAccount, createTransport} from "nodemailer";
+import {UserWeb} from "../models/web/user.web.model";
+import {GroupWeb} from "../models/web/group.web.model";
 
 const router: Router = express.Router();
 
@@ -34,8 +36,11 @@ router.route("/")
                     ["id", "ASC"]
                 ]
             }).then(function(foundUsers: User[]): void {
+                // Transform dbUsers to webUsers
+                const users = UserWeb.getArrayOfWebModelsFromArrayOfDbModels(foundUsers);
+
                 // Send the users back to the client
-                res.send(foundUsers);
+                res.send(users);
             });
         }).done();
     })
@@ -152,8 +157,11 @@ router.route("/:id")
                     }
                 ]
             }).then(function(foundGroups: Group[]): void {
+                const webUser = UserWeb.getWebModelFromDbModel(res.locals.user);
+                const webGroups = GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
+
                 // Send user together with group back to client
-                res.send([res.locals.user, foundGroups]);
+                res.send([webUser, webGroups]);
             });
         });
     })
