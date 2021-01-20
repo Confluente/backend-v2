@@ -146,7 +146,7 @@ export class ActivityWeb extends AbstractWebModel {
         webActivity.startTime = castedAct.startTime !== null ? new Date(castedAct.startTime) : null;
         webActivity.endTime = castedAct.endTime !== null ? new Date(castedAct.endTime) : null;
 
-        if (castedAct.canSubscribe) {
+        if ('canSubscribe' in castedAct && castedAct.canSubscribe) {
             webActivity.subscriptionDeadline = castedAct.subscriptionDeadline !== null
                 ? new Date(castedAct.subscriptionDeadline) : null;
             webActivity.typeOfQuestion = destringifyStringifiedArrayOfStrings(castedAct.typeOfQuestion);

@@ -12,7 +12,7 @@ import {Activity} from "../models/database/activity.model";
 
 const permissions: any = require("../permissions");
 
-import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../helpers/arrayHelper";
+import {stringifyArrayOfStrings} from "../helpers/arrayHelper";
 
 const router: Router = express.Router();
 
@@ -242,8 +242,12 @@ router.route("/manage")
                 attributes: ["id", "displayName", "fullName", "email"]
             }]
         }).then(function(foundActivities: Activity[]): void {
+
+            // Transform all db activities into web activities
+            const activities = ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
+
             // For every activity, check if the client is allowed to edit it
-            const promises = foundActivities.map(function(singleActivity: Activity): any {
+            const promises = activities.map(function(singleActivity: Activity): any {
                 return permissions.check(res.locals.session.user, {
                     type: "ACTIVITY_EDIT",
                     value: singleActivity.id
@@ -256,12 +260,6 @@ router.route("/manage")
                 // Filter all activities out that are null due to limited permission
                 promisedActivities = promisedActivities.filter(function(singleActivity: Activity): boolean {
                     return singleActivity !== null;
-                });
-
-                // For each activity in activities, enable markdown for description
-                promisedActivities = promisedActivities.map(function(singleActivity: Activity): Activity {
-                    singleActivity.dataValues.description_html = marked(singleActivity.description || "");
-                    return singleActivity;
                 });
 
                 // Send activities to the client
@@ -379,41 +377,7 @@ router.route("/:id")
             if (!result) { return res.sendStatus(403); }
 
             // Store activity in variable
-            const activity = res.locals.activity;
-
-            // Enable markdown
-            activity.dataValues.description_html = marked(activity.description);
-
-            // formatting activity correctly for frontend
-            if (activity.canSubscribe) {
-                // split strings into lists
-                activity.participants.forEach(function(participant: any): void {
-                    participant.subscription.answers =
-                        destringifyStringifiedArrayOfStrings(participant.subscription.answers);
-                });
-
-                activity.typeOfQuestion = destringifyStringifiedArrayOfStrings(activity.typeOfQuestion);
-                activity.questionDescriptions = destringifyStringifiedArrayOfStrings(activity.questionDescriptions);
-                activity.formOptions = destringifyStringifiedArrayOfStrings(activity.formOptions);
-                activity.required = destringifyStringifiedArrayOfStrings(activity.required);
-                activity.privacyOfQuestions = destringifyStringifiedArrayOfStrings(activity.privacyOfQuestions);
-                const newOptions: string[][] = [];
-                activity.formOptions.forEach(function(question: string): void {
-                    newOptions.push(question.split('#;#'));
-                });
-
-                activity.formOptions = newOptions;
-            }
-
-            // Send activity to client
-            if (activity.hasCoverImage) {
-                const files = fs.readdirSync(pathToPictures);
-                for (const file of files) {
-                    if (file.split(".")[0].toString() === activity.id.toString()) {
-                        activity.dataValues.coverImage = file;
-                    }
-                }
-            }
+            const activity = ActivityWeb.getWebModelFromDbModel(res.locals.activity);
 
             res.send(activity);
         }).done();
