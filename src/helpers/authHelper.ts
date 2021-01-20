@@ -56,11 +56,16 @@ export function authenticate(email: string, password: string): any {
     email = email.toLowerCase();
     return User.findOne({where: {email}}).then(function(user: User): any {
         if (!user) {
-            return {error: 406, data: "Email address not associated to any account"};
+            throw new Error("Email address not associated to any account");
         }
+
         return getPasswordHash(password, user.passwordSalt)
             .then(function(hash: string): any {
-                return (hash === user.passwordHash) ? user : {error: 406, data: "Password incorrect"};
+                if (hash === user.passwordHash) {
+                    return user;
+                } else {
+                    throw new Error("Password incorrect");
+                }
             });
     });
 }

@@ -4,6 +4,7 @@ import {User} from "../models/database/user.model";
 import {Group} from "../models/database/group.model";
 import {authenticate, startSession} from "../helpers/authHelper";
 import {Role} from "../models/database/role.model";
+import {UserWeb} from "../models/web/user.web.model";
 
 const router: Router = express.Router();
 
@@ -22,17 +23,11 @@ router.route("/")
             attributes: ["id", "email", "displayName", "consentWithPortraitRight"],
             include: [{
                 model: Group,
-                attributes: ["id", "displayName", "fullname", "description", "canOrganize", "email"]
+                attributes: ["id", "displayName", "fullName", "description", "canOrganize", "email"]
             }, Role]
         }).then(function(foundUser: User): void {
             // get the datavalues of the user
-            const profile: User = foundUser;
-
-            // set whether the user can organize activities
-            profile.canOrganize = profile.role.ACTIVITY_MANAGE || profile.groups.some(
-                function(groupOfUser: Group): boolean {
-                    return groupOfUser.canOrganize;
-            });
+            const profile: UserWeb = UserWeb.getWebModelFromDbModel(foundUser);
 
             // send the profile back the client
             res.send(profile);
@@ -57,11 +52,6 @@ router.route("/login")
 
         // authenticate user
         authenticate(req.body.email, req.body.password).then(function(foundUser: User): any {
-            // check if error occurred
-            // TODO figure out how to fix this?
-            if (foundUser.error === 406) {
-                return res.status(406).send(foundUser);
-            }
 
             // check if user account is approved
             if (foundUser.approved === false) {
@@ -77,7 +67,8 @@ router.route("/login")
                     res.status(200).send({});
                 });
         }).catch(function(err: Error): any {
-            return res.status(500).send({error: err});
+            // Authentication failed, send back error
+            return res.status(400).send({error: err});
         });
     });
 

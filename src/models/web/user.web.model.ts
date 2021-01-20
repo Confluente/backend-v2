@@ -81,7 +81,12 @@ export class UserWeb extends AbstractWebModel {
      */
     public approvingHash: string;
 
-    // TODO add nice comments
+    /**
+     * Whether this user can organize events
+     */
+    public canOrganize: boolean;
+
+        // TODO add nice comments
     public groups: UserGroupWeb[];
 
     public activities: SubscriptionWeb[];
@@ -94,6 +99,11 @@ export class UserWeb extends AbstractWebModel {
         if ((dbUser as User).role !== null) {
             webUser.role = RoleWeb.getWebModelFromDbModel((dbUser as User).role);
         }
+
+        webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(
+            function(groupOfUser: UserGroupWeb): boolean {
+                return groupOfUser.group.canOrganize;
+        });
 
         return webUser;
     }
