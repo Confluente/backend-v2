@@ -2,6 +2,7 @@ import express, {Request, Response, Router} from "express";
 
 import marked from "marked";
 import {Page} from "../models/database/page.model";
+import {PageWeb} from "../models/web/page.web.model";
 
 const permissions: any = require("../permissions");
 
@@ -22,14 +23,10 @@ router.route("/:url([^\?]+)")
             // If page is not found, send 404
             if (!page) { return res.sendStatus(404); }
 
-            // Enables markdown
-            if (req.query.render === "true") {
-                page.dataValues.html = marked(page.dataValues.content);
-                page.dataValues.content = undefined;
-            }
+            const webPage = PageWeb.getWebModelFromDbModel(page);
 
             // Send page to the client
-            res.send(page);
+            res.send(webPage);
         });
     })
 

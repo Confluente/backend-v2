@@ -121,7 +121,7 @@ export class Activity extends Model {
      * Subscription deadline of the activity.
      */
     @Column(DataType.TIME)
-    public subscriptionDeadline: object | null;
+    public subscriptionDeadline: any | null;
 
     /**
      * Stores whether the activity is published.

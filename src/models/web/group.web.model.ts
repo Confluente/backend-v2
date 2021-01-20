@@ -47,16 +47,18 @@ export class GroupWeb extends AbstractWebModel {
     public members!: UserGroupWeb[];
 
     public static getWebModelFromDbModel(dbGroup: Model): GroupWeb {
+        // for each attribute where the type and name are equal, copy them over
         const webGroup = copyMatchingSourceKeyValues(new GroupWeb(), dbGroup);
 
+        // copy over the group members
         webGroup.members = [];
-        const group = webGroup.copy();
-        for (const member of (dbGroup as Group).members) {
-            const func = member.UserGroup.func;
-            delete member.UserGroup;
-            const user = UserWeb.getWebModelFromDbModel(member);
-            webGroup.members.push(new UserGroupWeb(user, group, func));
-
+        if ((dbGroup as Group).members !== null) {
+            for (const member of (dbGroup as Group).members) {
+                const func = member.UserGroup.func;
+                delete member.UserGroup;
+                const user = UserWeb.getWebModelFromDbModel(member);
+                webGroup.members.push(new UserGroupWeb(user, webGroup, func));
+            }
         }
 
         return webGroup;

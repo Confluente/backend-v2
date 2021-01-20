@@ -16,7 +16,7 @@ import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../
 
 const router: Router = express.Router();
 
-import {Op} from 'sequelize';
+import {Op, where} from 'sequelize';
 import {ActivityWeb} from "../models/web/activity.web.model";
 
 // path where the pictures of the activities are put in in frontend
@@ -89,18 +89,15 @@ router.route("/")
                         new Date().setFullYear(new Date().getFullYear() + 10)
                     ]}
             },
-            include: [{
-                model: Group,
-                as: "Organizer",
-                attributes: ["id", "displayName", "fullName", "email"]
-            }, {
-                model: User,
-                as: "participants",
-                attributes: ["id", "displayName", "firstName", "lastName", "email"]
-            }]
+            include: [
+                {model: Group, attributes: ["id", "displayName", "fullName", "email"]},
+                {model: User, attributes: ["id", "displayName", "firstName", "lastName", "email"]}
+            ]
         }).then(function(foundActivities: Activity[]): any {
+            const activities = ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
+
             // Check for every activity if the client can view them
-            const promises = foundActivities.map(function(singleActivity: Activity): any {
+            const promises = activities.map(function(singleActivity: Activity): any {
                 // If the activity is published, everyone (also not logged in) is allowed to see them
                 // These lines are needed not to crash the management table in some cases
                 if (singleActivity.published) { return Q(singleActivity); }
@@ -122,12 +119,6 @@ router.route("/")
                 // Filter out all null events
                 promisedActivities = promisedActivities.filter(function(singleActivity: Activity): boolean {
                     return singleActivity !== null;
-                });
-
-                // For each activity in activities, enable markdown for description
-                promisedActivities = promisedActivities.map(function(singleActivity: Activity): Activity {
-                    singleActivity.description_html = marked(singleActivity.description || "");
-                    return singleActivity;
                 });
 
                 // Send activities to the client

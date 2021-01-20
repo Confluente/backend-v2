@@ -5,7 +5,7 @@
  * @returns             Stringified array, consisting of the input elements separated by #,#
  */
 export function stringifyArrayOfStrings(array: string[]): string {
-    if (array.length === 0) { return ""; }
+    if (array === null || array.length === 0) { return ""; }
 
     let result: string = "";
     for (let i: number = 0; i < array.length - 1; i++) {

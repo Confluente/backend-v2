@@ -1,6 +1,8 @@
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model} from "sequelize-typescript";
 import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {Page} from "../database/page.model";
+import marked from "marked";
 
 export class PageWeb extends AbstractWebModel {
     /**
@@ -19,11 +21,20 @@ export class PageWeb extends AbstractWebModel {
     public content!: any;
 
     /**
+     * Content of the page in html format
+     */
+    public htmlContent!: any;
+
+    /**
      * Author of the page.
      */
     public author!: string;
 
     public static getWebModelFromDbModel(dbPage: Model): PageWeb {
-        return copyMatchingSourceKeyValues(new PageWeb(), dbPage);
+        const webPage = copyMatchingSourceKeyValues(new PageWeb(), dbPage);
+
+        webPage.htmlContent = marked((dbPage as Page).content);
+
+        return webPage;
     }
 }

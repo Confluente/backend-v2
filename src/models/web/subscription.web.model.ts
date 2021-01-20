@@ -8,6 +8,12 @@ import {UserWeb} from "./user.web.model";
 // TODO add comments to this :)
 export  class SubscriptionWeb {
 
+    constructor(user: UserWeb, activity: ActivityWeb, answers: string) {
+        this.user = user;
+        this.activity = activity;
+        this.answers = answers;
+    }
+
     user!: UserWeb;
 
     activity!: ActivityWeb;

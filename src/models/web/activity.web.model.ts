@@ -1,10 +1,14 @@
-import {Activity} from "../database/activity.model";
 import marked from "marked";
 import {SubscriptionWeb} from "./subscription.web.model";
 import {GroupWeb} from "./group.web.model";
 import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
 import {AbstractWebModel} from "./abstract.web.model";
-import {Model} from "sequelize-typescript";
+import {Model, Sequelize} from "sequelize-typescript";
+import {Activity} from "../database/activity.model";
+import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../../helpers/arrayHelper";
+import * as fs from "fs";
+import {pathToActPictures} from "../../constants";
+import {UserWeb} from "./user.web.model";
 
 enum questionType {"☰ text", "◉ multiple choice", "☑ checkboxes"}
 
@@ -14,6 +18,7 @@ export class ActivityWeb extends AbstractWebModel {
     /**
      * ID of the activity
      * Can be empty if it is to be defined by the database yet
+     * TODO check if it can indeed be null?
      */
     public id: string | null;
 
@@ -45,12 +50,12 @@ export class ActivityWeb extends AbstractWebModel {
     /**
      * Start time of the activity.
      */
-    public startTime: any | null;
+    public startTime: Date | null;
 
     /**
      * End time of the activity.
      */
-    public endTime: any | null;
+    public endTime: Date | null;
 
     /**
      * canSubscribes stores whether members can subscribe to the activity.
@@ -60,12 +65,12 @@ export class ActivityWeb extends AbstractWebModel {
     /**
      * Participation fee of the activity.
      */
-    public participationFee: number | null;
+    public participationFee: number;
 
     /**
      * Number of questions in the subscription form.
      */
-    public numberOfQuestions: number | null;
+    public numberOfQuestions: number;
 
     /**
      * Type of questions in the subscription form.
@@ -106,7 +111,7 @@ export class ActivityWeb extends AbstractWebModel {
     /**
      * Subscription deadline of the activity.
      */
-    public subscriptionDeadline: object | null;
+    public subscriptionDeadline: Date | null;
 
     /**
      * Stores whether the activity is published.
@@ -118,20 +123,72 @@ export class ActivityWeb extends AbstractWebModel {
      */
     public hasCoverImage!: boolean;
 
-    // TODO add comments
+    /**
+     * Stores the name of the cover image
+     */
+    public coverImage: string;
+
+        // TODO add comments
     public participants: SubscriptionWeb[];
 
     // TODO change uses of this (was first capitalized)
     // TODO maybe change to HasOne relationship, as i feel like that makes more sense
     public organizer: GroupWeb;
 
-    // TODO Add comments
     public static getWebModelFromDbModel(dbActivity: Model): ActivityWeb {
-        let webActivity = new ActivityWeb();
-        webActivity = copyMatchingSourceKeyValues(webActivity, dbActivity);
+        // for each attribute where the type and name are equal, copy them over
+        const webActivity = copyMatchingSourceKeyValues(new ActivityWeb(), dbActivity);
 
+        // Cast activity to Activity model
+        const castedAct = dbActivity as Activity;
+
+        // TODO check whether this works
+        webActivity.startTime = castedAct.startTime !== null ? new Date(castedAct.startTime) : null;
+        webActivity.endTime = castedAct.endTime !== null ? new Date(castedAct.endTime) : null;
+
+        if (castedAct.canSubscribe) {
+            webActivity.subscriptionDeadline = castedAct.subscriptionDeadline !== null
+                ? new Date(castedAct.subscriptionDeadline) : null;
+            webActivity.typeOfQuestion = destringifyStringifiedArrayOfStrings(castedAct.typeOfQuestion);
+            webActivity.questionDescriptions = destringifyStringifiedArrayOfStrings(castedAct.questionDescriptions);
+            // TODO check if we can cast these immediately to boolean lists?
+            webActivity.required = destringifyStringifiedArrayOfStrings(castedAct.required);
+            webActivity.privacyOfQuestions = destringifyStringifiedArrayOfStrings(castedAct.privacyOfQuestions);
+
+            const nonSplitFormOptions = destringifyStringifiedArrayOfStrings(castedAct.formOptions);
+            webActivity.formOptions = [];
+            nonSplitFormOptions.forEach(function(question: string): void {
+                webActivity.formOptions.push(question.split('#;#'));
+            });
+
+            // Fill participants
+            webActivity.participants = [];
+            if (castedAct.participants !== null) {
+                for (const member of castedAct.participants) {
+                    const answers = member.Subscription.answers;
+                    delete member.Subscription;
+                    const user = UserWeb.getWebModelFromDbModel(member);
+                    webActivity.participants.push(new SubscriptionWeb(user, webActivity, answers));
+                }
+            }
+        }
+
+        webActivity.organizer = GroupWeb.getWebModelFromDbModel(castedAct.organizer);
+
+        // Save the name of the cover image
+        if (castedAct.hasCoverImage) {
+            const files = fs.readdirSync(pathToActPictures);
+            for (const file of files) {
+                if (file.split(".")[0].toString() === castedAct.id.toString()) {
+                    webActivity.coverImage = file;
+                }
+            }
+        }
+
+        // turn the description into html
         webActivity.description_html = marked(webActivity.description || "");
 
+        // return webActivity object
         return webActivity;
     }
 }

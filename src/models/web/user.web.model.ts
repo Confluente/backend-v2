@@ -4,6 +4,8 @@ import {SubscriptionWeb} from "./subscription.web.model";
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model} from "sequelize-typescript";
 import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {Role} from "../database/role.model";
+import {User} from "../database/user.model";
 
 export class UserWeb extends AbstractWebModel {
 
@@ -70,11 +72,6 @@ export class UserWeb extends AbstractWebModel {
     public mobilePhoneNumber: string | null;
 
     /**
-     * Salt of the password of the user.
-     */
-    public passwordSalt: any;
-
-    /**
      * Whether the account of the user is approved
      */
     public approved: boolean;
@@ -92,7 +89,11 @@ export class UserWeb extends AbstractWebModel {
     public role: RoleWeb;
 
     public static getWebModelFromDbModel(dbUser: Model): UserWeb {
-        let webUser = copyMatchingSourceKeyValues(new UserWeb(), dbUser);
+        const webUser = copyMatchingSourceKeyValues(new UserWeb(), dbUser);
+
+        if ((dbUser as User).role !== null) {
+            webUser.role = RoleWeb.getWebModelFromDbModel((dbUser as User).role);
+        }
 
         return webUser;
     }
