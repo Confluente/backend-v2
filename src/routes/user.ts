@@ -31,7 +31,7 @@ router.route("/")
             // If client has permission, find all users in database
             User.findAll({
                 attributes: ["id", "displayName", "email"],
-                include: [User.associations.role],
+                include: [Role],
                 order: [
                     ["id", "ASC"]
                 ]
@@ -149,7 +149,6 @@ router.route("/:id")
                 include: [
                     {
                         model: User,
-                        as: "members",
                         attributes: ["id"],
                         where: {
                             id: req.params.id
@@ -189,7 +188,6 @@ router.route("/:id")
                 include: [
                     {
                         model: User,
-                        as: "members",
                         attributes: ["id"],
                         where: {
                             id: req.params.id
