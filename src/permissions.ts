@@ -1,4 +1,4 @@
-import {Promise, all} from "q";
+import {Promise, all} from "bluebird";
 import {Request, Response} from "express";
 
 import {User} from "./models/database/user.model";
@@ -14,20 +14,28 @@ import {Role} from "./models/database/role.model";
  */
 export function check(user: User | number, scope: any): Promise<boolean> {
     let loggedIn = true;
-    return Promise(function(resolve, reject): any {
+    return new Promise(function(resolve, reject): any {
         if (!user) {
             // User undefined
             loggedIn = false;
-            const imposterRole: Role = Role.findOne({where: {
+            Role.findOne({
+                where: {
                     name: 'Not logged in'
-                }});
-            resolve({role: imposterRole});
+                }
+            }).then(function(role: Role): any {
+                if (role === null) {
+                    throw new Error("Permissions.check: 'Not logged in' role could not be found. " +
+                        "Be sure to have a correctly initialized database");
+                }
+
+                resolve({role});
+            });
         } else if (typeof user === 'number') {
             resolve(User.findByPk(user));
         } else {
             resolve(user);
         }
-    }).then(function(dbUser: User): boolean {
+    }).then(function(dbUser: User): Promise<boolean> | boolean {
 
         // Determine rule based on context
         switch (scope.type) {
@@ -47,7 +55,7 @@ export function check(user: User | number, scope: any): Promise<boolean> {
                     return ownAccount || dbUser.role.USER_VIEW_ALL;
                 });
             case "USER_MANAGE":
-                return dbUser.role.permissions.USER_MANAGE;
+                return dbUser.role.USER_MANAGE;
             case "CHANGE_PASSWORD":
                 return User.findByPk(scope.value).then(function(user_considered: User): boolean {
                     if (!user_considered) {
@@ -62,12 +70,19 @@ export function check(user: User | number, scope: any): Promise<boolean> {
             case "GROUP_MANAGE":
                 return dbUser.role.GROUP_MANAGE;
             case "GROUP_ORGANIZE":
-                if (!loggedIn) { return false; }
+                if (!loggedIn) {
+                    return false;
+                }
                 return Group.findByPk(scope.value).then(function(group: Group): boolean {
                     // Check whether group is allowed to organize
-                    if (!group.canOrganize) { return false; }
+                    if (!group.canOrganize) {
+                        return false;
+                    }
                     // If the group is allowed to organize, members are allowed to organize
-                    const member = dbUser.hasGroup(group.id);
+                    const member = dbUser.groups.some(
+                        function(dbGroup: Group & {UserGroup: any}): boolean {
+                            return dbGroup.id === group.id;
+                        });
                     return member || dbUser.role.GROUP_ORGANIZE_WITH_ALL;
                 });
             case "ACTIVITY_VIEW":
@@ -79,13 +94,20 @@ export function check(user: User | number, scope: any): Promise<boolean> {
                         return dbUser.role.ACTIVITY_VIEW_PUBLISHED;
                     }
                     // Unpublished activities allowed to be seen by organizers
-                    const organizing = loggedIn ? dbUser.hasGroup(activity.OrganizerId) : false;
+                    // const organizing = loggedIn ? dbUser.hasGroup(activity.OrganizerId) : false;
+                    const organizing = loggedIn ? dbUser.groups.some(
+                        function(dbGroup: Group & {UserGroup: any}): boolean {
+                            return dbGroup.id === activity.organizer.id;
+                    }) : false;
                     return organizing || dbUser.role.ACTIVITY_VIEW_ALL_UNPUBLISHED;
                 });
             case "ACTIVITY_EDIT":
                 return Activity.findByPk(scope.value).then(function(activity: Activity): boolean {
                     // Activities allowed to be edited by organizers
-                    const organizing = loggedIn ? dbUser.hasGroup(activity.OrganizerId) : false;
+                    const organizing = loggedIn ? dbUser.groups.some(
+                        function(dbGroup: Group & {UserGroup: any}): boolean {
+                            return dbGroup.id === activity.organizer.id;
+                        })  : false;
                     return organizing || dbUser.role.ACTIVITY_MANAGE;
                 });
             default:
@@ -118,7 +140,7 @@ export function requireAll(scopes: any): any {
                 return res.sendStatus(403);
             }
             return next();
-        }).fail(function(err: Error): void {
+        }).catch(function(err: Error): void {
             next(err);
         }).done();
     };

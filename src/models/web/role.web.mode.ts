@@ -52,6 +52,21 @@ export class RoleWeb extends AbstractWebModel {
     public ROLE_MANAGE!: boolean;
 
     /**
+     * Permission to view groups.
+     */
+    public GROUP_VIEW!: boolean;
+
+    /**
+     * Permission to manage groups.
+     */
+    public GROUP_MANAGE!: boolean;
+
+    /**
+     * Permission to organize events as any group.
+     */
+    public GROUP_ORGANIZE_WITH_ALL!: boolean;
+
+    /**
      * Permission to view published activities.
      */
     public ACTIVITY_VIEW_PUBLISHED!: boolean;

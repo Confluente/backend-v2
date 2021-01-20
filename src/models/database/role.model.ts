@@ -79,6 +79,30 @@ export class Role extends Model<Role> {
     public ROLE_MANAGE!: boolean;
 
     /**
+     * Permission to view groups.
+     */
+    @AllowNull(false)
+    @Default(false)
+    @Column(DataType.BOOLEAN)
+    public GROUP_VIEW!: boolean;
+
+    /**
+     * Permission to manage groups.
+     */
+    @AllowNull(false)
+    @Default(false)
+    @Column(DataType.BOOLEAN)
+    public GROUP_MANAGE!: boolean;
+
+    /**
+     * Permission to organize events as any group.
+     */
+    @AllowNull(false)
+    @Default(false)
+    @Column(DataType.BOOLEAN)
+    public GROUP_ORGANIZE_WITH_ALL!: boolean;
+
+    /**
      * Permission to view published activities.
      */
     @AllowNull(false)
