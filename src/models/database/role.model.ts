@@ -1,8 +1,30 @@
-import {AllowNull, Column, DataType, Default, ForeignKey, Model, PrimaryKey, Table, Unique} from "sequelize-typescript";
+import {
+    AllowNull,
+    AutoIncrement,
+    Column,
+    DataType,
+    Default,
+    ForeignKey,
+    Model,
+    PrimaryKey,
+    Table,
+    Unique
+} from "sequelize-typescript";
 import {User} from "./user.model";
+import {Activity} from "./activity.model";
 
 @Table({timestamps: false})
 export class Role extends Model<Role> {
+
+    /**
+     * ID of the role
+     */
+    @AllowNull(false)
+    @AutoIncrement
+    @Unique
+    @ForeignKey(() => User)
+    @Column(DataType.INTEGER)
+    public id!: number;
 
     /**
      * Name of the role.
@@ -10,7 +32,6 @@ export class Role extends Model<Role> {
     @Unique
     @PrimaryKey
     @AllowNull(false)
-    @ForeignKey(() => User)
     @Column(DataType.STRING(128))
     public name!: string;
 

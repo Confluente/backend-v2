@@ -4,25 +4,18 @@ import {Activity} from "./models/database/activity.model";
 import {User} from "./models/database/user.model";
 import {Group} from "./models/database/group.model";
 import {Role} from "./models/database/role.model";
-import {db} from "./db";
-
 
 import fs from 'fs';
 
-import {CompanyOpportunity} from "./models/database/company.opportunity.model";
-import {Page} from "./models/database/page.model";
-import {Session} from "./models/database/session.model";
-import {Subscription} from "./models/database/subscription.model";
-import {UserGroup} from "./models/database/usergroup.model";
+import {db} from "./db";
 
 if (!fs.existsSync("./data.sqlite")) {
     // database does not yet exist! great :)
 } else {
+    console.log("Deleting current instance of database!")
     fs.unlinkSync("./data.sqlite");
     // throw new Error("Delete the database (data.sqlite) before generating a new one");
 }
-
-// db.addModels([Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup]);
 
 // Standard roles
 const roles = [
@@ -375,47 +368,66 @@ const activities: any[] = [
     }
 ];
 
-// Import initial administrator and initial group to database
-all([
-    Role.bulkCreate(roles).then(function(result: any): void {
-        console.log("Created roles");
-    }),
-    User.bulkCreate(users).then(function(result: any): void {
-        console.log("Created users");
-    }),
-    Group.bulkCreate(groups).then(function(result: any): void {
-        console.log("Created groups");
-    }),
-    Activity.bulkCreate(activities).then(function(result: any): void {
-        console.log("Created activities");
-    })
-]).then(function(): any {
-    const promises: any[] = [];
 
-    users.forEach(function(userData: any): void {
-        const promise = User.findByPk(userData.email).then(function(user: User): void {
-            if (!userData.functions || !userData.groups) {
-            } else if (userData.functions.length !== userData.groups.length) {
-            } else {
-                for (let i = 0; i < userData.functions.length; i++) {
-                    user.$add('groups' , userData.groups[i], {through: {func: userData.functions[i]}});
+(async () => {
+
+    await db.sync({force: true});
+
+    // Import initial administrator and initial group to database
+    all([
+        Role.bulkCreate(roles).then(function(result: any): void {
+            console.log("Created roles");
+        }).catch(function(err: any): void {
+            console.error("Roles error!!!");
+            console.log(err);
+        }),
+        User.bulkCreate(users).then(function(result: any): void {
+            console.log("Created users");
+        }).catch(function(err: any): void {
+            console.error("Users error!!!");
+            console.log(err);
+        }),
+        Group.bulkCreate(groups).then(function(result: any): void {
+            console.log("Created groups");
+        }).catch(function(err: any): void {
+            console.error("Groups error!!!");
+            console.log(err);
+        }),
+        Activity.bulkCreate(activities).then(function(result: any): void {
+            console.log("Created activities");
+        }).catch(function(err: any): void {
+            console.error("Activities error!!!");
+            console.log(err);
+        })
+    ]).then(function(): any {
+        const promises: any[] = [];
+
+        users.forEach(function(userData: any): void {
+            const promise = User.findByPk(userData.email).then(function(user: User): void {
+                if (!userData.functions || !userData.groups) {
+                } else if (userData.functions.length !== userData.groups.length) {
+                } else {
+                    for (let i = 0; i < userData.functions.length; i++) {
+                        user.$add('groups', userData.groups[i], {through: {func: userData.functions[i]}});
+                    }
                 }
-            }
 
-            if (!userData.activities) {
+                if (!userData.activities) {
 
-            } else if (userData.activities && userData.activities.length === userData.answers.length) {
-                for (let i = 0; i < userData.activities.length; i++) {
-                    Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
-                        user.$add('activities' , activity, {through: {answers: userData.answers[i]}});
-                    });
+                } else if (userData.activities && userData.activities.length === userData.answers.length) {
+                    for (let i = 0; i < userData.activities.length; i++) {
+                        Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
+                            user.$add('activities', activity, {through: {answers: userData.answers[i]}});
+                        });
+                    }
                 }
-            }
+            });
+            promises.push(promise);
         });
-        promises.push(promise);
-    });
 
-    return all(promises);
-}).then(function(): void {
-    console.log("Done!");
-}).done();
+        return all(promises);
+    }).then(function(): void {
+        console.log("Done!");
+    }).done();
+
+})();

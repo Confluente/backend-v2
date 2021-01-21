@@ -15,6 +15,7 @@ import {User} from "./models/database/user.model";
 import {Session} from "./models/database/session.model";
 
 process.env.NODE_ENV = "development";
+import {db} from "./db";
 
 let webroot: any;
 

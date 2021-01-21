@@ -11,14 +11,11 @@ import {Subscription} from "./models/database/subscription.model";
 import {User} from "./models/database/user.model";
 import {UserGroup} from "./models/database/usergroup.model";
 
-const storage = (process.env.NODE_ENV === "test") ? ":memory:" : "data.sqlite";
+const storage = (process.env.NODE_ENV === "test") ? ":memory:" : "./db.sqlite";
 export const db: Sequelize = new Sequelize({
-    database: "db",
     dialect: "sqlite",
     username: null,
     password: null,
-    storage: ":memory:",
+    storage,
     models: [Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup],
 });
-
-// db.addModels([Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup]);
