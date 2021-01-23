@@ -4,7 +4,7 @@ import {
     Column,
     DataType,
     Default,
-    ForeignKey,
+    ForeignKey, HasMany,
     Model,
     PrimaryKey,
     Table,
@@ -145,4 +145,10 @@ export class Role extends Model<Role> {
     @Default(false)
     @Column(DataType.BOOLEAN)
     public ACTIVITY_MANAGE!: boolean;
+
+    /**
+     * Users that have this particular role.
+     */
+    @HasMany(() => User)
+    public users: User[];
 }

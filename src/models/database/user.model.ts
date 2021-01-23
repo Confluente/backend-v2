@@ -3,7 +3,7 @@ import {
     AutoIncrement, BelongsTo, BelongsToMany,
     Column,
     DataType,
-    Default, HasOne,
+    Default, ForeignKey, HasOne,
     Model,
     PrimaryKey,
     Table,
@@ -148,6 +148,6 @@ export class User extends Model<User> {
     @BelongsToMany(() => Activity, () => Subscription)
     public activities: Array<Activity & {Subscript: Subscription}>;
 
-    @BelongsTo(() => Role, 'id')
-    public role: Role;
+    @ForeignKey(() => Role)
+    public roleId: number;
 }
