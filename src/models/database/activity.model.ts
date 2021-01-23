@@ -146,5 +146,5 @@ export class Activity extends Model {
     // TODO change uses of this (was first capitalized)
     // TODO maybe change to HasOne relationship, as i feel like that makes more sense
     @ForeignKey(() => Group)
-    public organizerId: number;
+    public organizer: Group;
 }

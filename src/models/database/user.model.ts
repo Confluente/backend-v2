@@ -149,5 +149,5 @@ export class User extends Model<User> {
     public activities: Array<Activity & {Subscript: Subscription}>;
 
     @ForeignKey(() => Role)
-    public roleId: number;
+    public role: Role;
 }
