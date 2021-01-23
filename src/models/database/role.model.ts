@@ -1,6 +1,6 @@
 import {
     AllowNull,
-    AutoIncrement,
+    AutoIncrement, BelongsToMany,
     Column,
     DataType,
     Default,
@@ -22,7 +22,7 @@ export class Role extends Model<Role> {
     @AllowNull(false)
     @AutoIncrement
     @Unique
-    @ForeignKey(() => User)
+    @PrimaryKey
     @Column(DataType.INTEGER)
     public id!: number;
 
@@ -30,7 +30,6 @@ export class Role extends Model<Role> {
      * Name of the role.
      */
     @Unique
-    @PrimaryKey
     @AllowNull(false)
     @Column(DataType.STRING(128))
     public name!: string;

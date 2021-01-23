@@ -1,6 +1,6 @@
 import {
     AllowNull,
-    AutoIncrement, BelongsToMany,
+    AutoIncrement, BelongsTo, BelongsToMany,
     Column,
     DataType,
     Default, HasOne,
@@ -148,6 +148,6 @@ export class User extends Model<User> {
     @BelongsToMany(() => Activity, () => Subscription)
     public activities: Array<Activity & {Subscript: Subscription}>;
 
-    @HasOne(() => Role)
+    @BelongsTo(() => Role, 'id')
     public role: Role;
 }

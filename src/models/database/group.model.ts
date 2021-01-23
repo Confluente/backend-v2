@@ -7,7 +7,7 @@ import {
     PrimaryKey,
     Unique,
     BelongsToMany,
-    ForeignKey, AutoIncrement
+    ForeignKey, AutoIncrement, BelongsToManyAssociation, BelongsTo, HasMany
 } from 'sequelize-typescript';
 import {User} from "./user.model";
 import {UserGroup} from "./usergroup.model";
@@ -19,7 +19,6 @@ export class Group extends Model<Group> {
     @AllowNull(false)
     @AutoIncrement
     @Unique
-    @ForeignKey(() => Activity)
     @Column(DataType.INTEGER)
     public id!: number;
 
@@ -70,4 +69,8 @@ export class Group extends Model<Group> {
     // TODO add comment
     @BelongsToMany(() => User, () => UserGroup)
     public members: Array<User & {UserGroup: UserGroup}>;
+
+    // TODO add comment
+    @HasMany(() => Activity)
+    public activities: Activity[];
 }

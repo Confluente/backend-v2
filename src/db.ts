@@ -11,7 +11,7 @@ import {Subscription} from "./models/database/subscription.model";
 import {User} from "./models/database/user.model";
 import {UserGroup} from "./models/database/usergroup.model";
 
-const storage = (process.env.NODE_ENV === "test") ? ":memory:" : "./db.sqlite";
+const storage = (process.env.NODE_ENV === "test") ? ":memory:" : "./data.sqlite";
 export const db: Sequelize = new Sequelize({
     dialect: "sqlite",
     username: null,

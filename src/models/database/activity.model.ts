@@ -5,7 +5,7 @@ import {
     AllowNull,
     Default,
     BelongsToMany,
-    HasOne, Model
+    HasOne, Model, BelongsTo, ForeignKey
 } from 'sequelize-typescript';
 
 import {Group} from './group.model';
@@ -145,6 +145,6 @@ export class Activity extends Model {
 
     // TODO change uses of this (was first capitalized)
     // TODO maybe change to HasOne relationship, as i feel like that makes more sense
-    @HasOne(() => Group)
+    @ForeignKey(() => Group)
     public organizer: Group;
 }

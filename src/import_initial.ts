@@ -10,9 +10,10 @@ import fs from 'fs';
 import {db} from "./db";
 
 if (!fs.existsSync("./data.sqlite")) {
+    console.log("Not deleting current instance");
     // database does not yet exist! great :)
 } else {
-    console.log("Deleting current instance of database!")
+    console.log("Deleting current instance of database!");
     fs.unlinkSync("./data.sqlite");
     // throw new Error("Delete the database (data.sqlite) before generating a new one");
 }
@@ -150,7 +151,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 1,
+        role: 1,
         groups: [10],
         functions: ["Chair"]
     },
@@ -166,7 +167,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 2,
+        role: 2,
         groups: [10],
         functions: ["Member"]
     },
@@ -182,7 +183,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 4,
+        role: 4,
         groups: [1],
         functions: ["Member"]
     },
@@ -216,28 +217,28 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 3,
+        role: 3,
         groups: [3],
         functions: ["Member"]
     },
-    {
-        id: 6,
-        email: "activemember3@student.tue.nl",
-        displayName: "Active3 Member",
-        firstName: "Active3",
-        lastName: "dupermin",
-        honorsMembership: "Member",
-        mobilePhoneNumber: "somenumber",
-        approvingHash: "da;lkfjda;fjkad;fj",
-        passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
-        passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
-        approved: true,
-        RoleId: 3,
-        groups: [4],
-        functions: ["Treasurer"],
-        activities: [2],
-        answers: ["Active2 Member#,#activemember2@student.tue.nl#,#Kachawakaas#,#wooferdiedoofdoof"]
-    }
+    // {
+    //     id: 6,
+    //     email: "activemember3@student.tue.nl",
+    //     displayName: "Active3 Member",
+    //     firstName: "Active3",
+    //     lastName: "dupermin",
+    //     honorsMembership: "Member",
+    //     mobilePhoneNumber: "somenumber",
+    //     approvingHash: "da;lkfjda;fjkad;fj",
+    //     passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
+    //     passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
+    //     approved: true,
+    //     role: 3,
+    //     groups: [4],
+    //     functions: ["Treasurer"],
+    //     activities: [2],
+    //     answers: ["Active2 Member#,#activemember2@student.tue.nl#,#Kachawakaas#,#wooferdiedoofdoof"]
+    // }
 ];
 
 // Initial groups
@@ -372,62 +373,96 @@ const activities: any[] = [
 (async () => {
 
     await db.sync({force: true});
+    //
+
+    for (const ro of roles) {
+        Role.create(ro).catch(function(result: any): void {
+            console.log(result);
+        });
+    }
+
+    for (const us of users) {
+        User.create(us).then(function(result: any): void {
+        }).catch(function(err: Error): void {
+            console.log(us);
+            console.log(err.message, err.name, err.stack);
+        });
+    }
+
+    for (const gr of groups) {
+        Group.create(gr).then(function(result: any): void {
+        }).catch(function(err: Error): void {
+            console.log(gr);
+            console.log(err.message);
+            console.log(err.stack);
+        });
+    }
+
+    for (const act of activities) {
+        Activity.create(act).then(function(result: any): void {
+            console.log("act went fine");
+        }).catch(function(err: Error): void {
+            console.log(act);
+            console.log(err.message);
+            console.log(err.stack);
+        });
+    }
 
     // Import initial administrator and initial group to database
-    all([
-        Role.bulkCreate(roles).then(function(result: any): void {
-            console.log("Created roles");
-        }).catch(function(err: any): void {
-            console.error("Roles error!!!");
-            console.log(err);
-        }),
-        User.bulkCreate(users).then(function(result: any): void {
-            console.log("Created users");
-        }).catch(function(err: any): void {
-            console.error("Users error!!!");
-            console.log(err);
-        }),
-        Group.bulkCreate(groups).then(function(result: any): void {
-            console.log("Created groups");
-        }).catch(function(err: any): void {
-            console.error("Groups error!!!");
-            console.log(err);
-        }),
-        Activity.bulkCreate(activities).then(function(result: any): void {
-            console.log("Created activities");
-        }).catch(function(err: any): void {
-            console.error("Activities error!!!");
-            console.log(err);
-        })
-    ]).then(function(): any {
-        const promises: any[] = [];
-
-        users.forEach(function(userData: any): void {
-            const promise = User.findByPk(userData.email).then(function(user: User): void {
-                if (!userData.functions || !userData.groups) {
-                } else if (userData.functions.length !== userData.groups.length) {
-                } else {
-                    for (let i = 0; i < userData.functions.length; i++) {
-                        user.$add('groups', userData.groups[i], {through: {func: userData.functions[i]}});
-                    }
-                }
-
-                if (!userData.activities) {
-
-                } else if (userData.activities && userData.activities.length === userData.answers.length) {
-                    for (let i = 0; i < userData.activities.length; i++) {
-                        Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
-                            user.$add('activities', activity, {through: {answers: userData.answers[i]}});
-                        });
-                    }
-                }
-            });
-            promises.push(promise);
-        });
-
-        return all(promises);
-    }).then(function(): void {
-        console.log("Done!");
-    }).done();
+    // all([
+    //     Role.bulkCreate(roles).then(function(result: any): void {
+    //         console.log("Created roles");
+    //     }).catch(function(err: any): void {
+    //         console.error("Roles error!!!");
+    //         console.log(err);
+    //     }),
+    //     User.bulkCreate(users).then(function(result: any): void {
+    //         console.log("Created users");
+    //     }).catch(function(err: any): void {
+    //         console.error("Users error!!!");
+    //         console.log(err);
+    //     }),
+    //     Group.bulkCreate(groups).then(function(result: any): void {
+    //         console.log("Created groups");
+    //     }).catch(function(err: any): void {
+    //         console.error("Groups error!!!");
+    //         console.log(err);
+    //     }),
+    //     Activity.bulkCreate(activities).then(function(result: any): void {
+    //         console.log("Created activities");
+    //     }).catch(function(err: any): void {
+    //         console.error("Activities error!!!");
+    //         console.log(err);
+    //     })
+    // ]).then(function(): any {
+    //     const promises: any[] = [];
+    //
+    //     users.forEach(function(userData: any): void {
+    //         const promise = User.findByPk(userData.email).then(function(user: User): void {
+    //             if (!userData.functions || !userData.groups) {
+    //             } else if (userData.functions.length !== userData.groups.length) {
+    //             } else {
+    //                 for (let i = 0; i < userData.functions.length; i++) {
+    //                     user.$add('groups', userData.groups[i], {through: {func: userData.functions[i]}});
+    //                 }
+    //             }
+    //
+    //             if (!userData.activities) {
+    //
+    //             } else if (userData.activities && userData.activities.length === userData.answers.length) {
+    //                 for (let i = 0; i < userData.activities.length; i++) {
+    //                     Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
+    //                         user.$add('activities', activity, {through: {answers: userData.answers[i]}});
+    //                     });
+    //                 }
+    //             }
+    //         });
+    //         promises.push(promise);
+    //     });
+    //
+    //     return all(promises);
+    // }).then(function(): void {
+    //     console.log("Done!");
+    // }).done();
 
 })();
