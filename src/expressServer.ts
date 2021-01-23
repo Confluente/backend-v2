@@ -1,7 +1,7 @@
 import express, {Request, Response} from "express";
 import path from 'path';
 import morgan from 'morgan';
-import {json, urlencoded} from "body-parser";
+import bodyParser, {json, urlencoded} from "body-parser";
 import cookieParser from 'cookie-parser';
 import {scheduleJob} from 'node-schedule';
 import {Op} from "sequelize";
@@ -27,6 +27,7 @@ if (process.env.NODE_ENV === "test") {
     webroot = path.resolve(__dirname, "www");
 } else if (process.env.NODE_ENV === "development") {
     console.log("Running in DEVELOPMENT mode!");
+    webroot = path.resolve(__dirname, "../Frontend-Angular/src/");
 } else { // Running in production
     webroot = path.resolve(__dirname, "../frontend/build");
     app.use(morgan("combined", {stream: require("fs").createWriteStream("./access.log", {flags: "a"})}));
@@ -36,6 +37,24 @@ if (process.env.NODE_ENV === "test") {
         next();
     });
 }
+
+app.use(bodyParser.json({limit: '10mb'}));
+
+app.use(function(req: any, res: any, next: any): void {
+    // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Origin", "http://localhost");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, append,delete,entries,foreach,get,has,keys,set,values,Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+    next();
+});
+
+app.options('*', function(req: any, res: any): void {
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost");
+    res.setHeader('Access-Control-Allow-Methods', "GET, POST, OPTIONS, PUT, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.end();
+});
 
 // TODO check if the json thingy works
 app.use(json({limit: '10mb'}));
