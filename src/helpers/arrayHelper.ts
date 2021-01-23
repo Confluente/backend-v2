@@ -2,6 +2,7 @@
  * Takes an array of strings, and transforms it into a single string for use in the database
  * None of the strings should contain the preserved character combination #,#
  * @param array         Array of strings to be stringified
+ * @throws Error        If one of the items contains `#,#`
  * @returns             Stringified array, consisting of the input elements separated by #,#
  */
 export function stringifyArrayOfStrings(array: string[]): string {
