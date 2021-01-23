@@ -5,17 +5,24 @@
  * @returns             Stringified array, consisting of the input elements separated by #,#
  */
 export function stringifyArrayOfStrings(array: string[]): string {
-    if (array === null || array.length === 0) { return ""; }
+    if (array.length === 0) { return ""; }
 
     let result: string = "";
-    for (let i: number = 0; i < array.length - 1; i++) {
+    for (let i: number = 0; i < array.length; i++) {
+        if (array[i].includes("#,#")) {
+            throw new Error("ArrayHelper.stringifyArrayOfStrings: item " + i + " contains #,# (is " + array[i]
+                + ") and can therefore not be stringified");
+        }
+
         result += array[i];
-        result += "#,#";
+
+        if (i !== array.length - 1) {
+            result += "#,#";
+        }
     }
-    result += array[array.length - 1];
+
     return result;
 }
-
 
 /**
  * Takes a string as used for storing an array of strings in the database, and transforms it back to an array of strings
