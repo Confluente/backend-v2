@@ -378,28 +378,28 @@ const activities: any[] = [
 
     all([
         Role.bulkCreate(roles).then(function(result: any): void {
-            console.log("Created roles");
+            console.log("==========Created roles==========");
         }).catch(function(err: any): void {
             console.error("Roles error!!!");
             console.log(err);
         }),
 
         User.bulkCreate(users).then(function(result: any): void {
-            console.log("Created users");
+            console.log("==========Created users==========");
         }).catch(function(err: any): void {
             console.error("Users error!!!");
             console.log(err);
         }),
 
         Group.bulkCreate(groups).then(function(result: any): void {
-            console.log("Created groups");
+            console.log("==========Created groups==========");
         }).catch(function(err: any): void {
             console.error("Groups error!!!");
             console.log(err);
         }),
 
         Activity.bulkCreate(activities).then(function(result: any): void {
-            console.log("Created activities");
+            console.log("==========Created activities==========");
         }).catch(function(err: any): void {
             console.error("Activities error!!!");
             console.log(err);
