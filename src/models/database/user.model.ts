@@ -22,6 +22,7 @@ export class User extends Model<User> {
     /**
      * Database id of the user.
      */
+    @PrimaryKey
     @AutoIncrement
     @Unique
     @AllowNull(false)
@@ -32,7 +33,6 @@ export class User extends Model<User> {
      * Email of the user.
      */
     // TODO Check if we cant better have the db id as the primary key?
-    @PrimaryKey
     @Unique
     @AllowNull(false)
     @Column(DataType.STRING(128))

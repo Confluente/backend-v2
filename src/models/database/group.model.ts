@@ -16,6 +16,7 @@ import {Activity} from "./activity.model";
 @Table({timestamps: false})
 export class Group extends Model<Group> {
 
+    @PrimaryKey
     @AllowNull(false)
     @AutoIncrement
     @Unique
@@ -32,7 +33,6 @@ export class Group extends Model<Group> {
     /**
      * Full name of the group.
      */
-    @PrimaryKey
     @AllowNull(false)
     @Unique
     @Column(DataType.STRING(128))

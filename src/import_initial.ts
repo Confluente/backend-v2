@@ -173,7 +173,7 @@ const users = [
     },
     {
         id: 3,
-        email: "boardmember",
+        email: "boardmember@student.tue.nl",
         displayName: "Board Member",
         firstName: "Board",
         lastName: "Member",
@@ -221,24 +221,24 @@ const users = [
         groups: [3],
         functions: ["Member"]
     },
-    // {
-    //     id: 6,
-    //     email: "activemember3@student.tue.nl",
-    //     displayName: "Active3 Member",
-    //     firstName: "Active3",
-    //     lastName: "dupermin",
-    //     honorsMembership: "Member",
-    //     mobilePhoneNumber: "somenumber",
-    //     approvingHash: "da;lkfjda;fjkad;fj",
-    //     passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
-    //     passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
-    //     approved: true,
-    //     role: 3,
-    //     groups: [4],
-    //     functions: ["Treasurer"],
-    //     activities: [2],
-    //     answers: ["Active2 Member#,#activemember2@student.tue.nl#,#Kachawakaas#,#wooferdiedoofdoof"]
-    // }
+    {
+        id: 6,
+        email: "activemember3@student.tue.nl",
+        displayName: "Active3 Member",
+        firstName: "Active3",
+        lastName: "dupermin",
+        honorsMembership: "Member",
+        mobilePhoneNumber: "somenumber",
+        approvingHash: "da;lkfjda;fjkad;fj",
+        passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
+        passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
+        approved: true,
+        role: 3,
+        groups: [4],
+        functions: ["Treasurer"],
+        activities: [2],
+        answers: ["Active2 Member#,#activemember2@student.tue.nl#,#Kachawakaas#,#wooferdiedoofdoof"]
+    }
 ];
 
 // Initial groups
@@ -375,94 +375,61 @@ const activities: any[] = [
     await db.sync({force: true});
     //
 
-    for (const ro of roles) {
-        Role.create(ro).catch(function(result: any): void {
-            console.log(result);
+
+    all([
+        Role.bulkCreate(roles).then(function(result: any): void {
+            console.log("Created roles");
+        }).catch(function(err: any): void {
+            console.error("Roles error!!!");
+            console.log(err);
+        }),
+
+        User.bulkCreate(users).then(function(result: any): void {
+            console.log("Created users");
+        }).catch(function(err: any): void {
+            console.error("Users error!!!");
+            console.log(err);
+        }),
+
+        Group.bulkCreate(groups).then(function(result: any): void {
+            console.log("Created groups");
+        }).catch(function(err: any): void {
+            console.error("Groups error!!!");
+            console.log(err);
+        }),
+
+        Activity.bulkCreate(activities).then(function(result: any): void {
+            console.log("Created activities");
+        }).catch(function(err: any): void {
+            console.error("Activities error!!!");
+            console.log(err);
+        }),
+    ]).then(function(): void {
+        users.forEach(function(userData: any): void {
+            User.findByPk(userData.id).then(function(user: User): void {
+                if (!userData.functions || !userData.groups) {
+                } else if (userData.functions.length !== userData.groups.length) {
+                } else {
+                    for (let i = 0; i < userData.groups.length; i++) {
+                        Group.findByPk(userData.groups[i]).then(function(group: Group): void {
+                            user.$add('groups', group, {through: {func: userData.functions[i]}})
+                                .catch(function(err: Error): void {
+                                    console.log("Usergroup add error!");
+                                    console.log(err);
+                                });
+                        });
+                    }
+                }
+
+                if (!userData.activities) {
+                } else if (userData.activities && userData.activities.length === userData.answers.length) {
+                    for (let i = 0; i < userData.activities.length; i++) {
+                        Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
+                            user.$add('activities', activity, {through: {answers: userData.answers[i]}});
+                        });
+                    }
+                }
+            });
         });
-    }
-
-    for (const us of users) {
-        User.create(us).then(function(result: any): void {
-        }).catch(function(err: Error): void {
-            console.log(us);
-            console.log(err.message, err.name, err.stack);
-        });
-    }
-
-    for (const gr of groups) {
-        Group.create(gr).then(function(result: any): void {
-        }).catch(function(err: Error): void {
-            console.log(gr);
-            console.log(err.message);
-            console.log(err.stack);
-        });
-    }
-
-    for (const act of activities) {
-        Activity.create(act).then(function(result: any): void {
-            console.log("act went fine");
-        }).catch(function(err: Error): void {
-            console.log(act);
-            console.log(err.message);
-            console.log(err.stack);
-        });
-    }
-
-    // Import initial administrator and initial group to database
-    // all([
-    //     Role.bulkCreate(roles).then(function(result: any): void {
-    //         console.log("Created roles");
-    //     }).catch(function(err: any): void {
-    //         console.error("Roles error!!!");
-    //         console.log(err);
-    //     }),
-    //     User.bulkCreate(users).then(function(result: any): void {
-    //         console.log("Created users");
-    //     }).catch(function(err: any): void {
-    //         console.error("Users error!!!");
-    //         console.log(err);
-    //     }),
-    //     Group.bulkCreate(groups).then(function(result: any): void {
-    //         console.log("Created groups");
-    //     }).catch(function(err: any): void {
-    //         console.error("Groups error!!!");
-    //         console.log(err);
-    //     }),
-    //     Activity.bulkCreate(activities).then(function(result: any): void {
-    //         console.log("Created activities");
-    //     }).catch(function(err: any): void {
-    //         console.error("Activities error!!!");
-    //         console.log(err);
-    //     })
-    // ]).then(function(): any {
-    //     const promises: any[] = [];
-    //
-    //     users.forEach(function(userData: any): void {
-    //         const promise = User.findByPk(userData.email).then(function(user: User): void {
-    //             if (!userData.functions || !userData.groups) {
-    //             } else if (userData.functions.length !== userData.groups.length) {
-    //             } else {
-    //                 for (let i = 0; i < userData.functions.length; i++) {
-    //                     user.$add('groups', userData.groups[i], {through: {func: userData.functions[i]}});
-    //                 }
-    //             }
-    //
-    //             if (!userData.activities) {
-    //
-    //             } else if (userData.activities && userData.activities.length === userData.answers.length) {
-    //                 for (let i = 0; i < userData.activities.length; i++) {
-    //                     Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
-    //                         user.$add('activities', activity, {through: {answers: userData.answers[i]}});
-    //                     });
-    //                 }
-    //             }
-    //         });
-    //         promises.push(promise);
-    //     });
-    //
-    //     return all(promises);
-    // }).then(function(): void {
-    //     console.log("Done!");
-    // }).done();
-
+    });
 })();
