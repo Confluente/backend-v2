@@ -10,7 +10,11 @@ const fs = require('fs');
 
     await db.sync();
 
-    process.env.PORT = "81";
+    if (process.env.NODE_ENV === "development") {
+        process.env.PORT = "81";
+    } else {
+        process.env.PORT = "80";
+    }
 
     // Set port server
     const port: number = !Number.isNaN(Number(process.env.PORT)) ? Number(process.env.PORT) : 3000;
