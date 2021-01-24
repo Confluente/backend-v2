@@ -1,5 +1,5 @@
 import {expect, assert} from "chai";
-import {describe} from "mocha";
+import {describe, it} from "mocha";
 
 import {stringifyArrayOfStrings} from "../../src/helpers/arrayHelper";
 
