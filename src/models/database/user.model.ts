@@ -65,25 +65,25 @@ export class User extends Model<User> {
      * Major of the user
      */
     @Column(DataType.STRING(128))
-    public major!: string | null;
+    public major: string | null;
 
     /**
      * Stores the address of the user.
      */
     @Column(DataType.STRING(128))
-    public address!: string | null;
+    public address: string | null;
 
     /**
      * Honors track of the user.
      */
     @Column(DataType.STRING(128))
-    public track!: string | null;
+    public track: string | null;
 
     /**
      * Year that the user started with honors.
      */
     @Column(DataType.INTEGER)
-    public honorsGeneration!: number | null;
+    public honorsGeneration: number | null;
     
     /**
      * Stores what kind of membership the user has
@@ -96,13 +96,13 @@ export class User extends Model<User> {
      * Campus card number of the user.
      */
     @Column(DataType.STRING(128))
-    public campusCardNumber!: string | null;
+    public campusCardNumber: string | null;
 
     /**
      * Mobile phone number of the user.
      */
     @Column(DataType.STRING(128))
-    public mobilePhoneNumber!: string | null;
+    public mobilePhoneNumber: string | null;
 
     /**
      * Whether the user gave consent regarding portrait right.

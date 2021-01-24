@@ -19,7 +19,7 @@ if (!fs.existsSync("./data.sqlite")) {
 }
 
 // Standard roles
-const roles = [
+export const roles = [
     {
         id: 1,
         name: "Super admin",
@@ -346,7 +346,8 @@ const activities: any[] = [
         startTime: "18:00",
         endTime: "20:00",
         participationFee: 8.5,
-        OrganizerId: 2
+        OrganizerId: 2,
+        published: false
     },
     {
         id: 2,
