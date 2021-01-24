@@ -27,7 +27,6 @@ if (process.env.NODE_ENV === "test") {
     webroot = path.resolve(__dirname, "www");
 } else if (process.env.NODE_ENV === "development") {
     console.log("Running in DEVELOPMENT mode!");
-    webroot = path.resolve(__dirname, "../Frontend-Angular/src/");
 } else { // Running in production
     webroot = path.resolve(__dirname, "../frontend/build");
     app.use(morgan("combined", {stream: require("fs").createWriteStream("./access.log", {flags: "a"})}));
