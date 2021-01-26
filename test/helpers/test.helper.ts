@@ -8,7 +8,7 @@ import {Subscription} from "../../src/models/database/subscription.model";
 import {User} from "../../src/models/database/user.model";
 import {UserGroup} from "../../src/models/database/usergroup.model";
 
-export function cleanActivities(): void {
+export async function cleanActivities(): Promise<void> {
     Activity.destroy({truncate: true});
 }
 
@@ -38,4 +38,8 @@ export function cleanUsers(): void {
 
 export function cleanUsergroups(): void {
     UserGroup.destroy({truncate: true});
+}
+
+export function clean<B extends Model>(modelClass: B): void {
+    modelClass.destroy();
 }

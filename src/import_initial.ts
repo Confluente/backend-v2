@@ -9,13 +9,15 @@ import fs from 'fs';
 
 import {db} from "./db";
 
-if (!fs.existsSync("./data.sqlite")) {
-    console.log("Not deleting current instance");
-    // database does not yet exist! great :)
-} else {
-    console.log("Deleting current instance of database!");
-    fs.unlinkSync("./data.sqlite");
-    // throw new Error("Delete the database (data.sqlite) before generating a new one");
+if (process.env.NODE_ENV !== "test") {
+    if (!fs.existsSync("./data.sqlite")) {
+        console.log("Not deleting current instance");
+        // database does not yet exist! great :)
+    } else {
+        console.log("Deleting current instance of database!");
+        fs.unlinkSync("./data.sqlite");
+        // throw new Error("Delete the database (data.sqlite) before generating a new one");
+    }
 }
 
 // Standard roles
@@ -371,66 +373,68 @@ const activities: any[] = [
 ];
 
 
-(async () => {
+if (process.env.NODE_ENV !== "test") {
+    (async () => {
 
-    await db.sync({force: true});
-    //
+        await db.sync({force: true});
+        //
 
 
-    all([
-        Role.bulkCreate(roles).then(function(result: any): void {
-            console.log("==========Created roles==========");
-        }).catch(function(err: any): void {
-            console.error("Roles error!!!");
-            console.log(err);
-        }),
+        all([
+            Role.bulkCreate(roles).then(function(result: any): void {
+                console.log("==========Created roles==========");
+            }).catch(function(err: any): void {
+                console.error("Roles error!!!");
+                console.log(err);
+            }),
 
-        User.bulkCreate(users).then(function(result: any): void {
-            console.log("==========Created users==========");
-        }).catch(function(err: any): void {
-            console.error("Users error!!!");
-            console.log(err);
-        }),
+            User.bulkCreate(users).then(function(result: any): void {
+                console.log("==========Created users==========");
+            }).catch(function(err: any): void {
+                console.error("Users error!!!");
+                console.log(err);
+            }),
 
-        Group.bulkCreate(groups).then(function(result: any): void {
-            console.log("==========Created groups==========");
-        }).catch(function(err: any): void {
-            console.error("Groups error!!!");
-            console.log(err);
-        }),
+            Group.bulkCreate(groups).then(function(result: any): void {
+                console.log("==========Created groups==========");
+            }).catch(function(err: any): void {
+                console.error("Groups error!!!");
+                console.log(err);
+            }),
 
-        Activity.bulkCreate(activities).then(function(result: any): void {
-            console.log("==========Created activities==========");
-        }).catch(function(err: any): void {
-            console.error("Activities error!!!");
-            console.log(err);
-        }),
-    ]).then(function(): void {
-        users.forEach(function(userData: any): void {
-            User.findByPk(userData.id).then(function(user: User): void {
-                if (!userData.functions || !userData.groups) {
-                } else if (userData.functions.length !== userData.groups.length) {
-                } else {
-                    for (let i = 0; i < userData.groups.length; i++) {
-                        Group.findByPk(userData.groups[i]).then(function(group: Group): void {
-                            user.$add('groups', group, {through: {func: userData.functions[i]}})
-                                .catch(function(err: Error): void {
-                                    console.log("Usergroup add error!");
-                                    console.log(err);
-                                });
-                        });
+            Activity.bulkCreate(activities).then(function(result: any): void {
+                console.log("==========Created activities==========");
+            }).catch(function(err: any): void {
+                console.error("Activities error!!!");
+                console.log(err);
+            }),
+        ]).then(function(): void {
+            users.forEach(function(userData: any): void {
+                User.findByPk(userData.id).then(function(user: User): void {
+                    if (!userData.functions || !userData.groups) {
+                    } else if (userData.functions.length !== userData.groups.length) {
+                    } else {
+                        for (let i = 0; i < userData.groups.length; i++) {
+                            Group.findByPk(userData.groups[i]).then(function(group: Group): void {
+                                user.$add('groups', group, {through: {func: userData.functions[i]}})
+                                    .catch(function(err: Error): void {
+                                        console.log("Usergroup add error!");
+                                        console.log(err);
+                                    });
+                            });
+                        }
                     }
-                }
 
-                if (!userData.activities) {
-                } else if (userData.activities && userData.activities.length === userData.answers.length) {
-                    for (let i = 0; i < userData.activities.length; i++) {
-                        Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
-                            user.$add('activities', activity, {through: {answers: userData.answers[i]}});
-                        });
+                    if (!userData.activities) {
+                    } else if (userData.activities && userData.activities.length === userData.answers.length) {
+                        for (let i = 0; i < userData.activities.length; i++) {
+                            Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
+                                user.$add('activities', activity, {through: {answers: userData.answers[i]}});
+                            });
+                        }
                     }
-                }
+                });
             });
         });
-    });
-})();
+    })();
+}

@@ -1,5 +1,5 @@
 import {log} from "./logger";
-import {app} from './expressServer';
+import {app, setupServer} from './expressServer';
 import {db} from "./db";
 
 const httpServer = require('http').createServer(app);
@@ -9,6 +9,8 @@ const fs = require('fs');
 (async () => {
 
     await db.sync();
+
+    await setupServer(app);
 
     if (process.env.NODE_ENV === "development") {
         process.env.PORT = "81";

@@ -7,7 +7,8 @@ import {
     PrimaryKey,
     Unique,
     BelongsToMany,
-    ForeignKey, AutoIncrement, BelongsToManyAssociation, BelongsTo, HasMany
+    AutoIncrement,
+    HasMany
 } from 'sequelize-typescript';
 import {User} from "./user.model";
 import {UserGroup} from "./usergroup.model";

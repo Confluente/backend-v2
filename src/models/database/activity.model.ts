@@ -5,7 +5,7 @@ import {
     AllowNull,
     Default,
     BelongsToMany,
-    HasOne, Model, BelongsTo, ForeignKey
+    Model, ForeignKey
 } from 'sequelize-typescript';
 
 import {Group} from './group.model';

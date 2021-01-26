@@ -1,5 +1,3 @@
-import {Role} from "../database/role.model";
-import {Mode} from "fs";
 import {Model} from "sequelize-typescript";
 import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
 import {AbstractWebModel} from "./abstract.web.model";

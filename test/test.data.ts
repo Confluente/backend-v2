@@ -19,7 +19,7 @@ function getAgent(): any {
     });
 }
 
-const nonOrganizingGroup = {
+export const nonOrganizingGroup = {
     displayName: "NOG",
     fullName: "Non Organizing Group",
     description: "Non empty description",
@@ -28,7 +28,7 @@ const nonOrganizingGroup = {
     type: "committee"
 };
 
-const organizingGroup = {
+export const organizingGroup = {
     displayName: "OG",
     fullName: "Organizing Group",
     description: "Non empty description",
@@ -37,7 +37,7 @@ const organizingGroup = {
     type: "committee"
 };
 
-const member = {
+export const member = {
     email: "alice@hsaconfluente.nl",
     firstName: "Alice",
     lastName: "Memberoni",
@@ -50,7 +50,7 @@ const member = {
     passwordHash: getPasswordHashSync(password, passwordSaltBuffer.toString())
 };
 
-const unpublishedActivity = {
+export const unpublishedActivity = {
     id: 1,
     name: "The first ever activity!",
     description: "Wuuuuut its an activity!",
@@ -63,7 +63,7 @@ const unpublishedActivity = {
     published: false
 };
 
-const publishedActivityWithSubscriptionForm = {
+export const publishedActivityWithSubscriptionForm = {
     id: 2,
     name: "The first activity that you can subscribe to!",
     description: "Subscription forms!! How advanced!!",

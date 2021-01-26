@@ -1,17 +1,16 @@
 import {
     AllowNull,
-    AutoIncrement, BelongsToMany,
+    AutoIncrement,
     Column,
     DataType,
     Default,
-    ForeignKey, HasMany,
+    HasMany,
     Model,
     PrimaryKey,
     Table,
     Unique
 } from "sequelize-typescript";
 import {User} from "./user.model";
-import {Activity} from "./activity.model";
 
 @Table({timestamps: false})
 export class Role extends Model<Role> {

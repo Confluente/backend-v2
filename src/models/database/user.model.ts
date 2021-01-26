@@ -1,9 +1,11 @@
 import {
     AllowNull,
-    AutoIncrement, BelongsTo, BelongsToMany,
+    AutoIncrement,
+    BelongsToMany,
     Column,
     DataType,
-    Default, ForeignKey, HasOne,
+    Default,
+    ForeignKey,
     Model,
     PrimaryKey,
     Table,

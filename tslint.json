@@ -118,7 +118,8 @@
       "options": [
         "ban-keywords",
         "check-format",
-        "allow-snake-case"
+        "allow-snake-case",
+        "allow-leading-underscore"
       ]
     },
     "whitespace": {
