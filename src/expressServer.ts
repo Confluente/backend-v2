@@ -22,7 +22,6 @@ export function setupServer(server: Express): void {
 
     // Set webroot dependent on whether running for tests, development, or production
     if (process.env.NODE_ENV === "test") {
-        console.log("Running in TEST mode!");
         webroot = path.resolve(__dirname, "www");
     } else if (process.env.NODE_ENV === "development") {
         console.log("Running in DEVELOPMENT mode!");

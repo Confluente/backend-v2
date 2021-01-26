@@ -12,7 +12,7 @@
     "start_prod": "cross-env NODE_ENV=production nodemon --watch ./src/*ts --exec ts-node ./src/index.ts",
     "export": "node export.ts",
     "gendb": "npx ts-node src/import_initial.ts",
-    "tests": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.test.ts -t 5000 --require test/testFactory.ts"
+    "tests": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.test.ts -t 10000 --require test/testFactory.ts"
   },
   "author": "H.S.A. Confluente",
   "license": "",

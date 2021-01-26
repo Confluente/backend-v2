@@ -18,4 +18,5 @@ export const db: Sequelize = new Sequelize({
     password: null,
     storage,
     models: [Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup],
+    logging: false,
 });
