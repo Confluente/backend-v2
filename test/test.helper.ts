@@ -1,12 +1,12 @@
 import {Model} from "sequelize-typescript";
-import {Activity} from "../../src/models/database/activity.model";
-import {CompanyOpportunity} from "../../src/models/database/company.opportunity.model";
-import {Group} from "../../src/models/database/group.model";
-import {Page} from "../../src/models/database/page.model";
-import {Role} from "../../src/models/database/role.model";
-import {Subscription} from "../../src/models/database/subscription.model";
-import {User} from "../../src/models/database/user.model";
-import {UserGroup} from "../../src/models/database/usergroup.model";
+import {Activity} from "../src/models/database/activity.model";
+import {CompanyOpportunity} from "../src/models/database/company.opportunity.model";
+import {Group} from "../src/models/database/group.model";
+import {Page} from "../src/models/database/page.model";
+import {Role} from "../src/models/database/role.model";
+import {Subscription} from "../src/models/database/subscription.model";
+import {User} from "../src/models/database/user.model";
+import {UserGroup} from "../src/models/database/usergroup.model";
 
 export async function cleanActivities(): Promise<void> {
     Activity.destroy({truncate: true});

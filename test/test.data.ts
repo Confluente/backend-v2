@@ -60,7 +60,8 @@ export const unpublishedActivity = {
     endTime: "20:00",
     participationFee: 8.5,
     OrganizerId: 2,
-    published: false
+    published: false,
+    hasCoverImage: false,
 };
 
 export const publishedActivityWithSubscriptionForm = {

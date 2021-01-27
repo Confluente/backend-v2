@@ -35,7 +35,7 @@ export class Activity extends Model {
      * Location of the activity.
      */
     @Column(DataType.STRING(128))
-    public location!: string | null;
+    public location: string | null;
 
     /**
      * Date of the activity.
@@ -59,10 +59,9 @@ export class Activity extends Model {
     /**
      * canSubscribes stores whether members can subscribe to the activity.
      */
-    @AllowNull(false)
     @Default(false)
     @Column(DataType.BOOLEAN)
-    public canSubscribe!: boolean;
+    public canSubscribe: boolean;
 
     /**
      * Participation fee of the activity.
@@ -126,18 +125,16 @@ export class Activity extends Model {
     /**
      * Stores whether the activity is published.
      */
-    @AllowNull(false)
     @Default(false)
     @Column(DataType.BOOLEAN)
-    public published!: boolean;
+    public published: boolean;
 
     /**
      * Stores whether the activity has a cover image
      */
-    @AllowNull(false)
     @Default(false)
     @Column(DataType.BOOLEAN)
-    public hasCoverImage!: boolean;
+    public hasCoverImage: boolean;
 
     // TODO add comments
     @BelongsToMany(() => User, () => Subscription)
