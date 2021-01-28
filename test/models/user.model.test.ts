@@ -79,15 +79,21 @@ describe("user.model.ts", () => {
     });
 
     it('should not be able to add two users with the same email', (done) => {
+        // Create 2 valid user instances with the same email
         const user_1 = {...user};
         const user_2 = {...user};
 
-        User.create(user_1).then(function(dbUser_1: User): void {
-            User.create(user_2).then(function(dbUser_2: User): void {
+        // Try to create both users
+        User.create(user_1).then(function(_: User): void {
+            User.create(user_2).then(function(__: User): void {
+                // If successful, clean table and raise error
                 cleanUsers();
                 done(new Error("Was able to add two users with the same email address"));
             }).catch(function(err: Error): void {
+                // clean table
                 cleanUsers();
+
+                // If not successful for right reason, return, otherwise, raise error.
                 if (err.name === "SequelizeUniqueConstraintError") {
                     done();
                 } else {

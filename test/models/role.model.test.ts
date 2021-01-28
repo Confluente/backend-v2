@@ -74,4 +74,30 @@ describe("role.model.ts", () => {
             });
         });
     });
+
+    it('should not be able to create 2 roles with the same name', (done) => {
+        // create 2 valid role instances with the same name
+        const role_1 = {...role};
+        const role_2 = {...role};
+        delete role_2.id;
+
+        // Try to create both roles
+        Role.create(role_1).then(function(_: Role): void {
+            Role.create(role_2).then(function(__: Role): void {
+                // If successful, clean table and raise error
+                cleanRoles();
+                done(new Error("Was able to add two roles with the same name"));
+            }).catch(function(err: Error): void {
+                // clean table
+                cleanRoles();
+
+                // If not successful for right reason, return, otherwise, raise error.
+                if (err.name === "SequelizeUniqueConstraintError") {
+                    done();
+                } else {
+                    done(new Error("Was not able to add second role for the wrong reason"));
+                }
+            });
+        });
+    });
 });
