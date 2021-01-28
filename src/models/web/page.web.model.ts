@@ -1,6 +1,6 @@
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model} from "sequelize-typescript";
-import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {copyMatchingSourceKeyValues} from "../../helpers/model.copy.helper";
 import {Page} from "../database/page.model";
 import marked from "marked";
 

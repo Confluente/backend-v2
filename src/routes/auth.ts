@@ -2,7 +2,7 @@ import express, {Request, Response, Router} from "express";
 
 import {User} from "../models/database/user.model";
 import {Group} from "../models/database/group.model";
-import {authenticate, startSession} from "../helpers/authHelper";
+import {authenticate, startSession} from "../helpers/auth.helper";
 import {Role} from "../models/database/role.model";
 import {UserWeb} from "../models/web/user.web.model";
 

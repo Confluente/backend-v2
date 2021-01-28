@@ -1,11 +1,11 @@
 import marked from "marked";
 import {SubscriptionWeb} from "./subscription.web.model";
 import {GroupWeb} from "./group.web.model";
-import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {copyMatchingSourceKeyValues} from "../../helpers/model.copy.helper";
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model, Sequelize} from "sequelize-typescript";
 import {Activity} from "../database/activity.model";
-import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../../helpers/arrayHelper";
+import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../../helpers/array.helper";
 import * as fs from "fs";
 import {pathToActPictures} from "../../constants";
 import {UserWeb} from "./user.web.model";

@@ -1,7 +1,7 @@
 import {expect, assert} from "chai";
 import {describe, it} from "mocha";
 
-import {stringifyArrayOfStrings} from "../../src/helpers/arrayHelper";
+import {stringifyArrayOfStrings} from "../../src/helpers/array.helper";
 
 describe("arrayHelper", () => {
 

@@ -3,7 +3,7 @@ import {UserGroupWeb} from "./usergroup.web.model";
 import {SubscriptionWeb} from "./subscription.web.model";
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model} from "sequelize-typescript";
-import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {copyMatchingSourceKeyValues} from "../../helpers/model.copy.helper";
 import {Role} from "../database/role.model";
 import {User} from "../database/user.model";
 

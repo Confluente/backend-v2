@@ -1,5 +1,5 @@
 import {Model} from "sequelize-typescript";
-import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {copyMatchingSourceKeyValues} from "../../helpers/model.copy.helper";
 import {AbstractWebModel} from "./abstract.web.model";
 
 export class RoleWeb extends AbstractWebModel {

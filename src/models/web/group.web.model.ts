@@ -1,7 +1,7 @@
 import {UserWeb} from "./user.web.model";
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model} from "sequelize-typescript";
-import {copyMatchingSourceKeyValues} from "../../helpers/modelCopyHelper";
+import {copyMatchingSourceKeyValues} from "../../helpers/model.copy.helper";
 import {UserGroupWeb} from "./usergroup.web.model";
 import {Group} from "../database/group.model";
 

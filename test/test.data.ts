@@ -1,7 +1,7 @@
 import request from "supertest";
 
 import {app} from "../src/expressServer";
-import {getPasswordHashSync} from "../src/helpers/authHelper";
+import {getPasswordHashSync} from "../src/helpers/auth.helper";
 
 const password = "HonoursWorthyPassword";
 const passwordSaltBuffer = new Buffer("BlahBlah");

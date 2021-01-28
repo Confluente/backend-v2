@@ -5,7 +5,7 @@ import {Group} from "../models/database/group.model";
 import {Role} from "../models/database/role.model";
 
 const permissions: any = require("../permissions");
-import {generateSalt, getPasswordHashSync} from "../helpers/authHelper";
+import {generateSalt, getPasswordHashSync} from "../helpers/auth.helper";
 import {createTestAccount, createTransport} from "nodemailer";
 import {UserWeb} from "../models/web/user.web.model";
 import {GroupWeb} from "../models/web/group.web.model";

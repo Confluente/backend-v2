@@ -12,7 +12,7 @@ import {Activity} from "../models/database/activity.model";
 
 const permissions: any = require("../permissions");
 
-import {stringifyArrayOfStrings} from "../helpers/arrayHelper";
+import {stringifyArrayOfStrings} from "../helpers/array.helper";
 
 const router: Router = express.Router();
 
