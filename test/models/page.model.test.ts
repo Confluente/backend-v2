@@ -1,15 +1,15 @@
 import {TestFactory} from "../testFactory";
-import {Group} from "../../src/models/database/group.model";
-import {organizingGroup} from "../test.data";
+import {page} from "../test.data";
 import {assert} from "chai";
-import {cleanGroups} from "../test.helper";
+import {cleanPages} from "../test.helper";
+import {Page} from "../../src/models/database/page.model";
 
 const factory: TestFactory = new TestFactory();
 
 /**
- * Tests the group model.
+ * Tests the page model.
  */
-describe("group.model.ts", () => {
+describe("page.model.ts", () => {
 
     /**
      * Syncs the database and server before all tests.
@@ -28,15 +28,15 @@ describe("group.model.ts", () => {
     /**
      * Check if adding a valid instance works.
      */
-    it("Adding a valid group instance", (done) => {
+    it("Adding a valid page instance", (done) => {
         // Try to create instance
-        Group.create(organizingGroup).then(function(_: Group): void {
+        Page.create(page).then(function(_: Page): void {
             // Successfully created, thus clean table and return successful.
-            cleanGroups();
+            cleanPages();
             done();
         }).catch(function(_: Error): void {
             // Failed, thus clean table and raise error.
-            cleanGroups();
+            cleanPages();
             done(new Error("Could not create instance from valid model"));
         });
     });
@@ -46,26 +46,26 @@ describe("group.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["displayName", "fullName", "description", "canOrganize", "email", "type"];
+        const needed_props = ["url", "title", "content", "author"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {
             it("Testing specific invalid instance that misses " + prop, (done) => {
-                // Copy valid group
-                const group_copy = {...organizingGroup};
+                // Copy valid page
+                const page_copy = {...page};
 
                 // Delete needed property
                 // @ts-ignore
-                delete group_copy[prop];
+                delete page_copy[prop];
 
-                // Try to create group
-                Group.create(group_copy).then(function(_: Group): void {
+                // Try to create page
+                Page.create(page_copy).then(function(_: Page): void {
                     // If successful, clean database and raise error
-                    cleanGroups();
-                    done(new Error("Created group from invalid model"));
+                    cleanPages();
+                    done(new Error("Created page from invalid model"));
                 }).catch(function(_: Error): void {
                     // If unsuccessful, clean database and return
-                    cleanGroups();
+                    cleanPages();
                     done();
                 });
             });

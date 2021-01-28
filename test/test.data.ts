@@ -84,4 +84,20 @@ export const publishedActivityWithSubscriptionForm = {
     OrganizerId: 3
 };
 
+export const companyOpportunity = {
+    title: "Super duper cool vacancy",
+    companyName: "Some sponsor",
+    description: "Super cool description",
+    imageUrl: "some url",
+    contactEmail: "some email",
+    link: "A link to vacancy of the sponsor",
+    educationLevel: "Pleb",
+    category: "Vacancy"
+};
 
+export const page = {
+    url: "super cool url",
+    title: "super cool page",
+    content: "super cool content",
+    author: "Marijn Stijvers"
+};

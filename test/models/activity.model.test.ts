@@ -28,11 +28,16 @@ describe("activity.model.ts", () => {
     /**
      * Check if adding a valid instance works.
      */
-    it("Adding a valid activity instance", () => {
+    it("Adding a valid activity instance", (done) => {
+        // Try to create instance
         Activity.create(unpublishedActivity).then(function(_: Activity): void {
-            assert(true);
+            // Successfully created, thus clean table and return successful.
+            cleanActivities();
+            done();
         }).catch(function(_: Error): void {
-            assert.fail();
+            // Failed, thus clean table and raise error.
+            cleanActivities();
+            done(new Error("Could not create instance from valid model"));
         });
     });
 
