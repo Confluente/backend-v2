@@ -1,4 +1,4 @@
-import {Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {AllowNull, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
 import {Activity} from "./activity.model";
 import {User} from "./user.model";
 
@@ -11,10 +11,12 @@ import {User} from "./user.model";
 export  class Subscription extends Model<Subscription> {
 
     @ForeignKey(() => User)
+    @AllowNull(false)
     @Column(DataType.INTEGER)
     userId: number;
 
     @ForeignKey(() => Activity)
+    @AllowNull(false)
     @Column(DataType.INTEGER)
     activityId: number;
 
