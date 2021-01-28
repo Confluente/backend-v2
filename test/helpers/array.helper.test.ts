@@ -56,7 +56,7 @@ describe("array.helper.test.ts", () => {
         it("Passing null", () => {
             const stringToDestringify: string = null;
             expect(() => {
-                destringifyStringifiedArrayOfStrings(stringToDestringify)
+                destringifyStringifiedArrayOfStrings(stringToDestringify);
             }).to.throw("array.helper.destringifyStringifiedArrayofString: input_string was null");
         });
     });
