@@ -1,7 +1,9 @@
 import {TestFactory} from "../testFactory";
-import {session} from "../test.data";
+import {role, session, user} from "../test.data";
 import {cleanSessions} from "../test.helper";
 import {Session} from "../../src/models/database/session.model";
+import {User} from "../../src/models/database/user.model";
+import {Role} from "../../src/models/database/role.model";
 
 const factory: TestFactory = new TestFactory();
 
@@ -15,6 +17,8 @@ describe("session.model.ts", () => {
      */
     before(async () => {
         await factory.init();
+        await Role.create(role);
+        await User.create(user);
     });
 
     /**

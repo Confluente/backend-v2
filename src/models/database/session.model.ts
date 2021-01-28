@@ -1,4 +1,5 @@
-import {AllowNull, Column, DataType, Model, Table} from "sequelize-typescript";
+import {AllowNull, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {User} from "./user.model";
 
 @Table({timestamps: false})
 export class Session extends Model<Session> {
@@ -13,8 +14,8 @@ export class Session extends Model<Session> {
     /**
      * Id of the user of the session.
      */
-    // TODO do we make this a foreign key?
     @AllowNull(false)
+    @ForeignKey(() => User)
     @Column(DataType.INTEGER)
     public user!: number;
 

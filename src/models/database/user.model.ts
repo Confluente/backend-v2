@@ -5,7 +5,7 @@ import {
     Column,
     DataType,
     Default,
-    ForeignKey,
+    ForeignKey, HasOne,
     Model,
     PrimaryKey,
     Table,
@@ -17,6 +17,7 @@ import {Activity} from "./activity.model";
 import {Role} from "./role.model";
 import {Subscription} from "./subscription.model";
 import {UserGroup} from "./usergroup.model";
+import {Session} from "./session.model";
 
 @Table({timestamps: false})
 export class User extends Model<User> {
@@ -151,4 +152,7 @@ export class User extends Model<User> {
     @AllowNull(false)
     @Column
     public roleId!: number;
+
+    @HasOne(() => Session)
+    public session: Session;
 }
