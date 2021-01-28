@@ -77,4 +77,23 @@ describe("user.model.ts", () => {
             });
         });
     });
+
+    it('should not be able to add two users with the same email', (done) => {
+        const user_1 = {...user};
+        const user_2 = {...user};
+
+        User.create(user_1).then(function(dbUser_1: User): void {
+            User.create(user_2).then(function(dbUser_2: User): void {
+                cleanUsers();
+                done(new Error("Was able to add two users with the same email address"));
+            }).catch(function(err: Error): void {
+                cleanUsers();
+                if (err.name === "SequelizeUniqueConstraintError") {
+                    done();
+                } else {
+                    done(new Error("Was not able to add second user for the wrong reason"));
+                }
+            });
+        });
+    });
 });
