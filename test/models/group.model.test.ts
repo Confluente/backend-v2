@@ -26,12 +26,12 @@ describe("group.model.ts", () => {
     });
 
     /**
-     * Check if adding a vlid instance works.
+     * Check if adding a valid instance works.
      */
     it("Adding a valid group instance", () => {
-        Group.create(organizingGroup).then(function(group: Group): void {
+        Group.create(organizingGroup).then(function(_: Group): void {
             assert(true);
-        }).catch(function(result: any): void {
+        }).catch(function(_: Error): void {
             assert.fail();
         });
     });
@@ -54,11 +54,11 @@ describe("group.model.ts", () => {
                 delete group_copy[prop];
 
                 // Try to create group
-                Group.create(group_copy).then(function(group: Group): void {
+                Group.create(group_copy).then(function(_: Group): void {
                     // If successful, clean database and raise error
                     cleanGroups();
                     done(new Error("Created group from invalid model"));
-                }).catch(function(result: any): void {
+                }).catch(function(_: Error): void {
                     // If unsuccessful, clean database and return
                     cleanGroups();
                     done();

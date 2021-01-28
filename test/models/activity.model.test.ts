@@ -2,7 +2,7 @@ import {Activity} from "../../src/models/database/activity.model";
 import {unpublishedActivity} from "../test.data";
 import {assert} from "chai";
 import {TestFactory} from "../testFactory";
-import {cleanActivities, cleanGroups} from "../test.helper";
+import {cleanActivities} from "../test.helper";
 
 const factory: TestFactory = new TestFactory();
 
@@ -29,9 +29,9 @@ describe("activity.model.ts", () => {
      * Check if adding a valid instance works.
      */
     it("Adding a valid activity instance", () => {
-        Activity.create(unpublishedActivity).then(function(act): void {
+        Activity.create(unpublishedActivity).then(function(_: Activity): void {
             assert(true);
-        }).catch(function(result: any): void {
+        }).catch(function(_: Error): void {
             assert.fail();
         });
     });
@@ -54,11 +54,11 @@ describe("activity.model.ts", () => {
                 delete act_copy[prop];
 
                 // Try to create activity
-                Activity.create(act_copy).then(function(act: Activity): void {
+                Activity.create(act_copy).then(function(_: Activity): void {
                     // If successful, clean database and raise error
                     cleanActivities();
                     done(new Error("Created activity from invalid model"));
-                }).catch(function(result: any): void {
+                }).catch(function(_: Error): void {
                     // If unsuccessful, clean database and return
                     cleanActivities();
                     done();
