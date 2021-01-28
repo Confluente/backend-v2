@@ -75,4 +75,29 @@ describe("group.model.ts", () => {
             });
         });
     });
+
+    it('should not be able to add two groups with the same fullName', (done) => {
+        // create 2 valid group instances with the same fullName
+        const group_1 = {...organizingGroup};
+        const group_2 = {...organizingGroup};
+
+        // Try to create both groups
+        Group.create(group_1).then(function(_: Group): void {
+            Group.create(group_2).then(function(__: Group): void {
+                // If successful, clean table and raise error
+                cleanGroups();
+                done(new Error("Was able to add two groups with the same fullName"));
+            }).catch(function(err: Error): void {
+                // clean table
+                cleanGroups();
+
+                // If not successful for right reason, return, otherwise, raise error
+                if (err.name === "SequelizeUniqueConstraintError") {
+                    done();
+                } else {
+                    done(new Error("Was not able to add second group for the wrong reason"));
+                }
+            });
+        });
+    });
 });
