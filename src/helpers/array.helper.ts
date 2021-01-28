@@ -50,11 +50,14 @@ export function stringifyArrayOfNumbers(array: number[]): string {
     if (array.length === 0) { return ""; }
 
     let result: string = "";
-    for (let i: number = 0; i < array.length - 1; i++) {
+    for (let i: number = 0; i < array.length; i++) {
         result += array[i].toString();
-        result += "#,#";
+
+        if (i !== array.length - 1) {
+            result += "#,#";
+        }
     }
-    result += array[array.length - 1].toString();
+
     return result;
 }
 
@@ -65,14 +68,11 @@ export function stringifyArrayOfNumbers(array: number[]): string {
  * @returns                     Array of numbers encoded in the input string
  */
 export function destringifyStringifiedArrayOfNumbers(input_string: string): number[] {
-    if (input_string.length === 0) { return []; }
-
-    const split_string: string[] = input_string.split("#,#");
-    const result: number[] = new Array<number>(split_string.length);
-
-    for (let i: number = 0; i < split_string.length; i++) {
-        result[i] = +split_string[i];
+    if (input_string === null) {
+        throw new Error("array.helper.destringifyStringifiedArrayofNumbers: input_string was null");
     }
 
-    return result;
+    if (input_string.length === 0) { return []; }
+
+    return input_string.split("#,#").map((i: string) => +i);
 }
