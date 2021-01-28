@@ -101,3 +101,27 @@ export const page = {
     content: "super cool content",
     author: "Marijn Stijvers"
 };
+
+export const role = {
+    id: 1,
+    name: "Super admin",
+    // Pages
+    PAGE_VIEW: true,
+    PAGE_MANAGE: true,
+    // Users
+    USER_CREATE: true,
+    USER_VIEW_ALL: true,
+    USER_MANAGE: true,
+    CHANGE_ALL_PASSWORDS: true,
+    // Roles
+    ROLE_VIEW: true,
+    ROLE_MANAGE: true,
+    // Groups
+    GROUP_VIEW: true,
+    GROUP_MANAGE: true,
+    GROUP_ORGANIZE_WITH_ALL: true,
+    // Activities
+    ACTIVITY_VIEW_PUBLISHED: true,
+    ACTIVITY_VIEW_ALL_UNPUBLISHED: true,
+    ACTIVITY_MANAGE: true
+};

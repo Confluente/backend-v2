@@ -1,14 +1,14 @@
 import {TestFactory} from "../testFactory";
-import {page} from "../test.data";
-import {cleanPages} from "../test.helper";
-import {Page} from "../../src/models/database/page.model";
+import {role} from "../test.data";
+import {cleanRoles} from "../test.helper";
+import {Role} from "../../src/models/database/role.model";
 
 const factory: TestFactory = new TestFactory();
 
 /**
- * Tests the page model.
+ * Tests the role model.
  */
-describe("page.model.ts", () => {
+describe("role.model.ts", () => {
 
     /**
      * Syncs the database and server before all tests.
@@ -29,13 +29,13 @@ describe("page.model.ts", () => {
      */
     it("Adding a valid page instance", (done) => {
         // Try to create instance
-        Page.create(page).then(function(_: Page): void {
+        Role.create(role).then(function(_: Role): void {
             // Successfully created, thus clean table and return successful.
-            cleanPages();
+            cleanRoles();
             done();
         }).catch(function(_: Error): void {
             // Failed, thus clean table and raise error.
-            cleanPages();
+            cleanRoles();
             done(new Error("Could not create instance from valid model"));
         });
     });
@@ -45,26 +45,26 @@ describe("page.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["url", "title", "content", "author"];
+        const needed_props = ["name"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {
             it("Testing specific invalid instance that misses " + prop, (done) => {
-                // Copy valid page
-                const page_copy = {...page};
+                // Copy valid role
+                const role_copy = {...role};
 
                 // Delete needed property
                 // @ts-ignore
-                delete page_copy[prop];
+                delete role_copy[prop];
 
-                // Try to create page
-                Page.create(page_copy).then(function(_: Page): void {
+                // Try to create role
+                Role.create(role_copy).then(function(_: Role): void {
                     // If successful, clean database and raise error
-                    cleanPages();
-                    done(new Error("Created page from invalid model"));
+                    cleanRoles();
+                    done(new Error("Created role from invalid model"));
                 }).catch(function(_: Error): void {
                     // If unsuccessful, clean database and return
-                    cleanPages();
+                    cleanRoles();
                     done();
                 });
             });
