@@ -1,21 +1,23 @@
 import {TestFactory} from "../testFactory";
-import {Group} from "../../src/models/database/group.model";
-import {organizingGroup} from "../test.data";
-import {assert} from "chai";
-import {cleanGroups} from "../test.helper";
+import {role, user} from "../test.data";
+import {cleanRoles, cleanUsers} from "../test.helper";
+import {User} from "../../src/models/database/user.model";
+import {Role} from "../../src/models/database/role.model";
 
 const factory: TestFactory = new TestFactory();
 
 /**
- * Tests the group model.
+ * Tests the user model.
  */
-describe("group.model.ts", () => {
+describe("user.model.ts", () => {
 
     /**
      * Syncs the database and server before all tests.
      */
     before(async () => {
         await factory.init();
+
+        await Role.create(role);
     });
 
     /**
@@ -28,15 +30,15 @@ describe("group.model.ts", () => {
     /**
      * Check if adding a valid instance works.
      */
-    it("Adding a valid group instance", (done) => {
+    it("Adding a valid user instance", (done) => {
         // Try to create instance
-        Group.create(organizingGroup).then(function(_: Group): void {
+        User.create(user).then(function(_: User): void {
             // Successfully created, thus clean table and return successful.
-            cleanGroups();
+            cleanUsers();
             done();
-        }).catch(function(_: Error): void {
+        }).catch(function(err: Error): void {
             // Failed, thus clean table and raise error.
-            cleanGroups();
+            cleanUsers();
             done(new Error("Could not create instance from valid model"));
         });
     });
@@ -46,26 +48,26 @@ describe("group.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["displayName", "fullName", "description", "canOrganize", "email", "type"];
+        const needed_props = ["email", "firstName", "lastName", "displayName", "honorsMembership", "passwordHash", "passwordSalt", "approvingHash", "roleId"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {
             it("Testing specific invalid instance that misses " + prop, (done) => {
-                // Copy valid group
-                const group_copy = {...organizingGroup};
+                // Copy valid user
+                const user_copy = {...user};
 
                 // Delete needed property
                 // @ts-ignore
-                delete group_copy[prop];
+                delete user_copy[prop];
 
-                // Try to create group
-                Group.create(group_copy).then(function(_: Group): void {
+                // Try to create user
+                User.create(user_copy).then(function(__: User): void {
                     // If successful, clean database and raise error
-                    cleanGroups();
-                    done(new Error("Created group from invalid model"));
+                    cleanUsers();
+                    done(new Error("Created user from invalid model"));
                 }).catch(function(err: Error): void {
                     // If unsuccessful, clean database and return
-                    cleanGroups();
+                    cleanUsers();
                     if (err.name === "SequelizeValidationError" && err.message.includes("notNull Violation")) {
                         done();
                     } else {

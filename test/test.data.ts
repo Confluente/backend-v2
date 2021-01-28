@@ -6,11 +6,16 @@ import {getPasswordHashSync} from "../src/helpers/authHelper";
 const password = "HonoursWorthyPassword";
 const passwordSaltBuffer = new Buffer("BlahBlah");
 
-export const testUser = {
-    displayName: "Bob",
-    email: "bob@hsaconfluente.nl",
-    password: "ILikeTrains",
-    passwordSalt: new Buffer("BlahBlah")
+export const user = {
+    email: "superadmin",
+    displayName: "Super Administrator",
+    firstName: "Super",
+    lastName: "Administrator",
+    honorsMembership: "member",
+    approvingHash: "da;lkfjda;fjkad;fj",
+    passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
+    passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
+    roleId: 1
 };
 
 function getAgent(): any {

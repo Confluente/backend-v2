@@ -62,10 +62,14 @@ describe("role.model.ts", () => {
                     // If successful, clean database and raise error
                     cleanRoles();
                     done(new Error("Created role from invalid model"));
-                }).catch(function(_: Error): void {
+                }).catch(function(err: Error): void {
                     // If unsuccessful, clean database and return
                     cleanRoles();
-                    done();
+                    if (err.name === "SequelizeValidationError" && err.message.includes("notNull Violation")) {
+                        done();
+                    } else {
+                        done(new Error("Failed to add instance for the wrong reason"));
+                    }
                 });
             });
         });

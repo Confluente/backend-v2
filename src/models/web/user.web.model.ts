@@ -96,8 +96,10 @@ export class UserWeb extends AbstractWebModel {
     public static getWebModelFromDbModel(dbUser: Model): UserWeb {
         const webUser = copyMatchingSourceKeyValues(new UserWeb(), dbUser);
 
-        if ((dbUser as User).role !== null) {
-            webUser.role = RoleWeb.getWebModelFromDbModel((dbUser as User).role);
+        if ((dbUser as User).roleId !== null) {
+            Role.findByPk((dbUser as User).roleId).then(function(role: Role): void {
+                webUser.role = RoleWeb.getWebModelFromDbModel(role);
+            });
         }
 
         webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(

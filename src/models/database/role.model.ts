@@ -133,6 +133,6 @@ export class Role extends Model<Role> {
     /**
      * Users that have this particular role.
      */
-    @HasMany(() => User)
+    @HasMany(() => User, {})
     public users: User[];
 }

@@ -28,47 +28,53 @@ export function check(user: User | number, scope: any): Promise<boolean> {
                         "Be sure to have a correctly initialized database");
                 }
 
-                resolve({role});
+                resolve({dbUser: null, role});
             });
         } else if (typeof user === 'number') {
-            resolve(User.findByPk(user));
+            User.findByPk(user).then(function(dbUser: User): void {
+                Role.findByPk(dbUser.roleId).then(function(role: Role): void {
+                    resolve({dbUser, role});
+                });
+            });
         } else {
-            resolve(user);
+            Role.findByPk(user.roleId).then(function(role: Role): void {
+                resolve({dbUser: user, role});
+            });
         }
-    }).then(function(dbUser: User): Promise<boolean> | boolean {
+    }).then(function(res: {dbUser: User, role: Role}): Promise<boolean> | boolean {
 
         // Determine rule based on context
         switch (scope.type) {
             case "PAGE_VIEW":
-                return dbUser.role.PAGE_VIEW;
+                return res.role.PAGE_VIEW;
             case "PAGE_MANAGE":
-                return dbUser.role.PAGE_MANAGE;
+                return res.role.PAGE_MANAGE;
             case "USER_CREATE":
-                return dbUser.role.USER_CREATE;
+                return res.role.USER_CREATE;
             case "USER_VIEW":
                 return User.findByPk(scope.value).then(function(user_considered: User): boolean {
                     if (!user_considered) {
                         return false;
                     }
                     // Users can view their own account
-                    const ownAccount: boolean = (dbUser.id === user_considered.id);
-                    return ownAccount || dbUser.role.USER_VIEW_ALL;
+                    const ownAccount: boolean = (res.dbUser.id === user_considered.id);
+                    return ownAccount || res.role.USER_VIEW_ALL;
                 });
             case "USER_MANAGE":
-                return dbUser.role.USER_MANAGE;
+                return res.role.USER_MANAGE;
             case "CHANGE_PASSWORD":
                 return User.findByPk(scope.value).then(function(user_considered: User): boolean {
                     if (!user_considered) {
                         return false;
                     }
                     // Users can change their own password
-                    const ownAccount = (dbUser.id === user_considered.id);
-                    return ownAccount || dbUser.role.CHANGE_ALL_PASSWORDS;
+                    const ownAccount = (res.dbUser.id === user_considered.id);
+                    return ownAccount || res.role.CHANGE_ALL_PASSWORDS;
                 });
             case "GROUP_VIEW":
-                return dbUser.role.GROUP_VIEW;
+                return res.role.GROUP_VIEW;
             case "GROUP_MANAGE":
-                return dbUser.role.GROUP_MANAGE;
+                return res.role.GROUP_MANAGE;
             case "GROUP_ORGANIZE":
                 if (!loggedIn) {
                     return false;
@@ -79,11 +85,11 @@ export function check(user: User | number, scope: any): Promise<boolean> {
                         return false;
                     }
                     // If the group is allowed to organize, members are allowed to organize
-                    const member = dbUser.groups.some(
+                    const member = res.dbUser.groups.some(
                         function(dbGroup: Group & {UserGroup: any}): boolean {
                             return dbGroup.id === group.id;
                         });
-                    return member || dbUser.role.GROUP_ORGANIZE_WITH_ALL;
+                    return member || res.role.GROUP_ORGANIZE_WITH_ALL;
                 });
             case "ACTIVITY_VIEW":
                 return Activity.findByPk(scope.value).then(function(activity: Activity): boolean {
@@ -91,24 +97,24 @@ export function check(user: User | number, scope: any): Promise<boolean> {
                         return false;
                     }
                     if (activity.published) {
-                        return dbUser.role.ACTIVITY_VIEW_PUBLISHED;
+                        return res.role.ACTIVITY_VIEW_PUBLISHED;
                     }
                     // Unpublished activities allowed to be seen by organizers
                     // const organizing = loggedIn ? dbUser.hasGroup(activity.OrganizerId) : false;
-                    const organizing = loggedIn ? dbUser.groups.some(
+                    const organizing = loggedIn ? res.dbUser.groups.some(
                         function(dbGroup: Group & {UserGroup: any}): boolean {
                             return dbGroup.id === activity.organizer.id;
                     }) : false;
-                    return organizing || dbUser.role.ACTIVITY_VIEW_ALL_UNPUBLISHED;
+                    return organizing || res.role.ACTIVITY_VIEW_ALL_UNPUBLISHED;
                 });
             case "ACTIVITY_EDIT":
                 return Activity.findByPk(scope.value).then(function(activity: Activity): boolean {
                     // Activities allowed to be edited by organizers
-                    const organizing = loggedIn ? dbUser.groups.some(
+                    const organizing = loggedIn ? res.dbUser.groups.some(
                         function(dbGroup: Group & {UserGroup: any}): boolean {
                             return dbGroup.id === activity.organizer.id;
                         })  : false;
-                    return organizing || dbUser.role.ACTIVITY_MANAGE;
+                    return organizing || res.role.ACTIVITY_MANAGE;
                 });
             default:
                 throw new Error("Unknown scope type");

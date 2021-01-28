@@ -34,7 +34,6 @@ export class User extends Model<User> {
     /**
      * Email of the user.
      */
-    // TODO Check if we cant better have the db id as the primary key?
     @Unique
     @AllowNull(false)
     @Column(DataType.STRING(128))
@@ -109,10 +108,9 @@ export class User extends Model<User> {
     /**
      * Whether the user gave consent regarding portrait right.
      */
-    @AllowNull(false)
     @Default(false)
     @Column(DataType.BOOLEAN)
-    public consentWithPortraitRight!: boolean;
+    public consentWithPortraitRight: boolean;
 
     /**
      * Hash of the password of the user.
@@ -131,10 +129,9 @@ export class User extends Model<User> {
     /**
      * Whether the account of the user is approved
      */
-    @AllowNull(false)
     @Default(false)
     @Column(DataType.BOOLEAN)
-    public approved!: boolean;
+    public approved: boolean;
 
     /**
      * The hash link via which the account can be approved
@@ -151,5 +148,7 @@ export class User extends Model<User> {
     public activities: Array<Activity & {Subscript: Subscription}>;
 
     @ForeignKey(() => Role)
-    public role: Role;
+    @AllowNull(false)
+    @Column
+    public roleId!: number;
 }

@@ -62,10 +62,14 @@ describe("session.model.ts", () => {
                     // If successful, clean database and raise error
                     cleanSessions();
                     done(new Error("Created session from invalid model"));
-                }).catch(function(_: Error): void {
+                }).catch(function(err: Error): void {
                     // If unsuccessful, clean database and return
                     cleanSessions();
-                    done();
+                    if (err.name === "SequelizeValidationError" && err.message.includes("notNull Violation")) {
+                        done();
+                    } else {
+                        done(new Error("Failed to add instance for the wrong reason"));
+                    }
                 });
             });
         });

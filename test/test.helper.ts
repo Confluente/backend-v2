@@ -26,7 +26,7 @@ export function cleanPages(): void {
 }
 
 export function cleanRoles(): void {
-    Role.destroy({truncate: true});
+    Role.destroy({where: {}});
 }
 
 export function cleanSubscriptions(): void {

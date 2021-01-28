@@ -63,10 +63,14 @@ describe("activity.model.ts", () => {
                     // If successful, clean database and raise error
                     cleanActivities();
                     done(new Error("Created activity from invalid model"));
-                }).catch(function(_: Error): void {
+                }).catch(function(err: Error): void {
                     // If unsuccessful, clean database and return
                     cleanActivities();
-                    done();
+                    if (err.name === "SequelizeValidationError" && err.message.includes("notNull Violation")) {
+                        done();
+                    } else {
+                        done(new Error("Failed to add instance for the wrong reason"));
+                    }
                 });
             });
         });
