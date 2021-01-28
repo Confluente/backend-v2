@@ -11,7 +11,7 @@ export function stringifyArrayOfStrings(array: string[]): string {
     let result: string = "";
     for (let i: number = 0; i < array.length; i++) {
         if (array[i].includes("#,#")) {
-            throw new Error("ArrayHelper.stringifyArrayOfStrings: item " + i + " contains #,# (is " + array[i]
+            throw new Error("array.helper.stringifyArrayOfStrings: item " + i + " contains #,# (is " + array[i]
                 + ") and can therefore not be stringified");
         }
 
@@ -31,6 +31,10 @@ export function stringifyArrayOfStrings(array: string[]): string {
  * @returns                 Array of string encoded in the input string
  */
 export function destringifyStringifiedArrayOfStrings(input_string: string): string[] {
+    if (input_string === null) {
+        throw new Error("array.helper.destringifyStringifiedArrayofString: input_string was null");
+    }
+
     if (input_string.length === 0) { return []; }
 
     return input_string.split("#,#");
