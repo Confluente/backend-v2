@@ -13,9 +13,9 @@ export class Session extends Model<Session> {
     /**
      * Id of the user of the session.
      */
-    // TODO check if this really should be a blob?? Robin is confused
+    // TODO do we make this a foreign key?
     @AllowNull(false)
-    @Column(DataType.BLOB)
+    @Column(DataType.INTEGER)
     public user!: number;
 
     /**
@@ -29,6 +29,6 @@ export class Session extends Model<Session> {
      * Expiration date of the session.
      */
     @AllowNull(false)
-    @Column(DataType.BLOB)
+    @Column(DataType.DATE)
     public expires!: any;
 }

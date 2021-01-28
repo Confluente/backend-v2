@@ -125,3 +125,10 @@ export const role = {
     ACTIVITY_VIEW_ALL_UNPUBLISHED: true,
     ACTIVITY_MANAGE: true
 };
+
+export const session = {
+    token: new Buffer("something"),
+    user: 1,
+    ip: "funky ip address",
+    expires: new Date()
+};

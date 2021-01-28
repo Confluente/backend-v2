@@ -7,6 +7,7 @@ import {Role} from "../src/models/database/role.model";
 import {Subscription} from "../src/models/database/subscription.model";
 import {User} from "../src/models/database/user.model";
 import {UserGroup} from "../src/models/database/usergroup.model";
+import {Session} from "../src/models/database/session.model";
 
 export async function cleanActivities(): Promise<void> {
     Activity.destroy({truncate: true});
@@ -38,6 +39,10 @@ export function cleanUsers(): void {
 
 export function cleanUsergroups(): void {
     UserGroup.destroy({truncate: true});
+}
+
+export function cleanSessions(): void {
+    Session.destroy({truncate: true});
 }
 
 export function clean<B extends Model>(modelClass: B): void {
