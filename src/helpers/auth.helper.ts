@@ -12,6 +12,14 @@ const digest_iterations = (process.env.NODE_ENV === "test") ? 1 : 100000;
  * @return Hash, or rejects
  */
 export function getPasswordHash(password: string, salt: string): any {
+    if (password === null) {
+        throw new Error("auth.helper.getPasswordHash: password was null.");
+    }
+
+    if (salt === null) {
+        throw new Error("auth.helper.getPasswordHash: salt was null.");
+    }
+
     return Promise(function(resolve: any, reject: any): any {
         pbkdf2(password, salt, digest_iterations, 256 / 8, 'sha256',
             function(err: Error | null, hash: Buffer): any {
