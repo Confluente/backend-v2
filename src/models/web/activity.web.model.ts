@@ -128,12 +128,15 @@ export class ActivityWeb extends AbstractWebModel {
      */
     public coverImage: string;
 
-        // TODO add comments
+    /**
+     * Stores the users that have subscribed to this event as SubscriptionWeb objects.
+     */
     public participants: SubscriptionWeb[];
 
-    // TODO change uses of this (was first capitalized)
-    // TODO maybe change to HasOne relationship, as i feel like that makes more sense
-    public organizer: GroupWeb;
+    /**
+     * Stores a GroupWeb object representing the group that organizes this event.
+     */
+    public organizer!: GroupWeb;
 
     public static getWebModelFromDbModel(dbActivity: Model): ActivityWeb {
         // for each attribute where the type and name are equal, copy them over

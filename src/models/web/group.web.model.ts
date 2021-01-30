@@ -43,7 +43,9 @@ export class GroupWeb extends AbstractWebModel {
      */
     public type!: string;
 
-    // TODO add comment
+    /**
+     * Stores the members that this group has as UserGroupWeb objects.
+     */
     public members!: UserGroupWeb[];
 
     public static getWebModelFromDbModel(dbGroup: Model): GroupWeb {
