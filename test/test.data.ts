@@ -132,7 +132,7 @@ export const role = {
 };
 
 export const session = {
-    token: new Buffer("something"),
+    token: Buffer.from("something"),
     userId: 1,
     ip: "funky ip address",
     expires: new Date()
