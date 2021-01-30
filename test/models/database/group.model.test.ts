@@ -1,14 +1,15 @@
-import {TestFactory} from "../testFactory";
-import {role} from "../test.data";
-import {cleanRoles} from "../test.helper";
-import {Role} from "../../src/models/database/role.model";
+import {TestFactory} from "../../testFactory";
+import {Group} from "../../../src/models/database/group.model";
+import {organizingGroup} from "../../test.data";
+import {assert} from "chai";
+import {cleanGroups} from "../../test.helper";
 
 const factory: TestFactory = new TestFactory();
 
 /**
- * Tests the role model.
+ * Tests the group model.
  */
-describe("role.model.ts", () => {
+describe("group.model.ts", () => {
 
     /**
      * Syncs the database and server before all tests.
@@ -27,15 +28,15 @@ describe("role.model.ts", () => {
     /**
      * Check if adding a valid instance works.
      */
-    it("Adding a valid page instance", (done) => {
+    it("Adding a valid group instance", (done) => {
         // Try to create instance
-        Role.create(role).then(function(_: Role): void {
+        Group.create(organizingGroup).then(function(_: Group): void {
             // Successfully created, thus clean table and return successful.
-            cleanRoles();
+            cleanGroups();
             done();
         }).catch(function(_: Error): void {
             // Failed, thus clean table and raise error.
-            cleanRoles();
+            cleanGroups();
             done(new Error("Could not create instance from valid model"));
         });
     });
@@ -45,26 +46,26 @@ describe("role.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["name"];
+        const needed_props = ["displayName", "fullName", "description", "canOrganize", "email", "type"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {
             it("Testing specific invalid instance that misses " + prop, (done) => {
-                // Copy valid role
-                const role_copy = {...role};
+                // Copy valid group
+                const group_copy = {...organizingGroup};
 
                 // Delete needed property
                 // @ts-ignore
-                delete role_copy[prop];
+                delete group_copy[prop];
 
-                // Try to create role
-                Role.create(role_copy).then(function(_: Role): void {
+                // Try to create group
+                Group.create(group_copy).then(function(_: Group): void {
                     // If successful, clean database and raise error
-                    cleanRoles();
-                    done(new Error("Created role from invalid model"));
+                    cleanGroups();
+                    done(new Error("Created group from invalid model"));
                 }).catch(function(err: Error): void {
                     // If unsuccessful, clean database and return
-                    cleanRoles();
+                    cleanGroups();
                     if (err.name === "SequelizeValidationError" && err.message.includes("notNull Violation")) {
                         done();
                     } else {
@@ -75,27 +76,26 @@ describe("role.model.ts", () => {
         });
     });
 
-    it('should not be able to create 2 roles with the same name', (done) => {
-        // create 2 valid role instances with the same name
-        const role_1 = {...role};
-        const role_2 = {...role};
-        delete role_2.id;
+    it('should not be able to add two groups with the same fullName', (done) => {
+        // create 2 valid group instances with the same fullName
+        const group_1 = {...organizingGroup};
+        const group_2 = {...organizingGroup};
 
-        // Try to create both roles
-        Role.create(role_1).then(function(_: Role): void {
-            Role.create(role_2).then(function(__: Role): void {
+        // Try to create both groups
+        Group.create(group_1).then(function(_: Group): void {
+            Group.create(group_2).then(function(__: Group): void {
                 // If successful, clean table and raise error
-                cleanRoles();
-                done(new Error("Was able to add two roles with the same name"));
+                cleanGroups();
+                done(new Error("Was able to add two groups with the same fullName"));
             }).catch(function(err: Error): void {
                 // clean table
-                cleanRoles();
+                cleanGroups();
 
-                // If not successful for right reason, return, otherwise, raise error.
+                // If not successful for right reason, return, otherwise, raise error
                 if (err.name === "SequelizeUniqueConstraintError") {
                     done();
                 } else {
-                    done(new Error("Was not able to add second role for the wrong reason"));
+                    done(new Error("Was not able to add second group for the wrong reason"));
                 }
             });
         });

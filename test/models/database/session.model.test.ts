@@ -1,20 +1,24 @@
-import {TestFactory} from "../testFactory";
-import {page} from "../test.data";
-import {cleanPages} from "../test.helper";
-import {Page} from "../../src/models/database/page.model";
+import {TestFactory} from "../../testFactory";
+import {role, session, user} from "../../test.data";
+import {cleanSessions} from "../../test.helper";
+import {Session} from "../../../src/models/database/session.model";
+import {User} from "../../../src/models/database/user.model";
+import {Role} from "../../../src/models/database/role.model";
 
 const factory: TestFactory = new TestFactory();
 
 /**
- * Tests the page model.
+ * Tests the session model.
  */
-describe("page.model.ts", () => {
+describe("session.model.ts", () => {
 
     /**
      * Syncs the database and server before all tests.
      */
     before(async () => {
         await factory.init();
+        await Role.create(role);
+        await User.create(user);
     });
 
     /**
@@ -27,15 +31,15 @@ describe("page.model.ts", () => {
     /**
      * Check if adding a valid instance works.
      */
-    it("Adding a valid page instance", (done) => {
+    it("Adding a valid session instance", (done) => {
         // Try to create instance
-        Page.create(page).then(function(_: Page): void {
+        Session.create(session).then(function(_: Session): void {
             // Successfully created, thus clean table and return successful.
-            cleanPages();
+            cleanSessions();
             done();
         }).catch(function(_: Error): void {
             // Failed, thus clean table and raise error.
-            cleanPages();
+            cleanSessions();
             done(new Error("Could not create instance from valid model"));
         });
     });
@@ -45,26 +49,26 @@ describe("page.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["url", "title", "content", "author"];
+        const needed_props = ["token", "userId", "ip", "expires"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {
             it("Testing specific invalid instance that misses " + prop, (done) => {
-                // Copy valid page
-                const page_copy = {...page};
+                // Copy valid session
+                const session_copy = {...session};
 
                 // Delete needed property
                 // @ts-ignore
-                delete page_copy[prop];
+                delete session_copy[prop];
 
-                // Try to create page
-                Page.create(page_copy).then(function(_: Page): void {
+                // Try to create session
+                Session.create(session_copy).then(function(_: Session): void {
                     // If successful, clean database and raise error
-                    cleanPages();
-                    done(new Error("Created page from invalid model"));
+                    cleanSessions();
+                    done(new Error("Created session from invalid model"));
                 }).catch(function(err: Error): void {
                     // If unsuccessful, clean database and return
-                    cleanPages();
+                    cleanSessions();
                     if (err.name === "SequelizeValidationError" && err.message.includes("notNull Violation")) {
                         done();
                     } else {

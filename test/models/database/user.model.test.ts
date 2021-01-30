@@ -1,8 +1,8 @@
-import {TestFactory} from "../testFactory";
-import {role, user} from "../test.data";
-import {cleanRoles, cleanUsers} from "../test.helper";
-import {User} from "../../src/models/database/user.model";
-import {Role} from "../../src/models/database/role.model";
+import {TestFactory} from "../../testFactory";
+import {role, user} from "../../test.data";
+import {cleanRoles, cleanUsers} from "../../test.helper";
+import {User} from "../../../src/models/database/user.model";
+import {Role} from "../../../src/models/database/role.model";
 
 const factory: TestFactory = new TestFactory();
 

@@ -3,10 +3,8 @@ import {Group} from "./group.model";
 import {User} from "./user.model";
 
 /**
- * userGroup is the function relating users to groups via userGroup.
- * Function is the function that the user has in the group.
+ * Table for storing the many-to-many relation between groups and their members.
  */
-// TODO add comments to this :)
 @Table({timestamps: false})
 export class UserGroup extends Model<UserGroup> {
 

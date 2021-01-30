@@ -3,10 +3,8 @@ import {Activity} from "./activity.model";
 import {User} from "./user.model";
 
 /**
- * subscription is the function relating users to activities via subscriptions.
- * Answers are the answers that the user gave to the questions of the form.
+ * Table for storing the many-to-many relation between activities and users that have subscribed to an activity.
  */
-// TODO add comments to this :)
 @Table({timestamps: false})
 export  class Subscription extends Model<Subscription> {
 

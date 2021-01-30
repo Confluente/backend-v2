@@ -1,24 +1,21 @@
-import {TestFactory} from "../testFactory";
-import {role, session, user} from "../test.data";
-import {cleanSessions} from "../test.helper";
-import {Session} from "../../src/models/database/session.model";
-import {User} from "../../src/models/database/user.model";
-import {Role} from "../../src/models/database/role.model";
+import {Activity} from "../../../src/models/database/activity.model";
+import {unpublishedActivity} from "../../test.data";
+import {assert} from "chai";
+import {TestFactory} from "../../testFactory";
+import {cleanActivities} from "../../test.helper";
 
 const factory: TestFactory = new TestFactory();
 
 /**
- * Tests the session model.
+ * Tests the activity model.
  */
-describe("session.model.ts", () => {
+describe("activity.model.ts", () => {
 
     /**
      * Syncs the database and server before all tests.
      */
     before(async () => {
         await factory.init();
-        await Role.create(role);
-        await User.create(user);
     });
 
     /**
@@ -31,15 +28,15 @@ describe("session.model.ts", () => {
     /**
      * Check if adding a valid instance works.
      */
-    it("Adding a valid session instance", (done) => {
+    it("Adding a valid activity instance", (done) => {
         // Try to create instance
-        Session.create(session).then(function(_: Session): void {
+        Activity.create(unpublishedActivity).then(function(_: Activity): void {
             // Successfully created, thus clean table and return successful.
-            cleanSessions();
+            cleanActivities();
             done();
         }).catch(function(_: Error): void {
             // Failed, thus clean table and raise error.
-            cleanSessions();
+            cleanActivities();
             done(new Error("Could not create instance from valid model"));
         });
     });
@@ -49,26 +46,26 @@ describe("session.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["token", "userId", "ip", "expires"];
+        const needed_props = ["name", "description", "date"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {
             it("Testing specific invalid instance that misses " + prop, (done) => {
-                // Copy valid session
-                const session_copy = {...session};
+                // Copy valid activity
+                const act_copy = {...unpublishedActivity};
 
                 // Delete needed property
                 // @ts-ignore
-                delete session_copy[prop];
+                delete act_copy[prop];
 
-                // Try to create session
-                Session.create(session_copy).then(function(_: Session): void {
+                // Try to create activity
+                Activity.create(act_copy).then(function(_: Activity): void {
                     // If successful, clean database and raise error
-                    cleanSessions();
-                    done(new Error("Created session from invalid model"));
+                    cleanActivities();
+                    done(new Error("Created activity from invalid model"));
                 }).catch(function(err: Error): void {
                     // If unsuccessful, clean database and return
-                    cleanSessions();
+                    cleanActivities();
                     if (err.name === "SequelizeValidationError" && err.message.includes("notNull Violation")) {
                         done();
                     } else {

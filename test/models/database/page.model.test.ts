@@ -1,15 +1,14 @@
-import {Activity} from "../../src/models/database/activity.model";
-import {unpublishedActivity} from "../test.data";
-import {assert} from "chai";
-import {TestFactory} from "../testFactory";
-import {cleanActivities} from "../test.helper";
+import {TestFactory} from "../../testFactory";
+import {page} from "../../test.data";
+import {cleanPages} from "../../test.helper";
+import {Page} from "../../../src/models/database/page.model";
 
 const factory: TestFactory = new TestFactory();
 
 /**
- * Tests the activity model.
+ * Tests the page model.
  */
-describe("activity.model.ts", () => {
+describe("page.model.ts", () => {
 
     /**
      * Syncs the database and server before all tests.
@@ -28,15 +27,15 @@ describe("activity.model.ts", () => {
     /**
      * Check if adding a valid instance works.
      */
-    it("Adding a valid activity instance", (done) => {
+    it("Adding a valid page instance", (done) => {
         // Try to create instance
-        Activity.create(unpublishedActivity).then(function(_: Activity): void {
+        Page.create(page).then(function(_: Page): void {
             // Successfully created, thus clean table and return successful.
-            cleanActivities();
+            cleanPages();
             done();
         }).catch(function(_: Error): void {
             // Failed, thus clean table and raise error.
-            cleanActivities();
+            cleanPages();
             done(new Error("Could not create instance from valid model"));
         });
     });
@@ -46,26 +45,26 @@ describe("activity.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["name", "description", "date"];
+        const needed_props = ["url", "title", "content", "author"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {
             it("Testing specific invalid instance that misses " + prop, (done) => {
-                // Copy valid activity
-                const act_copy = {...unpublishedActivity};
+                // Copy valid page
+                const page_copy = {...page};
 
                 // Delete needed property
                 // @ts-ignore
-                delete act_copy[prop];
+                delete page_copy[prop];
 
-                // Try to create activity
-                Activity.create(act_copy).then(function(_: Activity): void {
+                // Try to create page
+                Page.create(page_copy).then(function(_: Page): void {
                     // If successful, clean database and raise error
-                    cleanActivities();
-                    done(new Error("Created activity from invalid model"));
+                    cleanPages();
+                    done(new Error("Created page from invalid model"));
                 }).catch(function(err: Error): void {
                     // If unsuccessful, clean database and return
-                    cleanActivities();
+                    cleanPages();
                     if (err.name === "SequelizeValidationError" && err.message.includes("notNull Violation")) {
                         done();
                     } else {

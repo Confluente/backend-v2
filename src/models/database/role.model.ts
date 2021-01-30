@@ -131,7 +131,7 @@ export class Role extends Model<Role> {
     public ACTIVITY_MANAGE: boolean;
 
     /**
-     * Users that have this particular role.
+     * Users that have this particular role (one-to-many relation)
      */
     @HasMany(() => User, {})
     public users: User[];

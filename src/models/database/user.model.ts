@@ -58,7 +58,7 @@ export class User extends Model<User> {
      * Display name of the user.
      * Usually concatenation of first name and last name
      */
-        // TODO delete this, and just make a function for get Display Name or smth
+    // TODO delete this, and just make a function for get Display Name or smth
     @AllowNull(false)
     @Column(DataType.STRING(128))
     public displayName!: string;
@@ -141,18 +141,29 @@ export class User extends Model<User> {
     @Column(DataType.STRING(128))
     public approvingHash!: string;
 
-    // TODO add nice comments
+    /**
+     * Stores the groups that this user is a member of (many-to-many relation)
+     */
     @BelongsToMany(() => Group, () => UserGroup)
     public groups: Array<Group & {UserGroup: UserGroup}>;
 
+    /**
+     * Stores the activities that this user is subscribed to (many-to-many relation)
+     */
     @BelongsToMany(() => Activity, () => Subscription)
     public activities: Array<Activity & {Subscript: Subscription}>;
 
+    /**
+     * Stores the id of the role that this user has.
+     */
     @ForeignKey(() => Role)
     @AllowNull(false)
     @Column
     public roleId!: number;
 
+    /**
+     * Stores the session that belongs to this user (one-to-one relation)
+     */
     @HasOne(() => Session)
     public session: Session;
 }

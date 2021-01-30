@@ -67,11 +67,15 @@ export class Group extends Model<Group> {
     @Column(DataType.STRING(128))
     public type!: string;
 
-    // TODO add comment
+    /**
+     * Stores the users that are a member of this group (many-to-many relation)
+     */
     @BelongsToMany(() => User, () => UserGroup)
     public members: Array<User & {UserGroup: UserGroup}>;
 
-    // TODO add comment
+    /**
+     * Stores the activities that this group organizes (one-to-many relation)
+     */
     @HasMany(() => Activity)
     public activities: Activity[];
 }

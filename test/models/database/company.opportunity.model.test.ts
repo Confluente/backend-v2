@@ -1,7 +1,7 @@
-import {TestFactory} from "../testFactory";
-import {CompanyOpportunity} from "../../src/models/database/company.opportunity.model";
-import {companyOpportunity} from "../test.data";
-import {cleanCompanyOpportunities} from "../test.helper";
+import {TestFactory} from "../../testFactory";
+import {CompanyOpportunity} from "../../../src/models/database/company.opportunity.model";
+import {companyOpportunity} from "../../test.data";
+import {cleanCompanyOpportunities} from "../../test.helper";
 
 const factory: TestFactory = new TestFactory();
 

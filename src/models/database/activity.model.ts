@@ -136,12 +136,15 @@ export class Activity extends Model {
     @Column(DataType.BOOLEAN)
     public hasCoverImage: boolean;
 
-    // TODO add comments
+    /**
+     * Stores the users that have subscribed to this event (many-to-many relation)
+     */
     @BelongsToMany(() => User, () => Subscription)
     public participants: Array<User & {Subscription: Subscription}>;
 
-    // TODO change uses of this (was first capitalized)
-    // TODO maybe change to HasOne relationship, as i feel like that makes more sense
+    /**
+     * Stores the group that organizes this activity (one-to-many relation)
+     */
     @ForeignKey(() => Group)
     public organizer: Group;
 }
