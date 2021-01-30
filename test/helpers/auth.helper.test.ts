@@ -1,5 +1,6 @@
-import {getPasswordHash} from "../../src/helpers/auth.helper";
+import {generateSalt, getPasswordHash} from "../../src/helpers/auth.helper";
 import { expect, assert } from "chai";
+import exp = require("constants");
 
 describe("auth.helper.ts", () => {
 
@@ -39,6 +40,25 @@ describe("auth.helper.ts", () => {
 
     describe("generateSalt", () => {
 
+        it("checks basic case", () => {
+            const length = 32;
+
+            assert.equal(generateSalt(length).length, length);
+        });
+
+        it("check for negative length", () => {
+            const length = -1;
+
+            expect(() => {
+                generateSalt(length);
+            }).to.throw("auth.helper.generateSalt: length had negative value -1.");
+        });
+
+        it("checks for length of 0", () => {
+            const length = 0;
+
+            assert.equal(generateSalt(length), "");
+        });
     });
 
     describe("getPasswordHashSync", () => {

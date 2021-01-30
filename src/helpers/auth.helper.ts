@@ -38,6 +38,10 @@ export function getPasswordHash(password: string, salt: string): any {
  * @return Salt characters
  */
 export function generateSalt(length: number): string {
+    if (length < 0) {
+        throw new Error("auth.helper.generateSalt: length had negative value " + length.toString() + ".");
+    }
+
     return randomBytes(Math.ceil(length / 2))
         .toString('hex') /** convert to hexadecimal format */
         .slice(0, length);   /** return required number of characters */
