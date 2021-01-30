@@ -49,7 +49,7 @@ describe("session.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["token", "user", "ip", "expires"];
+        const needed_props = ["token", "userId", "ip", "expires"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {

@@ -99,11 +99,16 @@ export function authenticate(email: string, password: string): any {
  * @return session
  */
 export function startSession(userId: number, ip: string): any {
+    if (ip === null) {
+        throw new Error("auth.helper.startSession: IP was null.");
+    } else if (ip === "") {
+        throw new Error("auth.helper.startSession: IP was empty.");
+    }
+    
     const session_lifetime = 7; // in days
     return q.nfbind(randomBytes)(32).then(function(bytes: any): any {
-        console.log("new session made");
         return Session.create({
-            user: userId,
+            userId: userId,
             ip,
             token: bytes,
             expires: (new Date()).setDate(new Date().getDate() + session_lifetime)

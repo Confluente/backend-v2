@@ -13,6 +13,7 @@
     "deprecation": {
       "severity": "warning"
     },
+    "object-literal-shorthand": [false],
     "component-class-suffix": true,
     "contextual-lifecycle": true,
     "directive-class-suffix": true,

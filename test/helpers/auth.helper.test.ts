@@ -1,10 +1,17 @@
-import {authenticate, generateSalt, getPasswordHash, getPasswordHashSync} from "../../src/helpers/auth.helper";
+import {
+    authenticate,
+    generateSalt,
+    getPasswordHash,
+    getPasswordHashSync,
+    startSession
+} from "../../src/helpers/auth.helper";
 import { expect, assert } from "chai";
 import {User} from "../../src/models/database/user.model";
 import {role, user} from "../test.data";
 import {TestFactory} from "../testFactory";
 import {Role} from "../../src/models/database/role.model";
-import {cleanRoles, cleanUsers} from "../test.helper";
+import {cleanRoles, cleanSessions, cleanUsers} from "../test.helper";
+import {Session} from "../../src/models/database/session.model";
 
 const factory: TestFactory = new TestFactory();
 
@@ -163,5 +170,58 @@ describe("auth.helper.ts", () => {
 
     describe("startSession", () => {
 
+        before(async () => {
+            await factory.init();
+            await Role.create(role);
+        });
+
+        after(async () => {
+            await factory.close();
+            cleanRoles();
+        });
+
+        it("basic case", (done) => {
+            User.create(user).then(function(dbUser: User): void {
+                startSession(dbUser.id, "coolIPAddress").then(function(session: Session): void {
+                    User.findByPk(dbUser.id, {include: [Session]}).then(function(updatedUser: User): void {
+                        cleanSessions();
+                        if (updatedUser.session.token.equals(session.token)) {
+                            done();
+                        } else {
+                            done(new Error("Tokens dont match up"));
+                        }
+                    });
+                }).catch(function(err: Error): void {
+                    cleanSessions();
+                    done(new Error("Failed to make session"));
+                });
+            });
+        });
+
+        it("Starting session for unknown userId", (done) => {
+            startSession(3, "coolIPAddress").then(function(session: Session): void {
+                cleanSessions();
+                done(new Error("Could create session for non existing user"));
+            }).catch(function(err: Error): void {
+                cleanSessions();
+                if (err.name === "SequelizeForeignKeyConstraintError") {
+                    done();
+                } else {
+                    done(new Error("Could not create session, but for the wrong reason"));
+                }
+            });
+        });
+
+        it("If IP is empty string", () => {
+            expect(() => {
+                startSession(1, "");
+            }).to.throw("auth.helper.startSession: IP was empty.");
+        });
+
+        it("If IP is null", () => {
+            expect(() => {
+                startSession(1, null);
+            }).to.throw("auth.helper.startSession: IP was null.");
+        });
     });
 });

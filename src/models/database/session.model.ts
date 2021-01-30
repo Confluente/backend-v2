@@ -17,7 +17,7 @@ export class Session extends Model<Session> {
     @AllowNull(false)
     @ForeignKey(() => User)
     @Column(DataType.INTEGER)
-    public user!: number;
+    public userId!: number;
 
     /**
      * IP address of the user.
