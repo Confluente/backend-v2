@@ -1,10 +1,10 @@
 import request from "supertest";
 
 import {app} from "../src/expressServer";
-import {getPasswordHashSync} from "../src/helpers/auth.helper";
+import {generateSalt, getPasswordHashSync} from "../src/helpers/auth.helper";
 
 const password = "HonoursWorthyPassword";
-const passwordSaltBuffer = new Buffer("BlahBlah");
+const passwordSaltExample = generateSalt(16);
 
 export const user = {
     email: "superadmin",
@@ -13,8 +13,8 @@ export const user = {
     lastName: "Administrator",
     honorsMembership: "member",
     approvingHash: "da;lkfjda;fjkad;fj",
-    passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
-    passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
+    passwordSalt: passwordSaltExample,
+    passwordHash: getPasswordHashSync(password, passwordSaltExample),
     roleId: 1
 };
 
@@ -51,8 +51,8 @@ export const member = {
     consentWithPortraitRight: true,
     approved: true,
     approvingHash: "approved_random_hash",
-    passwordSalt: passwordSaltBuffer,
-    passwordHash: getPasswordHashSync(password, passwordSaltBuffer.toString())
+    passwordSalt: passwordSaltExample,
+    passwordHash: getPasswordHashSync(password, passwordSaltExample)
 };
 
 export const unpublishedActivity = {

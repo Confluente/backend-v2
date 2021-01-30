@@ -53,8 +53,17 @@ export function generateSalt(length: number): string {
  * @param salt                  Salt for which Hash is to be found
  * @return Hash
  */
-export function getPasswordHashSync(password: string, salt: string): string {
-    return pbkdf2Sync(password, salt, digest_iterations, 256 / 8, 'sha256').toString();
+export function getPasswordHashSync(password: string, salt: string): Buffer {
+    if (password === null) {
+        throw new Error("auth.helper.getPasswordHashSync: password was null.");
+    }
+
+    if (salt === null) {
+        throw new Error("auth.helper.getPasswordHashSync: salt was null.");
+    }
+
+
+    return pbkdf2Sync(password, salt, digest_iterations, 256 / 8, 'sha256');
 }
 
 
@@ -68,12 +77,12 @@ export function authenticate(email: string, password: string): any {
     email = email.toLowerCase();
     return User.findOne({where: {email}}).then(function(user: User): any {
         if (!user) {
-            throw new Error("Email address not associated to any account");
+            throw new Error("Email address " + email + " not associated to any account");
         }
 
         return getPasswordHash(password, user.passwordSalt)
-            .then(function(hash: string): any {
-                if (hash === user.passwordHash) {
+            .then(function(hash: Buffer): any {
+                if (hash.equals(user.passwordHash)) {
                     return user;
                 } else {
                     throw new Error("Password incorrect");

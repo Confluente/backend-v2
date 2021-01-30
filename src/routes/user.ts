@@ -271,11 +271,11 @@ router.route("/changePassword/:id")
                     return res.status(404).send({status: "Not Found"});
                 } else {
                     // Get the hash of the (original) password the user put
-                    const inputtedPasswordHash: string =
+                    const inputtedPasswordHash =
                         getPasswordHashSync(req.body.password, foundUser.passwordSalt);
 
                     // Check if it is indeed the correct password
-                    if (inputtedPasswordHash === foundUser.passwordHash) {
+                    if (inputtedPasswordHash.equals(foundUser.passwordHash)) {
                         return res.status(406).send({status: "Not equal passwords"});
                     }
 
@@ -286,7 +286,7 @@ router.route("/changePassword/:id")
 
                     // Generate new salt and hash
                     const passwordSalt: string = generateSalt(16); // Create salt of 16 characters
-                    const passwordHash: string = getPasswordHashSync(req.body.passwordNew, passwordSalt);
+                    const passwordHash = getPasswordHashSync(req.body.passwordNew, passwordSalt);
 
                     // Update user in database with new password and hash
                     return foundUser.update({
