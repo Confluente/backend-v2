@@ -3,7 +3,6 @@ import {Role} from "../../../src/models/database/role.model";
 import {organizingGroup, role, user} from "../../test.data";
 import {User} from "../../../src/models/database/user.model";
 import {Group} from "../../../src/models/database/group.model";
-import {where} from "sequelize";
 import {GroupWeb} from "../../../src/models/web/group.web.model";
 import { expect } from "chai";
 
