@@ -49,6 +49,10 @@ export class GroupWeb extends AbstractWebModel {
     public members!: UserGroupWeb[];
 
     public static getWebModelFromDbModel(dbGroup: Model): GroupWeb {
+        if (!(dbGroup instanceof Group)) {
+            throw new Error("group.web.model.getWebModelFromDbModel: dbGroup was not a Group instance.");
+        }
+
         // for each attribute where the type and name are equal, copy them over
         // @ts-ignore
         const webGroup: GroupWeb = copyMatchingSourceKeyValues(new GroupWeb(), dbGroup.dataValues);
