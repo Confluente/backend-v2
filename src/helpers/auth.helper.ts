@@ -77,7 +77,7 @@ export function authenticate(email: string, password: string): any {
     email = email.toLowerCase();
     return User.findOne({where: {email}}).then(function(user: User): any {
         if (!user) {
-            throw new Error("Email address " + email + " not associated to any account");
+            throw new Error("Email address " + email + " not associated to any account.");
         }
 
         return getPasswordHash(password, user.passwordSalt)

@@ -4,6 +4,7 @@ import {User} from "../../src/models/database/user.model";
 import {role, user} from "../test.data";
 import {TestFactory} from "../testFactory";
 import {Role} from "../../src/models/database/role.model";
+import {cleanRoles, cleanUsers} from "../test.helper";
 
 const factory: TestFactory = new TestFactory();
 
@@ -108,6 +109,7 @@ describe("auth.helper.ts", () => {
 
         after(async () => {
             await factory.close();
+            cleanRoles();
         });
 
         it("checks basic case", (done) => {
@@ -115,14 +117,46 @@ describe("auth.helper.ts", () => {
 
             User.create(new_user).then(function(dbUser: User): void {
                 authenticate(new_user.email, "HonoursWorthyPassword").then(function(auth_user: User): void {
+                    cleanUsers();
                     if (auth_user.id === dbUser.id && auth_user.email === dbUser.email) {
                         done();
                     } else {
                         done(new Error("Authenticate successful, but not correct(?)"));
                     }
                 }).catch(function(_: Error): void {
+                    cleanUsers();
                     done(new Error());
                 });
+            });
+        });
+
+        it("checks basic failing case", (done) => {
+            const new_user = {...user};
+
+            User.create(new_user).then(function(dbUser: User): void {
+                authenticate(new_user.email, "IncorrectPassword").then(function(auth_user: User): void {
+                    cleanUsers();
+                    done(new Error("Authentication successful with incorrect password"));
+                }).catch(function(err: Error): void {
+                    cleanUsers();
+                    if (err.message === "Password incorrect") {
+                        done();
+                    } else {
+                        done(new Error("Could not authenticate for wrong reason"));
+                    }
+                });
+            });
+        });
+
+        it("checks for unknown email case", (done) => {
+            authenticate("unknown@email", "somepassword").then(function(auth_user: User): void {
+                done(new Error("Authenticated nonexisting user"));
+            }).catch(function(err: Error): void {
+                if (err.message === "Email address unknown@email not associated to any account.") {
+                    done();
+                } else {
+                    done(new Error("Could not authenticate for wrong reason"));
+                }
             });
         });
     });
