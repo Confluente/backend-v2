@@ -15,4 +15,8 @@ export abstract class AbstractWebModel {
     public static getWebModelFromDbModel<B extends Model>(dBModel: B): AbstractWebModel {
         throw new Error("Not implemented for concrete class");
     }
+
+    public getCopyable(): string[] {
+        throw new Error("Not implemented for concrete class");
+    }
 }

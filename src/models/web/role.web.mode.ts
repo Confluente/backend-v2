@@ -1,5 +1,5 @@
 import {Model} from "sequelize-typescript";
-import {copyMatchingSourceKeyValues} from "../../helpers/model.copy.helper";
+import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
 import {AbstractWebModel} from "./abstract.web.model";
 
 export class RoleWeb extends AbstractWebModel {
@@ -80,6 +80,11 @@ export class RoleWeb extends AbstractWebModel {
     public ACTIVITY_MANAGE!: boolean;
 
     public static getWebModelFromDbModel(dbRole: Model): RoleWeb {
-        return copyMatchingSourceKeyValues(new RoleWeb(), dbRole);
+        // @ts-ignore
+        return copyMatchingSourceKeyValues(new RoleWeb(), dbRole.dataValues);
+    }
+
+    public getCopyable(): string[] {
+        return ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE", "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "GROUP_VIEW", "GROUP_MANAGE", "GROUP_ORGANIZE_WITH_ALL", "ACTIVITY_VIEW_PUBLISHED", "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"];
     }
 }

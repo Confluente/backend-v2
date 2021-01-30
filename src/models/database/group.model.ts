@@ -14,6 +14,7 @@ import {User} from "./user.model";
 import {UserGroup} from "./usergroup.model";
 import {Activity} from "./activity.model";
 
+
 @Table({timestamps: false})
 export class Group extends Model<Group> {
 

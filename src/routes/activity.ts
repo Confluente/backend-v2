@@ -97,7 +97,7 @@ router.route("/")
             const activities = ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
 
             // Check for every activity if the client can view them
-            const promises = activities.map(function(singleActivity: Activity): any {
+            const promises = activities.map(function(singleActivity: ActivityWeb): any {
                 // If the activity is published, everyone (also not logged in) is allowed to see them
                 // These lines are needed not to crash the management table in some cases
                 if (singleActivity.published) { return Q(singleActivity); }
@@ -109,7 +109,7 @@ router.route("/")
                 return permissions.check(res.locals.session.user, {
                     type: "ACTIVITY_VIEW",
                     value: singleActivity.id
-                }).then(function(result: boolean): Activity {
+                }).then(function(result: boolean): ActivityWeb {
                     // If no permission, return null, otherwise return activity
                     return result ? singleActivity : null;
                 });
@@ -244,14 +244,14 @@ router.route("/manage")
         }).then(function(foundActivities: Activity[]): void {
 
             // Transform all db activities into web activities
-            const activities = ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
+            const activities: ActivityWeb[] = ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
 
             // For every activity, check if the client is allowed to edit it
-            const promises = activities.map(function(singleActivity: Activity): any {
+            const promises = activities.map(function(singleActivity: ActivityWeb): any {
                 return permissions.check(res.locals.session.user, {
                     type: "ACTIVITY_EDIT",
                     value: singleActivity.id
-                }).then(function(result: boolean): Activity {
+                }).then(function(result: boolean): ActivityWeb {
                     return result ? singleActivity : null;
                 });
             });

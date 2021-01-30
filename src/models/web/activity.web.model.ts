@@ -1,7 +1,7 @@
 import marked from "marked";
 import {SubscriptionWeb} from "./subscription.web.model";
 import {GroupWeb} from "./group.web.model";
-import {copyMatchingSourceKeyValues} from "../../helpers/model.copy.helper";
+import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model, Sequelize} from "sequelize-typescript";
 import {Activity} from "../database/activity.model";
@@ -45,7 +45,7 @@ export class ActivityWeb extends AbstractWebModel {
     /**
      * Date of the activity.
      */
-    public date!: any;
+    public date!: Date;
 
     /**
      * Start time of the activity.
@@ -138,9 +138,20 @@ export class ActivityWeb extends AbstractWebModel {
      */
     public organizer!: GroupWeb;
 
+    public static getArrayOfWebModelsFromArrayOfDbModels(dbModels: Model[]): ActivityWeb[] {
+        const transformed: ActivityWeb[] = [];
+
+        for (const obj of dbModels) {
+            transformed.push(this.getWebModelFromDbModel(obj));
+        }
+
+        return transformed;
+    }
+
     public static getWebModelFromDbModel(dbActivity: Model): ActivityWeb {
         // for each attribute where the type and name are equal, copy them over
-        const webActivity = copyMatchingSourceKeyValues(new ActivityWeb(), dbActivity);
+        // @ts-ignore
+        const webActivity = copyMatchingSourceKeyValues(new ActivityWeb(), dbActivity.dataValues);
 
         // Cast activity to Activity model
         const castedAct = dbActivity as Activity;
@@ -193,5 +204,9 @@ export class ActivityWeb extends AbstractWebModel {
 
         // return webActivity object
         return webActivity;
+    }
+
+    public getCopyable(): string[] {
+        return ["id", "name", "description", "location", "canSubscribe", "participationFee", "numberOfQuestions", "published", "hasCoverImage"];
     }
 }

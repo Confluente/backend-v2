@@ -1,7 +1,7 @@
 import {UserWeb} from "./user.web.model";
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model} from "sequelize-typescript";
-import {copyMatchingSourceKeyValues} from "../../helpers/model.copy.helper";
+import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
 import {UserGroupWeb} from "./usergroup.web.model";
 import {Group} from "../database/group.model";
 
@@ -50,7 +50,8 @@ export class GroupWeb extends AbstractWebModel {
 
     public static getWebModelFromDbModel(dbGroup: Model): GroupWeb {
         // for each attribute where the type and name are equal, copy them over
-        const webGroup = copyMatchingSourceKeyValues(new GroupWeb(), dbGroup);
+        // @ts-ignore
+        const webGroup: GroupWeb = copyMatchingSourceKeyValues(new GroupWeb(), dbGroup.dataValues);
 
         // copy over the group members
         webGroup.members = [];
@@ -64,5 +65,9 @@ export class GroupWeb extends AbstractWebModel {
         }
 
         return webGroup;
+    }
+
+    public getCopyable(): string[] {
+        return ["id", "displayName", "fullName", "description", "canOrganize", "email", "type"];
     }
 }

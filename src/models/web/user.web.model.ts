@@ -3,7 +3,7 @@ import {UserGroupWeb} from "./usergroup.web.model";
 import {SubscriptionWeb} from "./subscription.web.model";
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model} from "sequelize-typescript";
-import {copyMatchingSourceKeyValues} from "../../helpers/model.copy.helper";
+import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
 import {Role} from "../database/role.model";
 import {User} from "../database/user.model";
 
@@ -94,19 +94,25 @@ export class UserWeb extends AbstractWebModel {
     public role: RoleWeb;
 
     public static getWebModelFromDbModel(dbUser: Model): UserWeb {
-        const webUser = copyMatchingSourceKeyValues(new UserWeb(), dbUser);
+        // @ts-ignore
+        const webUser = copyMatchingSourceKeyValues(new UserWeb(), dbUser.dataValues);
 
         if ((dbUser as User).roleId !== null) {
             Role.findByPk((dbUser as User).roleId).then(function(role: Role): void {
                 webUser.role = RoleWeb.getWebModelFromDbModel(role);
+
+                webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(
+                    function(groupOfUser: UserGroupWeb): boolean {
+                        return groupOfUser.group.canOrganize;
+                    }
+                );
             });
         }
 
-        webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(
-            function(groupOfUser: UserGroupWeb): boolean {
-                return groupOfUser.group.canOrganize;
-        });
-
         return webUser;
+    }
+
+    public getCopyable(): string[] {
+        return ["id", "email", "firstName", "lastName", "displayName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "approved", "approvingHash", "canOrganize"];
     }
 }
