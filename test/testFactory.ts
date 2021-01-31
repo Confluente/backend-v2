@@ -26,7 +26,7 @@ export class TestFactory {
         username: null,
         password: null,
         models: [Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup],
-        logging: false,
+        // logging: false,
     });
 
     public get app(): supertest.SuperTest<supertest.Test> {

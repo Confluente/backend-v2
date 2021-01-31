@@ -6,13 +6,15 @@ export abstract class AbstractWebModel {
         const transformed: AbstractWebModel[] = [];
 
         for (const obj of dbModels) {
-            transformed.push(this.getWebModelFromDbModel(obj));
+            this.getWebModelFromDbModel(obj).then(function(awm: AbstractWebModel): void {
+                transformed.push(awm);
+            });
         }
 
         return transformed;
     }
 
-    public static getWebModelFromDbModel<B extends Model>(dBModel: B): AbstractWebModel {
+    public static async getWebModelFromDbModel<B extends Model>(dBModel: B): Promise<AbstractWebModel> {
         throw new Error("Not implemented for concrete class");
     }
 

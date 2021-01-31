@@ -6,6 +6,7 @@ import {Model} from "sequelize-typescript";
 import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
 import {Role} from "../database/role.model";
 import {User} from "../database/user.model";
+import {GroupWeb} from "./group.web.model";
 
 export class UserWeb extends AbstractWebModel {
 
@@ -86,28 +87,59 @@ export class UserWeb extends AbstractWebModel {
      */
     public canOrganize: boolean;
 
-        // TODO add nice comments
+    /**
+     * Stores the groups that this user is a part of, represented by UserGroupWeb objects.
+     */
     public groups: UserGroupWeb[];
 
+    /**
+     * Stores the activities this user is subscribed to, represented by SubscriptionWeb objects.
+     */
     public activities: SubscriptionWeb[];
 
+    /**
+     * Stores the role this user has, represented by a RoleWeb object.
+     */
     public role: RoleWeb;
 
-    public static getWebModelFromDbModel(dbUser: Model): UserWeb {
+    public static async getWebModelFromDbModel(dbUser: Model): Promise<UserWeb> {
+        if (!(dbUser instanceof User)) {
+            throw new Error("user.web.model.getWebModelFromDbModel: dbUser was not a User instance");
+        }
+
         // @ts-ignore
         const webUser = copyMatchingSourceKeyValues(new UserWeb(), dbUser.dataValues);
 
-        if ((dbUser as User).roleId !== null) {
-            Role.findByPk((dbUser as User).roleId).then(function(role: Role): void {
-                webUser.role = RoleWeb.getWebModelFromDbModel(role);
+        webUser.groups = [];
+        if ((dbUser as User).groups && (dbUser as User).groups.length !== 0) {
+            for (const group of (dbUser as User).groups) {
+                const func = group.UserGroup.func;
+                delete group.UserGroup;
+                const webGroup = GroupWeb.getWebModelFromDbModel(group);
+                webUser.groups.push(new UserGroupWeb(webUser, webGroup, func));
+            }
+        }
+
+        if ((dbUser as User).roleId !== undefined || (dbUser as User).roleId !== null) {
+            Role.findAll().then(function(roles: Role[]): void {
+                console.log("hi");
+            });
+
+            Role.findOne({where: {id: 1}}).then(function(dbRole: Role): void {
+                webUser.role = RoleWeb.getWebModelFromDbModel(dbRole);
 
                 webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(
                     function(groupOfUser: UserGroupWeb): boolean {
                         return groupOfUser.group.canOrganize;
                     }
                 );
+            }).catch(function(err: any): void {
+                console.log(err);
+            }).finally(function(): void {
+                console.log("execute");
             });
         }
+
 
         return webUser;
     }
