@@ -1,4 +1,4 @@
-import {RoleWeb} from "./role.web.mode";
+import {RoleWeb} from "./role.web.model";
 import {UserGroupWeb} from "./usergroup.web.model";
 import {SubscriptionWeb} from "./subscription.web.model";
 import {AbstractWebModel} from "./abstract.web.model";
@@ -115,29 +115,22 @@ export class UserWeb extends AbstractWebModel {
             for (const group of (dbUser as User).groups) {
                 const func = group.UserGroup.func;
                 delete group.UserGroup;
-                const webGroup = GroupWeb.getWebModelFromDbModel(group);
-                webUser.groups.push(new UserGroupWeb(webUser, webGroup, func));
+                GroupWeb.getWebModelFromDbModel(group).then(function(webGroup: GroupWeb): void {
+                    webUser.groups.push(new UserGroupWeb(webUser, webGroup, func));
+                });
             }
         }
 
         if ((dbUser as User).roleId !== undefined || (dbUser as User).roleId !== null) {
-            Role.findAll().then(function(roles: Role[]): void {
-                console.log("hi");
-            });
+            const dbRole = await Role.findOne({where: {id: (dbUser as User).roleId}});
 
-            Role.findOne({where: {id: 1}}).then(function(dbRole: Role): void {
-                webUser.role = RoleWeb.getWebModelFromDbModel(dbRole);
+            webUser.role = await RoleWeb.getWebModelFromDbModel(dbRole);
 
-                webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(
-                    function(groupOfUser: UserGroupWeb): boolean {
-                        return groupOfUser.group.canOrganize;
-                    }
-                );
-            }).catch(function(err: any): void {
-                console.log(err);
-            }).finally(function(): void {
-                console.log("execute");
-            });
+            webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(
+                function(groupOfUser: UserGroupWeb): boolean {
+                    return groupOfUser.group.canOrganize;
+                }
+            );
         }
 
 

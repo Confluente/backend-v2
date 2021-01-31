@@ -27,10 +27,10 @@ router.route("/")
             }, Role]
         }).then(function(foundUser: User): void {
             // get the datavalues of the user
-            const profile: UserWeb = UserWeb.getWebModelFromDbModel(foundUser);
-
-            // send the profile back the client
-            res.send(profile);
+            UserWeb.getWebModelFromDbModel(foundUser).then(function(profile: UserWeb): void {
+                // send the profile back the client
+                res.send(profile);
+            });
         });
     });
 

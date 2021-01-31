@@ -3,7 +3,7 @@ import express, {Router, Request, Response} from "express";
 import {Role} from "../models/database/role.model";
 
 import {check} from "../permissions";
-import {RoleWeb} from "../models/web/role.web.mode";
+import {RoleWeb} from "../models/web/role.web.model";
 
 const router: Router = express.Router();
 

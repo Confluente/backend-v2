@@ -10,41 +10,49 @@ import {UserGroup} from "../src/models/database/usergroup.model";
 import {Session} from "../src/models/database/session.model";
 
 export async function cleanActivities(): Promise<void> {
-    Activity.destroy({truncate: true});
+    await Activity.destroy({truncate: true});
 }
 
-export function cleanCompanyOpportunities(): void {
-    CompanyOpportunity.destroy({truncate: true});
+export async function cleanCompanyOpportunities(): Promise<void> {
+    await CompanyOpportunity.destroy({truncate: true});
 }
 
-export function cleanGroups(): void {
-    Group.destroy({truncate: true});
+export async function cleanGroups(): Promise<void> {
+    await Group.destroy({truncate: true});
 }
 
-export function cleanPages(): void {
-    Page.destroy({truncate: true});
+export async function cleanPages(): Promise<void> {
+    await Page.destroy({truncate: true});
 }
 
-export function cleanRoles(): void {
-    Role.destroy({where: {}});
+export async function cleanRoles(): Promise<void> {
+    await Role.destroy({where: {}});
 }
 
-export function cleanSubscriptions(): void {
-    Subscription.destroy({truncate: true});
+export async function cleanSubscriptions(): Promise<void> {
+    await Subscription.destroy({truncate: true});
 }
 
-export function cleanUsers(): void {
-    User.destroy({truncate: true});
+export async function cleanUsers(): Promise<void> {
+    await User.destroy({truncate: true});
 }
 
-export function cleanUsergroups(): void {
-    UserGroup.destroy({truncate: true});
+export async function cleanUsergroups(): Promise<void> {
+    await UserGroup.destroy({truncate: true});
 }
 
-export function cleanSessions(): void {
-    Session.destroy({truncate: true});
+export async function cleanSessions(): Promise<void> {
+    await Session.destroy({truncate: true});
 }
 
-export function clean<B extends Model>(modelClass: B): void {
-    modelClass.destroy();
+export async function cleanDb(): Promise<void> {
+    await cleanActivities();
+    await cleanCompanyOpportunities();
+    await cleanGroups();
+    await cleanPages();
+    await cleanRoles();
+    await cleanSubscriptions();
+    await cleanUsers();
+    await cleanUsergroups();
+    await cleanSessions();
 }

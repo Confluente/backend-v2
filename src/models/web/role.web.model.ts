@@ -80,9 +80,9 @@ export class RoleWeb extends AbstractWebModel {
      */
     public ACTIVITY_MANAGE!: boolean;
 
-    public static getWebModelFromDbModel(dbRole: Model): RoleWeb {
+    public static async getWebModelFromDbModel(dbRole: Model): Promise<RoleWeb> {
         if (!(dbRole instanceof Role)) {
-            throw new Error("role.web.model.getWebModelFromDbModel: dbRole was not a Role instance");
+            throw new Error("role.web.model.getWebModelFromDbModel: dbRole was not a Role instance.");
         }
 
         // @ts-ignore

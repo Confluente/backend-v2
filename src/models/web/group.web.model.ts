@@ -48,7 +48,7 @@ export class GroupWeb extends AbstractWebModel {
      */
     public members!: UserGroupWeb[];
 
-    public static getWebModelFromDbModel(dbGroup: Model): GroupWeb {
+    public static async getWebModelFromDbModel(dbGroup: Model): Promise<GroupWeb> {
         if (!(dbGroup instanceof Group)) {
             throw new Error("group.web.model.getWebModelFromDbModel: dbGroup was not a Group instance.");
         }
@@ -59,12 +59,13 @@ export class GroupWeb extends AbstractWebModel {
 
         // copy over the group members
         webGroup.members = [];
-        if ((dbGroup as Group).members !== null) {
+        if ((dbGroup as Group).members && (dbGroup as Group).members.length !== 0) {
             for (const member of (dbGroup as Group).members) {
                 const func = member.UserGroup.func;
                 delete member.UserGroup;
-                const user = UserWeb.getWebModelFromDbModel(member);
-                webGroup.members.push(new UserGroupWeb(user, webGroup, func));
+                await UserWeb.getWebModelFromDbModel(member).then(function(user: UserWeb): void {
+                    webGroup.members.push(new UserGroupWeb(user, webGroup, func));
+                });
             }
         }
 

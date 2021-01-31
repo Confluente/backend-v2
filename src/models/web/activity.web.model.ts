@@ -142,13 +142,15 @@ export class ActivityWeb extends AbstractWebModel {
         const transformed: ActivityWeb[] = [];
 
         for (const obj of dbModels) {
-            transformed.push(this.getWebModelFromDbModel(obj));
+            this.getWebModelFromDbModel(obj).then(function(aw: ActivityWeb): void {
+                transformed.push(aw);
+            });
         }
 
         return transformed;
     }
 
-    public static getWebModelFromDbModel(dbActivity: Model): ActivityWeb {
+    public static async getWebModelFromDbModel(dbActivity: Model): Promise<ActivityWeb> {
         // for each attribute where the type and name are equal, copy them over
         // @ts-ignore
         const webActivity = copyMatchingSourceKeyValues(new ActivityWeb(), dbActivity.dataValues);
@@ -181,8 +183,9 @@ export class ActivityWeb extends AbstractWebModel {
                 for (const member of castedAct.participants) {
                     const answers = member.Subscription.answers;
                     delete member.Subscription;
-                    const user = UserWeb.getWebModelFromDbModel(member);
-                    webActivity.participants.push(new SubscriptionWeb(user, webActivity, answers));
+                    await UserWeb.getWebModelFromDbModel(member).then(function(user: UserWeb): void {
+                        webActivity.participants.push(new SubscriptionWeb(user, webActivity, answers));
+                    });
                 }
             }
         }

@@ -30,7 +30,7 @@ export class PageWeb extends AbstractWebModel {
      */
     public author!: string;
 
-    public static getWebModelFromDbModel(dbPage: Model): PageWeb {
+    public static async getWebModelFromDbModel(dbPage: Model): Promise<PageWeb> {
         if (!(dbPage instanceof Page)) {
             throw new Error("page.web.model.getWebModelFromDbModel: dbPage was not a Page instance");
         }

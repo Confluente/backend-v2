@@ -5,6 +5,7 @@ import {User} from "../../../src/models/database/user.model";
 import {Group} from "../../../src/models/database/group.model";
 import {GroupWeb} from "../../../src/models/web/group.web.model";
 import { expect } from "chai";
+import {cleanDb} from "../../test.helper";
 
 const factory: TestFactory = new TestFactory();
 
@@ -24,6 +25,7 @@ describe("group.web.model.ts", () => {
      */
     after(async () => {
         await factory.close();
+        cleanDb();
     });
 
     describe("getWebModelFromDbModel", () => {
@@ -40,31 +42,37 @@ describe("group.web.model.ts", () => {
                         Group.findByPk(dbGr.id, {attributes: ["id", "description"], include: [User]})
                                 .then(function(updatedGroup: Group): void {
                             // Create web object
-                            const webGroup = GroupWeb.getWebModelFromDbModel(updatedGroup);
+                            GroupWeb.getWebModelFromDbModel(updatedGroup).then(function(webGroup: GroupWeb): void {
+                                // Check if web object is correct
+                                let correct = true;
+                                if (webGroup.members[0].user.id !== dbUser.id) { correct = false; }
+                                if (webGroup.members[0].func !== "Chair") { correct = false; }
+                                if (webGroup.description !== "Non empty description") { correct = false; }
+                                if (webGroup.members.length !== 1) { correct = false; }
 
-                            // Check if web object is correct
-                            let correct = true;
-                            if (webGroup.members[0].user.id !== dbUser.id) { correct = false; }
-                            if (webGroup.members[0].func !== "Chair") { correct = false; }
-                            if (webGroup.description !== organizingGroup.description) { correct = false; }
-                            if (webGroup.members.length !== 1) { correct = false; }
-
-                            if (correct) {
-                                done();
-                            } else {
-                                done(new Error());
-                            }
+                                if (correct) {
+                                    done();
+                                } else {
+                                    done(new Error());
+                                }
+                            });
                         });
                     });
                 });
             });
         });
 
-        it("checks exception", () => {
+        it("checks exception", (done) => {
             User.findOne({where: {email: user.email}}).then(function(dbUser: User): void {
-                expect(() => {
-                    GroupWeb.getWebModelFromDbModel(dbUser);
-                }).to.throw("group.web.model.getWebModelFromDbModel: dbGroup was not a Group instance.");
+                GroupWeb.getWebModelFromDbModel(dbUser).then(function(gw: GroupWeb): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "group.web.model.getWebModelFromDbModel: dbGroup was not a Group instance.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
             });
         });
     });
