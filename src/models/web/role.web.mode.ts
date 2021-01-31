@@ -1,6 +1,7 @@
 import {Model} from "sequelize-typescript";
 import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
 import {AbstractWebModel} from "./abstract.web.model";
+import {Role} from "../database/role.model";
 
 export class RoleWeb extends AbstractWebModel {
 
@@ -80,6 +81,10 @@ export class RoleWeb extends AbstractWebModel {
     public ACTIVITY_MANAGE!: boolean;
 
     public static getWebModelFromDbModel(dbRole: Model): RoleWeb {
+        if (!(dbRole instanceof Role)) {
+            throw new Error("role.web.model.getWebModelFromDbModel: dbRole was not a Role instance");
+        }
+
         // @ts-ignore
         return copyMatchingSourceKeyValues(new RoleWeb(), dbRole.dataValues);
     }

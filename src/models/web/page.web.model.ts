@@ -32,7 +32,7 @@ export class PageWeb extends AbstractWebModel {
 
     public static getWebModelFromDbModel(dbPage: Model): PageWeb {
         if (!(dbPage instanceof Page)) {
-            throw new Error("page.web.model.getWebModelFromDbModel: dbPage wwas not a Page instance");
+            throw new Error("page.web.model.getWebModelFromDbModel: dbPage was not a Page instance");
         }
 
         // @ts-ignore

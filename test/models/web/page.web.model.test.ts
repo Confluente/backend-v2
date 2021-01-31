@@ -48,7 +48,7 @@ describe("page.web.model.ts", () => {
             Role.create(role).then(function(dbRole: Role): void {
                 expect(() => {
                     PageWeb.getWebModelFromDbModel(dbRole);
-                }).to.throw("page.web.model.getWebModelFromDbModel: dbPage wwas not a Page instance");
+                }).to.throw("page.web.model.getWebModelFromDbModel: dbPage was not a Page instance");
             });
         });
     });
