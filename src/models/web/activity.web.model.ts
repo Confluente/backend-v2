@@ -9,6 +9,7 @@ import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../
 import * as fs from "fs";
 import {pathToActPictures} from "../../constants";
 import {UserWeb} from "./user.web.model";
+import {Group} from "../database/group.model";
 
 enum questionType {"☰ text", "◉ multiple choice", "☑ checkboxes"}
 
@@ -50,12 +51,12 @@ export class ActivityWeb extends AbstractWebModel {
     /**
      * Start time of the activity.
      */
-    public startTime: Date | null;
+    public startTime: string | null;
 
     /**
      * End time of the activity.
      */
-    public endTime: Date | null;
+    public endTime: string | null;
 
     /**
      * canSubscribes stores whether members can subscribe to the activity.
@@ -151,6 +152,10 @@ export class ActivityWeb extends AbstractWebModel {
     }
 
     public static async getWebModelFromDbModel(dbActivity: Model): Promise<ActivityWeb> {
+        if (!(dbActivity instanceof Activity)) {
+            throw new Error("activity.web.model.getWebModelFromDbModel: dbActivity was not an Activity instance");
+        }
+
         // for each attribute where the type and name are equal, copy them over
         // @ts-ignore
         const webActivity = copyMatchingSourceKeyValues(new ActivityWeb(), dbActivity.dataValues);
@@ -158,18 +163,15 @@ export class ActivityWeb extends AbstractWebModel {
         // Cast activity to Activity model
         const castedAct = dbActivity as Activity;
 
-        // TODO check whether this works
-        webActivity.startTime = castedAct.startTime !== null ? new Date(castedAct.startTime) : null;
-        webActivity.endTime = castedAct.endTime !== null ? new Date(castedAct.endTime) : null;
-
         if ('canSubscribe' in castedAct && castedAct.canSubscribe) {
             webActivity.subscriptionDeadline = castedAct.subscriptionDeadline !== null
                 ? new Date(castedAct.subscriptionDeadline) : null;
             webActivity.typeOfQuestion = destringifyStringifiedArrayOfStrings(castedAct.typeOfQuestion);
             webActivity.questionDescriptions = destringifyStringifiedArrayOfStrings(castedAct.questionDescriptions);
-            // TODO check if we can cast these immediately to boolean lists?
-            webActivity.required = destringifyStringifiedArrayOfStrings(castedAct.required);
-            webActivity.privacyOfQuestions = destringifyStringifiedArrayOfStrings(castedAct.privacyOfQuestions);
+            webActivity.required = destringifyStringifiedArrayOfStrings(castedAct.required)
+                .map((el: string) => (el === 'true'));
+            webActivity.privacyOfQuestions = destringifyStringifiedArrayOfStrings(castedAct.privacyOfQuestions)
+                .map((el: string) => (el === 'true'));
 
             const nonSplitFormOptions = destringifyStringifiedArrayOfStrings(castedAct.formOptions);
             webActivity.formOptions = [];
@@ -181,7 +183,7 @@ export class ActivityWeb extends AbstractWebModel {
             webActivity.participants = [];
             if (castedAct.participants !== null) {
                 for (const member of castedAct.participants) {
-                    const answers = member.Subscription.answers;
+                    const answers = destringifyStringifiedArrayOfStrings(member.Subscription.answers);
                     delete member.Subscription;
                     await UserWeb.getWebModelFromDbModel(member).then(function(user: UserWeb): void {
                         webActivity.participants.push(new SubscriptionWeb(user, webActivity, answers));
@@ -190,7 +192,11 @@ export class ActivityWeb extends AbstractWebModel {
             }
         }
 
-        webActivity.organizer = GroupWeb.getWebModelFromDbModel(castedAct.organizer);
+        await Group.findByPk(Number(castedAct.organizer)).then(function(dbGroup: Group): void {
+            GroupWeb.getWebModelFromDbModel(dbGroup).then(function(gw: GroupWeb): void {
+                webActivity.organizer = gw;
+            });
+        });
 
         // Save the name of the cover image
         if (castedAct.hasCoverImage) {
@@ -210,6 +216,6 @@ export class ActivityWeb extends AbstractWebModel {
     }
 
     public getCopyable(): string[] {
-        return ["id", "name", "description", "location", "canSubscribe", "participationFee", "numberOfQuestions", "published", "hasCoverImage"];
+        return ["id", "name", "description", "location", "canSubscribe", "participationFee", "numberOfQuestions", "published", "hasCoverImage", "startTime", "endTime"];
     }
 }

@@ -47,14 +47,14 @@ export class Activity extends Model {
     /**
      * Start time of the activity.
      */
-    @Column(DataType.TIME)
-    public startTime: any | null;
+    @Column(DataType.STRING)
+    public startTime: string | null;
 
     /**
      * End time of the activity.
      */
-    @Column(DataType.TIME)
-    public endTime: any | null;
+    @Column(DataType.STRING)
+    public endTime: string | null;
 
     /**
      * canSubscribes stores whether members can subscribe to the activity.

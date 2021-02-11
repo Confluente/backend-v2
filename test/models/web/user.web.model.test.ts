@@ -61,6 +61,8 @@ describe("user.web.model.ts", () => {
                 } else {
                     resolve(new Error());
                 }
+            }).catch(function(err: Error): void {
+                resolve(new Error());
             });
         });
 

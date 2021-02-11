@@ -4,7 +4,6 @@ import {organizingGroup, role, user} from "../../test.data";
 import {User} from "../../../src/models/database/user.model";
 import {Group} from "../../../src/models/database/group.model";
 import {GroupWeb} from "../../../src/models/web/group.web.model";
-import { expect } from "chai";
 import {cleanDb} from "../../test.helper";
 
 const factory: TestFactory = new TestFactory();
@@ -24,8 +23,8 @@ describe("group.web.model.ts", () => {
      * Closes database and server after all tests.
      */
     after(async () => {
+        await cleanDb();
         await factory.close();
-        cleanDb();
     });
 
     describe("getWebModelFromDbModel", () => {

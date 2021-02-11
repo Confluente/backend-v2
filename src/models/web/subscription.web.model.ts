@@ -6,7 +6,7 @@ import {UserWeb} from "./user.web.model";
  */
 export  class SubscriptionWeb {
 
-    constructor(user: UserWeb, activity: ActivityWeb, answers: string) {
+    constructor(user: UserWeb, activity: ActivityWeb, answers: string[]) {
         this.user = user;
         this.activity = activity;
         this.answers = answers;
@@ -16,5 +16,5 @@ export  class SubscriptionWeb {
 
     activity!: ActivityWeb;
 
-    answers!: string;
+    answers!: string[];
 }
