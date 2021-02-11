@@ -153,7 +153,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        role: 1,
+        roleId: 1,
         groups: [10],
         functions: ["Chair"]
     },
@@ -169,7 +169,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        role: 2,
+        roleId: 2,
         groups: [10],
         functions: ["Member"]
     },
@@ -185,7 +185,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        role: 4,
+        roleId: 4,
         groups: [1],
         functions: ["Member"]
     },
@@ -219,7 +219,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        role: 3,
+        roleId: 3,
         groups: [3],
         functions: ["Member"]
     },
@@ -235,7 +235,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        role: 3,
+        roleId: 3,
         groups: [4],
         functions: ["Treasurer"],
         activities: [2],
