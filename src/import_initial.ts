@@ -201,7 +201,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 3,
+        roleId: 3,
         groups: [3, 4],
         functions: ["Chair", "Secretary"],
         activities: [2],
@@ -381,14 +381,14 @@ if (process.env.NODE_ENV !== "test") {
 
 
         all([
-            Role.bulkCreate(roles).then(function(result: any): void {
+            await Role.bulkCreate(roles).then(function(result: any): void {
                 console.log("==========Created roles==========");
             }).catch(function(err: any): void {
                 console.error("Roles error!!!");
                 console.log(err);
             }),
 
-            User.bulkCreate(users).then(function(result: any): void {
+            await User.bulkCreate(users).then(function(result: any): void {
                 console.log("==========Created users==========");
             }).catch(function(err: any): void {
                 console.error("Users error!!!");
