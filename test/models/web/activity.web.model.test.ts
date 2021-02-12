@@ -3,11 +3,10 @@ import {Role} from "../../../src/models/database/role.model";
 import {organizingGroup, publishedActivityWithSubscriptionForm, role, user} from "../../test.data";
 import {User} from "../../../src/models/database/user.model";
 import {cleanDb} from "../../test.helper";
-import {ActivityWeb} from "../../../src/models/web/activity.web.model";
+import {ActivityWeb, questionType} from "../../../src/models/web/activity.web.model";
 import {Group} from "../../../src/models/database/group.model";
 import {Activity} from "../../../src/models/database/activity.model";
 import {resolve} from "q";
-import {Association} from "sequelize-typescript";
 
 const factory: TestFactory = new TestFactory();
 
@@ -31,31 +30,34 @@ describe("activity.web.model.ts", () => {
 
     describe("getWebModelFromDbModel", () => {
 
-        // it("basic case", async (done) => {
-        //     const dbGroup = await Group.create(organizingGroup);
-        //     let dbAct = await Activity.create(publishedActivityWithSubscriptionForm);
-        //     await dbGroup.$add('activities', dbAct);
-        //     const dbUser = await User.create(user);
-        //     await dbGroup.$add('members', dbUser, {through: {func: "Member"}});
-        //     await dbUser.$add('activities', dbAct, {through: {answers: "Super Administrator#,#superadmin#,#Kapowowowskies#,#woof"}});
-        //
-        //     dbAct = await Activity.findByPk(dbAct.id, {include: [User]});
-        //
-        //     ActivityWeb.getWebModelFromDbModel(dbAct).then(function(webAct: ActivityWeb): void {
-        //         let correct = true;
-        //         if (webAct.id !== dbAct.id) { correct = false; }
-        //         if (webAct.startTime !== "05:00") { correct = false; }
-        //         // if (webAct.typeOfQuestion[0] !== "name") { correct = false; }
-        //
-        //         if (correct) {
-        //             resolve();
-        //         } else {
-        //             resolve(new Error());
-        //         }
-        //     }).catch(function(err: Error): void {
-        //         resolve(new Error());
-        //     });
-        // });
+        it("basic case", async () => {
+            const dbGroup = await Group.create(organizingGroup);
+            let dbAct = await Activity.create(publishedActivityWithSubscriptionForm);
+            await dbGroup.$add('activities', dbAct);
+            const dbUser = await User.create(user);
+            await dbGroup.$add('members', dbUser, {through: {func: "Member"}});
+            await dbUser.$add('activities', dbAct, {through: {answers: "Super Administrator#,#superadmin#,#Kapowowowskies#,#woof"}});
+
+            dbAct = await Activity.findByPk(dbAct.id, {include: [User]});
+
+            ActivityWeb.getWebModelFromDbModel(dbAct).then(function(webAct: ActivityWeb): void {
+                if ((webAct.id !== dbAct.id) ||
+                        (webAct.startTime !== "01:00") ||
+                        (webAct.typeOfQuestion[0].toString() !== "name") ||
+                        (webAct.required[0] !== true) ||
+                        (webAct.formOptions[0][0] !== "lk") ||
+                        (webAct.participants[0].user.email !== "superadmin") ||
+                        (webAct.participants[0].activity.startTime !== "01:00") ||
+                        (webAct.organizer.displayName !== "OG"))
+                {
+                    resolve(new Error());
+                }
+
+                resolve();
+            }).catch(function(err: Error): void {
+                resolve(new Error());
+            });
+        });
 
         it("checks exception", (done) => {
             Role.findByPk(1).then(function(dbRole: Role): void {
