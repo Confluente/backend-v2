@@ -3,7 +3,7 @@ import {Role} from "../../../src/models/database/role.model";
 import {organizingGroup, publishedActivityWithSubscriptionForm, role, user} from "../../test.data";
 import {User} from "../../../src/models/database/user.model";
 import {cleanDb} from "../../test.helper";
-import {ActivityWeb, questionType} from "../../../src/models/web/activity.web.model";
+import {ActivityWeb} from "../../../src/models/web/activity.web.model";
 import {Group} from "../../../src/models/database/group.model";
 import {Activity} from "../../../src/models/database/activity.model";
 import {resolve} from "q";
