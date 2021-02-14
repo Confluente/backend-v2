@@ -47,15 +47,15 @@ export async function cleanSessions(): Promise<void> {
 }
 
 export async function cleanDb(): Promise<void> {
-    await cleanActivities();
+    await cleanSubscriptions();
     await cleanCompanyOpportunities();
+    await cleanSessions();
+    await cleanUsergroups();
+    await cleanActivities();
     await cleanGroups();
     await cleanPages();
-    await cleanRoles();
-    await cleanSubscriptions();
     await cleanUsers();
-    await cleanUsergroups();
-    await cleanSessions();
+    await cleanRoles();
 }
 
 export function authenticate(agent: any, credentials: any): any {

@@ -10,14 +10,18 @@ import {Subscription} from "../src/models/database/subscription.model";
 import {User} from "../src/models/database/user.model";
 import {UserGroup} from "../src/models/database/usergroup.model";
 import {Session} from "../src/models/database/session.model";
-import supertest from "supertest";
+import supertest, {SuperAgentTest} from "supertest";
 import {setupServer} from "../src/expressServer";
 import {resolve} from "q";
+import {initTestData} from "./test.data";
 
 export class TestFactory {
     private _app: Express;
     private _connection: any;
     private _server: HttpServer;
+    public agents: {
+        activeMemberAgent: SuperAgentTest;
+    };
 
     // DB testDb
     private db: Sequelize = new Sequelize({
@@ -37,11 +41,16 @@ export class TestFactory {
         return this._server;
     }
 
-    public async init(): Promise<void> {
+    public async init(inTestData: boolean = false): Promise<void> {
         this._app = express();
         this._connection = await this.db.sync({force: true});
         setupServer(this._app);
         this._server = createServer(this._app).listen("80");
+
+        if (inTestData) {
+            const agents = await initTestData(this._app);
+            this.agents = agents;
+        }
     }
 
     public async close(): Promise<void> {

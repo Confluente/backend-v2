@@ -118,6 +118,7 @@ export function setupServer(server: Express): void {
     server.use("/api/user", require("./routes/user"));
     server.use("/api/page", require("./routes/page"));
     server.use("/api/notifications", require("./routes/notification"));
+    server.use("/api/partners", require("./routes/partner"));
     server.use("/api/*", function(req: any, res: any): void {
         res.sendStatus(404);
     });

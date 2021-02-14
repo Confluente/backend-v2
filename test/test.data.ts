@@ -93,18 +93,14 @@ export const nonActiveMember = {
     roleId: 3,
 };
 
-// Initialize agents
-export const superAdminAgent = getAgent();
-export const adminAgent = getAgent();
-export const boardMemberAgent = getAgent();
-export const activeMemberAgent = getAgent();
-export const nonActiveMemberAgent = getAgent();
-export const nobodyUserAgent = getAgent();
+function getAgent(server: any): supertest.SuperAgentTest {
+    const agent = request.agent(server);
 
-function getAgent(): supertest.Request {
-    return request.agent(app).use((a) => {
+    agent.use((a) => {
         a.set("X-Requested-With", "XMLHttpRequest");
     });
+
+    return agent;
 }
 
 export const organizingGroup = {
@@ -227,7 +223,7 @@ export const session = {
 const users = [superAdmin, admin, boardMember, activeMember, nonActiveMember];
 const activities = [unpublishedActivity, publishedActivityWithSubscriptionForm];
 
-export async function initTestData(): Promise<void> {
+export async function initTestData(server: any): Promise<any> {
     all([
         await Role.bulkCreate(roles),
         await User.bulkCreate(users),
@@ -235,7 +231,7 @@ export async function initTestData(): Promise<void> {
         await Activity.bulkCreate(activities),
         await Page.create(page),
         await CompanyOpportunity.create(companyOpportunity),
-    ]).then(function(): void {
+    ]).then(function(): any {
         activities.forEach(function(actData: any): void {
             Group.findByPk(actData.organizerId).then(function(group: Group): void {
                 Activity.findByPk(actData.id).then(function(act: Activity): void {
@@ -270,10 +266,35 @@ export async function initTestData(): Promise<void> {
             });
         });
 
+        const superAdminAgent = getAgent(server);
+        const adminAgent = getAgent(server);
+        const boardMemberAgent = getAgent(server);
+        const activeMemberAgent = getAgent(server);
+        const nonActiveMemberAgent = getAgent(server);
+        const nobodyUserAgent = getAgent(server);
+
         authenticate(superAdminAgent, superAdmin);
         authenticate(adminAgent, admin);
         authenticate(boardMemberAgent, boardMember);
         authenticate(activeMemberAgent, activeMember);
         authenticate(nonActiveMemberAgent, nonActiveMember);
+
+        const agents = {
+            superAdminAgent,
+            adminAgent,
+            boardMemberAgent,
+            activeMemberAgent,
+            nonActiveMemberAgent,
+            nobodyUserAgent,
+        };
+
+        agents.superAdminAgent = superAdminAgent;
+        agents.adminAgent = adminAgent;
+        agents.boardMemberAgent = boardMemberAgent;
+        agents.activeMemberAgent = activeMemberAgent;
+        agents.nonActiveMemberAgent = nonActiveMemberAgent;
+        agents.nobodyUserAgent = nobodyUserAgent;
+
+        return agents;
     });
 }
