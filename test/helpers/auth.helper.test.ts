@@ -7,7 +7,7 @@ import {
 } from "../../src/helpers/auth.helper";
 import { expect, assert } from "chai";
 import {User} from "../../src/models/database/user.model";
-import {role, user} from "../test.data";
+import {role, superAdmin} from "../test.data";
 import {TestFactory} from "../testFactory";
 import {Role} from "../../src/models/database/role.model";
 import {cleanRoles, cleanSessions, cleanUsers} from "../test.helper";
@@ -120,7 +120,7 @@ describe("auth.helper.ts", () => {
         });
 
         it("checks basic case", (done) => {
-            const new_user = {...user};
+            const new_user = {...superAdmin};
 
             User.create(new_user).then(function(dbUser: User): void {
                 authenticate(new_user.email, "HonoursWorthyPassword").then(function(auth_user: User): void {
@@ -138,7 +138,7 @@ describe("auth.helper.ts", () => {
         });
 
         it("checks basic failing case", (done) => {
-            const new_user = {...user};
+            const new_user = {...superAdmin};
 
             User.create(new_user).then(function(dbUser: User): void {
                 authenticate(new_user.email, "IncorrectPassword").then(function(auth_user: User): void {
@@ -181,7 +181,7 @@ describe("auth.helper.ts", () => {
         });
 
         it("basic case", (done) => {
-            User.create(user).then(function(dbUser: User): void {
+            User.create(superAdmin).then(function(dbUser: User): void {
                 startSession(dbUser.id, "coolIPAddress").then(function(session: Session): void {
                     User.findByPk(dbUser.id, {include: [Session]}).then(function(updatedUser: User): void {
                         cleanSessions();

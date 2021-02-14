@@ -1,5 +1,5 @@
 import {TestFactory} from "../../testFactory";
-import {role, session, user} from "../../test.data";
+import {role, session, superAdmin} from "../../test.data";
 import {cleanSessions} from "../../test.helper";
 import {Session} from "../../../src/models/database/session.model";
 import {User} from "../../../src/models/database/user.model";
@@ -18,7 +18,7 @@ describe("session.model.ts", () => {
     before(async () => {
         await factory.init();
         await Role.create(role);
-        await User.create(user);
+        await User.create(superAdmin);
     });
 
     /**

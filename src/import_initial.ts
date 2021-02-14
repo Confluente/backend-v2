@@ -209,9 +209,9 @@ const users = [
     },
     {
         id: 5,
-        email: "activemember2@student.tue.nl",
-        displayName: "Active2 Member",
-        firstName: "Active2",
+        email: "nonactivemember@student.tue.nl",
+        displayName: "NonActive Member",
+        firstName: "NonActive",
         lastName: "Member",
         honorsMembership: "member",
         mobilePhoneNumber: "somenumber",
@@ -220,8 +220,6 @@ const users = [
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
         roleId: 3,
-        groups: [3],
-        functions: ["Member"]
     },
     {
         id: 6,
@@ -395,14 +393,14 @@ if (process.env.NODE_ENV !== "test") {
                 console.log(err);
             }),
 
-            Group.bulkCreate(groups).then(function(result: any): void {
+            await Group.bulkCreate(groups).then(function(result: any): void {
                 console.log("==========Created groups==========");
             }).catch(function(err: any): void {
                 console.error("Groups error!!!");
                 console.log(err);
             }),
 
-            Activity.bulkCreate(activities).then(function(result: any): void {
+            await Activity.bulkCreate(activities).then(function(result: any): void {
                 console.log("==========Created activities==========");
             }).catch(function(err: any): void {
                 console.error("Activities error!!!");

@@ -8,6 +8,7 @@ import {Subscription} from "../src/models/database/subscription.model";
 import {User} from "../src/models/database/user.model";
 import {UserGroup} from "../src/models/database/usergroup.model";
 import {Session} from "../src/models/database/session.model";
+import * as supertest from "supertest";
 
 export async function cleanActivities(): Promise<void> {
     await Activity.destroy({truncate: true});
@@ -55,4 +56,8 @@ export async function cleanDb(): Promise<void> {
     await cleanUsers();
     await cleanUsergroups();
     await cleanSessions();
+}
+
+export function authenticate(agent: any, credentials: any): any {
+    return agent.post("/api/auth/login").send(credentials).expect(200);
 }

@@ -1,6 +1,6 @@
 import {TestFactory} from "../../testFactory";
 import {Role} from "../../../src/models/database/role.model";
-import {organizingGroup, role, user} from "../../test.data";
+import {organizingGroup, role, superAdmin} from "../../test.data";
 import {User} from "../../../src/models/database/user.model";
 import {Group} from "../../../src/models/database/group.model";
 import {GroupWeb} from "../../../src/models/web/group.web.model";
@@ -16,7 +16,7 @@ describe("group.web.model.ts", () => {
     before(async () => {
         await factory.init();
         await Role.create(role);
-        await User.create(user);
+        await User.create(superAdmin);
     });
 
     /**
@@ -31,7 +31,7 @@ describe("group.web.model.ts", () => {
 
         it("basic case", (done) => {
             // Find the created user
-            User.findOne({where: {email: user.email}}).then(function(dbUser: User): void {
+            User.findOne({where: {email: superAdmin.email}}).then(function(dbUser: User): void {
                 // Create a group for the member to be a part of
                 Group.create(organizingGroup).then(function(dbGr: Group): void {
                     // Add the user to the group
@@ -62,7 +62,7 @@ describe("group.web.model.ts", () => {
         });
 
         it("checks exception", (done) => {
-            User.findOne({where: {email: user.email}}).then(function(dbUser: User): void {
+            User.findOne({where: {email: superAdmin.email}}).then(function(dbUser: User): void {
                 GroupWeb.getWebModelFromDbModel(dbUser).then(function(gw: GroupWeb): void {
                     done(new Error());
                 }).catch(function(err: Error): void {

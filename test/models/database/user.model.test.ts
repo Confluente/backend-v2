@@ -1,5 +1,5 @@
 import {TestFactory} from "../../testFactory";
-import {role, user} from "../../test.data";
+import {role, superAdmin} from "../../test.data";
 import {cleanRoles, cleanUsers} from "../../test.helper";
 import {User} from "../../../src/models/database/user.model";
 import {Role} from "../../../src/models/database/role.model";
@@ -32,7 +32,7 @@ describe("user.model.ts", () => {
      */
     it("Adding a valid user instance", (done) => {
         // Try to create instance
-        User.create(user).then(function(_: User): void {
+        User.create(superAdmin).then(function(_: User): void {
             // Successfully created, thus clean table and return successful.
             cleanUsers();
             done();
@@ -54,7 +54,7 @@ describe("user.model.ts", () => {
         needed_props.forEach(function(prop: string): void {
             it("Testing specific invalid instance that misses " + prop, (done) => {
                 // Copy valid user
-                const user_copy = {...user};
+                const user_copy = {...superAdmin};
 
                 // Delete needed property
                 // @ts-ignore
@@ -80,8 +80,8 @@ describe("user.model.ts", () => {
 
     it('should not be able to add two users with the same email', (done) => {
         // Create 2 valid user instances with the same email
-        const user_1 = {...user};
-        const user_2 = {...user};
+        const user_1 = {...superAdmin};
+        const user_2 = {...superAdmin};
 
         // Try to create both users
         User.create(user_1).then(function(_: User): void {

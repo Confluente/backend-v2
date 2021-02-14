@@ -1,6 +1,6 @@
 import {TestFactory} from "../../testFactory";
 import {Role} from "../../../src/models/database/role.model";
-import {organizingGroup, publishedActivityWithSubscriptionForm, role, user} from "../../test.data";
+import {organizingGroup, publishedActivityWithSubscriptionForm, role, superAdmin} from "../../test.data";
 import {User} from "../../../src/models/database/user.model";
 import {cleanDb} from "../../test.helper";
 import {ActivityWeb} from "../../../src/models/web/activity.web.model";
@@ -34,7 +34,7 @@ describe("activity.web.model.ts", () => {
             const dbGroup = await Group.create(organizingGroup);
             let dbAct = await Activity.create(publishedActivityWithSubscriptionForm);
             await dbGroup.$add('activities', dbAct);
-            const dbUser = await User.create(user);
+            const dbUser = await User.create(superAdmin);
             await dbGroup.$add('members', dbUser, {through: {func: "Member"}});
             await dbUser.$add('activities', dbAct, {through: {answers: "Super Administrator#,#superadmin#,#Kapowowowskies#,#woof"}});
 

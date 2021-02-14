@@ -1,12 +1,23 @@
-import request from "supertest";
+import request, {SuperAgentTest} from "supertest";
 
 import {app} from "../src/expressServer";
 import {generateSalt, getPasswordHashSync} from "../src/helpers/auth.helper";
+import {all} from "q";
+import {Role} from "../src/models/database/role.model";
+import {User} from "../src/models/database/user.model";
+import {Group} from "../src/models/database/group.model";
+import {Activity} from "../src/models/database/activity.model";
+import {Page} from "../src/models/database/page.model";
+import {CompanyOpportunity} from "../src/models/database/company.opportunity.model";
+import {roles} from "../src/import_initial";
+import * as supertest from "supertest";
+import {authenticate} from "./test.helper";
 
 const password = "HonoursWorthyPassword";
 const passwordSaltExample = generateSalt(16);
 
-export const user = {
+export const superAdmin = {
+    id: 1,
     email: "superadmin",
     displayName: "Super Administrator",
     firstName: "Super",
@@ -18,27 +29,101 @@ export const user = {
     roleId: 1
 };
 
-function getAgent(): any {
+export const admin = {
+    id: 2,
+    email: "admin",
+    displayName: "Administrator",
+    firstName: "Just",
+    lastName: "Administrator",
+    honorsMembership: "member",
+    approvingHash: "da;lkfjda;fjkad;fj",
+    passwordSalt: passwordSaltExample,
+    passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    approved: true,
+    roleId: 2,
+    groups: [10],
+    functions: ["Member"]
+};
+
+export const boardMember = {
+    id: 3,
+    email: "boardmember@student.tue.nl",
+    displayName: "Board Member",
+    firstName: "Board",
+    lastName: "Member",
+    honorsMembership: "member",
+    approvingHash: "da;lkfjda;fjkad;fj",
+    passwordSalt: passwordSaltExample,
+    passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    approved: true,
+    roleId: 4,
+    groups: [1],
+    functions: ["Member"]
+};
+
+export const activeMember = {
+    id: 4,
+    email: "activemember1@student.tue.nl",
+    displayName: "Active1 Member",
+    firstName: "Active1",
+    lastName: "Member",
+    honorsMembership: "member",
+    approvingHash: "da;lkfjda;fjkad;fj",
+    passwordSalt: passwordSaltExample,
+    passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    approved: true,
+    roleId: 3,
+    groups: [1, 2],
+    functions: ["Chair", "Secretary"],
+    activities: [2],
+    answers: ["Active1 Member#,#activemember1@student.tue.nl#,#Kapowowowskies#,#woof"]
+};
+
+export const nonActiveMember = {
+    id: 5,
+    email: "nonactivemember@student.tue.nl",
+    displayName: "NonActive Member",
+    firstName: "NonActive",
+    lastName: "Member",
+    honorsMembership: "member",
+    approvingHash: "da;lkfjda;fjkad;fj",
+    passwordSalt: passwordSaltExample,
+    passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    approved: true,
+    roleId: 3,
+};
+
+// Initialize agents
+export const superAdminAgent = getAgent();
+export const adminAgent = getAgent();
+export const boardMemberAgent = getAgent();
+export const activeMemberAgent = getAgent();
+export const nonActiveMemberAgent = getAgent();
+export const nobodyUserAgent = getAgent();
+
+function getAgent(): supertest.Request {
     return request.agent(app).use((a) => {
         a.set("X-Requested-With", "XMLHttpRequest");
     });
 }
 
-export const nonOrganizingGroup = {
-    displayName: "NOG",
-    fullName: "Non Organizing Group",
-    description: "Non empty description",
-    canOrganize: false,
-    email: "nog@hsaconfluente.nl",
-    type: "committee"
-};
-
 export const organizingGroup = {
+    id: 1,
     displayName: "OG",
     fullName: "Organizing Group",
     description: "Non empty description",
     canOrganize: false,
     email: "og@hsaconfluente.nl",
+    type: "committee"
+};
+
+export const nonOrganizingGroup = {
+    id: 2,
+    displayName: "NOG",
+    fullName: "Non Organizing Group",
+    description: "Non empty description",
+    canOrganize: false,
+    email: "nog@hsaconfluente.nl",
     type: "committee"
 };
 
@@ -64,7 +149,7 @@ export const unpublishedActivity = {
     startTime: "18:00",
     endTime: "20:00",
     participationFee: 8.5,
-    OrganizerId: 2,
+    organizerId: 1,
     published: false,
     hasCoverImage: false,
 };
@@ -86,7 +171,8 @@ export const publishedActivityWithSubscriptionForm = {
     required: "true#,#true#,#true#,#false",
     subscriptionDeadline: (new Date()).setDate((new Date()).getDate() + 1),
     published: true,
-    OrganizerId: 3
+    organizerId: 1
+
 };
 
 export const companyOpportunity = {
@@ -137,3 +223,57 @@ export const session = {
     ip: "funky ip address",
     expires: new Date()
 };
+
+const users = [superAdmin, admin, boardMember, activeMember, nonActiveMember];
+const activities = [unpublishedActivity, publishedActivityWithSubscriptionForm];
+
+export async function initTestData(): Promise<void> {
+    all([
+        await Role.bulkCreate(roles),
+        await User.bulkCreate(users),
+        await Group.bulkCreate([organizingGroup, nonOrganizingGroup]),
+        await Activity.bulkCreate(activities),
+        await Page.create(page),
+        await CompanyOpportunity.create(companyOpportunity),
+    ]).then(function(): void {
+        activities.forEach(function(actData: any): void {
+            Group.findByPk(actData.organizerId).then(function(group: Group): void {
+                Activity.findByPk(actData.id).then(function(act: Activity): void {
+                    group.$add('activities', act);
+                });
+            });
+        });
+
+        users.forEach(function(userData: any): void {
+            User.findByPk(userData.id).then(function(user: User): void {
+                if (!userData.functions || !userData.groups) {
+                } else if (userData.functions.length !== userData.groups.length) {
+                } else {
+                    for (let i = 0; i < userData.groups.length; i++) {
+                        Group.findByPk(userData.groups[i]).then(function(group: Group): void {
+                            user.$add('groups', group, {through: {func: userData.functions[i]}})
+                                .catch(function(err: Error): void {
+                                    console.log(err);
+                                });
+                        });
+                    }
+                }
+
+                if (!userData.activities) {
+                } else if (userData.activities && userData.activities.length === userData.answers.length) {
+                    for (let i = 0; i < userData.activities.length; i++) {
+                        Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
+                            user.$add('activities', activity, {through: {answers: userData.answers[i]}});
+                        });
+                    }
+                }
+            });
+        });
+
+        authenticate(superAdminAgent, superAdmin);
+        authenticate(adminAgent, admin);
+        authenticate(boardMemberAgent, boardMember);
+        authenticate(activeMemberAgent, activeMember);
+        authenticate(nonActiveMemberAgent, nonActiveMember);
+    });
+}
