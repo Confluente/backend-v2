@@ -98,7 +98,7 @@ export const nonActiveMember = {
     roleId: 3,
 };
 
-function getAgent(server: any): supertest.SuperAgentTest {
+export function getAgent(server: any): supertest.SuperAgentTest {
     const agent = request.agent(server);
 
     agent.use((a) => {

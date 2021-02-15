@@ -1,7 +1,7 @@
 import {TestFactory} from "../testFactory";
 import {cleanDb} from "../test.helper";
 import {User} from "../../src/models/database/user.model";
-import {nonActiveMember} from "../test.data";
+import {getAgent, nonActiveMember} from "../test.data";
 const factory: TestFactory = new TestFactory();
 
 describe("auth.ts (/api/auth)", () => {
@@ -55,10 +55,34 @@ describe("auth.ts (/api/auth)", () => {
 
         describe("post", () => {
 
-            // First delete non active user from db
-            User.findByPk(nonActiveMember.id).then(function(user: User): void {
-                user.destroy().then(() => {
+            it("Test standard functionality", (done) => {
+                // First delete non active user from db (session is also automatically deleted on cascade
+                User.findByPk(nonActiveMember.id).then(function(user: User): void {
+                    user.destroy().then(() => {
 
+                        // Instantiate data for inserting new member
+                        const naMember = {...nonActiveMember};
+                        delete naMember.id;
+
+                        // Create new member
+                        User.create(naMember).then(function(dbUser: User): void {
+
+                            // Create new agent
+                            const agent = getAgent(factory.app);
+
+                            // login new agent
+                            agent.post("/api/auth/login")
+                                .send(naMember)
+                                .expect(200)
+                                .then((res: any) => {
+                                    if (res.body.message === "Logged in successfully!") {
+                                        done();
+                                    } else {
+                                        done(new Error());
+                                    }
+                                });
+                        });
+                    });
                 });
             });
         });

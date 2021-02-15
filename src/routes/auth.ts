@@ -59,7 +59,7 @@ router.route("/login")
 
             // check if user account is approved
             if (foundUser.approved === false) {
-                return res.status(406).send("User account has not yet been approved");
+                return res.status(406).send({message: "User account has not yet been approved"});
             }
 
             res.locals.user = foundUser;
@@ -68,7 +68,7 @@ router.route("/login")
             return startSession(foundUser.id, req.ip)
                 .then(function(session: any): void {
                     res.cookie('session', session.token.toString("base64"), { expires: session.expires });
-                    res.status(200).send("Logged in successfully!");
+                    res.status(200).send({message: "Logged in successfully!"});
                 });
         }).catch(function(err: Error): any {
             // Authentication failed, send back error
