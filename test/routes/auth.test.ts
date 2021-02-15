@@ -1,6 +1,5 @@
 import {TestFactory} from "../testFactory";
 import {cleanDb} from "../test.helper";
-
 const factory: TestFactory = new TestFactory();
 
 describe("auth.ts", () => {
@@ -41,7 +40,7 @@ describe("auth.ts", () => {
                     } else {
                         done(new Error());
                     }
-                }).catch(function(err: Error): void {
+                }).catch(function(_: Error): void {
                     done(new Error());
                 });
         });

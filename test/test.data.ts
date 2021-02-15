@@ -1,8 +1,7 @@
-import request, {SuperAgentTest} from "supertest";
+import request from "supertest";
 
-import {app} from "../src/expressServer";
 import {generateSalt, getPasswordHashSync} from "../src/helpers/auth.helper";
-import {all, resolve} from "q";
+import {all} from "q";
 import {Role} from "../src/models/database/role.model";
 import {User} from "../src/models/database/user.model";
 import {Group} from "../src/models/database/group.model";
