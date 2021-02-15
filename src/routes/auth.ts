@@ -3,7 +3,6 @@ import express, {Request, Response, Router} from "express";
 import {User} from "../models/database/user.model";
 import {Group} from "../models/database/group.model";
 import {authenticate, startSession} from "../helpers/auth.helper";
-import {Role} from "../models/database/role.model";
 import {UserWeb} from "../models/web/user.web.model";
 import {Session} from "../models/database/session.model";
 import {Op} from "sequelize";
@@ -14,7 +13,7 @@ router.route("/")
     /**
      * Function for getting the profile of the user.
      */
-    .get(function(req: Request, res: Response, next: any): any {
+    .get(function(req: Request, res: Response): any {
         // Check whether the response has a session (handled by express)
         if (!res.locals.session) {
             return res.status(401).send({message: "Request does not have a session."});
@@ -22,7 +21,7 @@ router.route("/")
 
         // find the user of the session in the database
         User.findOne({
-            attributes: ["id", "email", "displayName", "consentWithPortraitRight"],
+            attributes: ["id", "email", "displayName", "consentWithPortraitRight", "roleId"],
             include: [{
                 model: Group,
                 attributes: ["id", "displayName", "fullName", "description", "canOrganize", "email"]
@@ -49,17 +48,11 @@ router.route("/login")
     /**
      * Function for logging a user in.
      */
-    .post(function(req: Request, res: Response, next: any): any {
+    .post(function(req: Request, res: Response): any {
         // Check if both the email and password field were filled in
         if (!req.body.email || !req.body.password) {
             return res.sendStatus(400);
         }
-
-        // initialize variables
-        const credentials: any = {
-            email: req.body.email,
-            password: req.body.password
-        };
 
         // authenticate user
         authenticate(req.body.email, req.body.password).then(function(foundUser: User): any {
