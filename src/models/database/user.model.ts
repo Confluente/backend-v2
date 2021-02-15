@@ -18,7 +18,6 @@ import {Role} from "./role.model";
 import {Subscription} from "./subscription.model";
 import {UserGroup} from "./usergroup.model";
 import {Session} from "./session.model";
-import {options} from "marked";
 
 @Table({timestamps: false})
 export class User extends Model<User> {
