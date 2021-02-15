@@ -32,6 +32,7 @@ router.route("/")
             }],
         }).then((foundUser: User) => {
 
+            // If no user was found, send an error
             if (foundUser === undefined || foundUser === null) {
                 res.status(400).send("Could not find user associated session token");
             }
@@ -39,7 +40,7 @@ router.route("/")
             // get the data values of the user
             UserWeb.getWebModelFromDbModel(foundUser).then(function(profile: UserWeb): void {
                 // send the profile back the client
-                res.send(profile);
+                res.status(200).send(profile);
             });
         });
     });
