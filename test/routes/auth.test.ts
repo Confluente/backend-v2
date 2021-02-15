@@ -20,12 +20,12 @@ describe("auth.ts", () => {
         await factory.close();
     });
 
-    it("test if init works", (done) => {
+    it("Test if standard auth call works", (done) => {
         factory.agents.activeMemberAgent.get("/api/auth")
             .expect(200)
-            .then(function(res: any): any {
+            .then(function(_: any): any {
                 done();
-            }).catch(function(res: any): any {
+            }).catch(function(_: any): any {
                 done(new Error());
             });
     });
