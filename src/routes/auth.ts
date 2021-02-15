@@ -5,6 +5,8 @@ import {Group} from "../models/database/group.model";
 import {authenticate, startSession} from "../helpers/auth.helper";
 import {Role} from "../models/database/role.model";
 import {UserWeb} from "../models/web/user.web.model";
+import {Session} from "../models/database/session.model";
+import {Op} from "sequelize";
 
 const router: Router = express.Router();
 
@@ -15,17 +17,25 @@ router.route("/")
     .get(function(req: Request, res: Response, next: any): any {
         // Check whether the response has a session (handled by express)
         if (!res.locals.session) {
-            return res.sendStatus(401);
+            return res.status(401).send({message: "Request does not have a session."});
         }
 
         // find the user of the session in the database
-        User.findByPk(res.locals.session.userId, {
+        User.findOne({
             attributes: ["id", "email", "displayName", "consentWithPortraitRight"],
             include: [{
                 model: Group,
                 attributes: ["id", "displayName", "fullName", "description", "canOrganize", "email"]
-            }]
-        }).then(function(foundUser: User): void {
+            }, {
+                model: Session,
+                where: {token: {[Op.like]: res.locals.session.token}}
+            }],
+        }).then((foundUser: User) => {
+
+            if (foundUser === undefined || foundUser === null) {
+                res.status(400).send("Could not find user associated session token");
+            }
+
             // get the data values of the user
             UserWeb.getWebModelFromDbModel(foundUser).then(function(profile: UserWeb): void {
                 // send the profile back the client

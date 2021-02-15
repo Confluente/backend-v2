@@ -19,7 +19,12 @@ export class TestFactory {
     private _connection: any;
     private _server: HttpServer;
     public agents: {
+        superAdminAgent: SuperAgentTest;
+        adminAgent: SuperAgentTest;
+        boardMemberAgent: SuperAgentTest;
         activeMemberAgent: SuperAgentTest;
+        nonActiveMemberAgent: SuperAgentTest;
+        nobodyUserAgent: SuperAgentTest;
     };
 
     // DB testDb
