@@ -18,7 +18,7 @@ let webroot: any;
 
 export const app: Express = express();
 
-export function setupServer(server: Express): void {
+export async function setupServer(server: Express): Promise<void> {
 
     // Set webroot dependent on whether running for tests, development, or production
     if (process.env.NODE_ENV === "test") {

@@ -19,14 +19,14 @@ router.route("/")
         }
 
         // find the user of the session in the database
-        User.findByPk(res.locals.session.user, {
+        User.findByPk(res.locals.session.userId, {
             attributes: ["id", "email", "displayName", "consentWithPortraitRight"],
             include: [{
                 model: Group,
                 attributes: ["id", "displayName", "fullName", "description", "canOrganize", "email"]
-            }, Role]
+            }]
         }).then(function(foundUser: User): void {
-            // get the datavalues of the user
+            // get the data values of the user
             UserWeb.getWebModelFromDbModel(foundUser).then(function(profile: UserWeb): void {
                 // send the profile back the client
                 res.send(profile);
@@ -55,7 +55,7 @@ router.route("/login")
 
             // check if user account is approved
             if (foundUser.approved === false) {
-                return res.status(406).send({error: 406, data: "User account has not yet been approved"});
+                return res.status(406).send("User account has not yet been approved");
             }
 
             res.locals.user = foundUser;
@@ -64,7 +64,7 @@ router.route("/login")
             return startSession(foundUser.id, req.ip)
                 .then(function(session: any): void {
                     res.cookie('session', session.token.toString("base64"), { expires: session.expires });
-                    res.status(200).send({});
+                    res.status(200).send("Logged in successfully!");
                 });
         }).catch(function(err: Error): any {
             // Authentication failed, send back error

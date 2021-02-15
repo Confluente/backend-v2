@@ -116,12 +116,12 @@ export class UserWeb extends AbstractWebModel {
                 const func = group.UserGroup.func;
                 delete group.UserGroup;
                 GroupWeb.getWebModelFromDbModel(group).then(function(webGroup: GroupWeb): void {
-                    webUser.groups.push(new UserGroupWeb(webUser, webGroup, func));
+                    webUser.groups.push(new UserGroupWeb(null, webGroup, func));
                 });
             }
         }
 
-        if ((dbUser as User).roleId !== undefined || (dbUser as User).roleId !== null) {
+        if ((dbUser as User).roleId !== undefined && (dbUser as User).roleId !== null) {
             const dbRole = await Role.findOne({where: {id: (dbUser as User).roleId}});
 
             webUser.role = await RoleWeb.getWebModelFromDbModel(dbRole);

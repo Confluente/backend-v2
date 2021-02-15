@@ -58,6 +58,10 @@ export async function cleanDb(): Promise<void> {
     await cleanRoles();
 }
 
-export function authenticate(agent: any, credentials: any): any {
-    return agent.post("/api/auth/login").send(credentials).expect(200);
+export async function authenticate(agent: any, credentials: any): Promise<any> {
+    return agent.post("/api/auth/login").send(credentials).expect(200)
+        .catch(function(res: any): void {
+            console.log("Logging in went wrong!");
+            console.log(res);
+        });
 }

@@ -10,9 +10,8 @@ import {Subscription} from "../src/models/database/subscription.model";
 import {User} from "../src/models/database/user.model";
 import {UserGroup} from "../src/models/database/usergroup.model";
 import {Session} from "../src/models/database/session.model";
-import supertest, {SuperAgentTest} from "supertest";
+import {SuperAgentTest} from "supertest";
 import {setupServer} from "../src/expressServer";
-import {resolve} from "q";
 import {initTestData} from "./test.data";
 
 export class TestFactory {
@@ -30,11 +29,11 @@ export class TestFactory {
         username: null,
         password: null,
         models: [Activity, CompanyOpportunity, Group, Page, Role, Session, Subscription, User, UserGroup],
-        // logging: false,
+        logging: false,
     });
 
-    public get app(): supertest.SuperTest<supertest.Test> {
-        return supertest(this._app);
+    public get app(): Express {
+        return this._app;
     }
 
     public get server(): HttpServer {
@@ -44,12 +43,11 @@ export class TestFactory {
     public async init(inTestData: boolean = false): Promise<void> {
         this._app = express();
         this._connection = await this.db.sync({force: true});
-        setupServer(this._app);
-        this._server = createServer(this._app).listen("80");
+        await setupServer(this.app);
+        this._server = createServer(this.app).listen("80");
 
         if (inTestData) {
-            const agents = await initTestData(this._app);
-            this.agents = agents;
+            this.agents = await initTestData(this.app);
         }
     }
 

@@ -2,7 +2,7 @@ import request, {SuperAgentTest} from "supertest";
 
 import {app} from "../src/expressServer";
 import {generateSalt, getPasswordHashSync} from "../src/helpers/auth.helper";
-import {all} from "q";
+import {all, resolve} from "q";
 import {Role} from "../src/models/database/role.model";
 import {User} from "../src/models/database/user.model";
 import {Group} from "../src/models/database/group.model";
@@ -26,7 +26,9 @@ export const superAdmin = {
     approvingHash: "da;lkfjda;fjkad;fj",
     passwordSalt: passwordSaltExample,
     passwordHash: getPasswordHashSync(password, passwordSaltExample),
-    roleId: 1
+    password: password,
+    approved: true,
+    roleId: 1,
 };
 
 export const admin = {
@@ -39,6 +41,7 @@ export const admin = {
     approvingHash: "da;lkfjda;fjkad;fj",
     passwordSalt: passwordSaltExample,
     passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    password: password,
     approved: true,
     roleId: 2,
     groups: [10],
@@ -55,6 +58,7 @@ export const boardMember = {
     approvingHash: "da;lkfjda;fjkad;fj",
     passwordSalt: passwordSaltExample,
     passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    password: password,
     approved: true,
     roleId: 4,
     groups: [1],
@@ -71,6 +75,7 @@ export const activeMember = {
     approvingHash: "da;lkfjda;fjkad;fj",
     passwordSalt: passwordSaltExample,
     passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    password: password,
     approved: true,
     roleId: 3,
     groups: [1, 2],
@@ -89,6 +94,7 @@ export const nonActiveMember = {
     approvingHash: "da;lkfjda;fjkad;fj",
     passwordSalt: passwordSaltExample,
     passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    password: password,
     approved: true,
     roleId: 3,
 };
@@ -224,14 +230,14 @@ const users = [superAdmin, admin, boardMember, activeMember, nonActiveMember];
 const activities = [unpublishedActivity, publishedActivityWithSubscriptionForm];
 
 export async function initTestData(server: any): Promise<any> {
-    all([
+    return all([
         await Role.bulkCreate(roles),
         await User.bulkCreate(users),
         await Group.bulkCreate([organizingGroup, nonOrganizingGroup]),
         await Activity.bulkCreate(activities),
         await Page.create(page),
         await CompanyOpportunity.create(companyOpportunity),
-    ]).then(function(): any {
+    ]).then(async function(): Promise<any> {
         activities.forEach(function(actData: any): void {
             Group.findByPk(actData.organizerId).then(function(group: Group): void {
                 Activity.findByPk(actData.id).then(function(act: Activity): void {
@@ -273,11 +279,11 @@ export async function initTestData(server: any): Promise<any> {
         const nonActiveMemberAgent = getAgent(server);
         const nobodyUserAgent = getAgent(server);
 
-        authenticate(superAdminAgent, superAdmin);
-        authenticate(adminAgent, admin);
-        authenticate(boardMemberAgent, boardMember);
-        authenticate(activeMemberAgent, activeMember);
-        authenticate(nonActiveMemberAgent, nonActiveMember);
+        await authenticate(superAdminAgent, superAdmin);
+        await authenticate(adminAgent, admin);
+        await authenticate(boardMemberAgent, boardMember);
+        await authenticate(activeMemberAgent, activeMember);
+        await authenticate(nonActiveMemberAgent, nonActiveMember);
 
         const agents = {
             superAdminAgent,
