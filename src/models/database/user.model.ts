@@ -18,6 +18,7 @@ import {Role} from "./role.model";
 import {Subscription} from "./subscription.model";
 import {UserGroup} from "./usergroup.model";
 import {Session} from "./session.model";
+import {options} from "marked";
 
 @Table({timestamps: false})
 export class User extends Model<User> {
@@ -151,7 +152,7 @@ export class User extends Model<User> {
      * Stores the activities that this user is subscribed to (many-to-many relation)
      */
     @BelongsToMany(() => Activity, () => Subscription)
-    public activities: Array<Activity & {Subscript: Subscription}>;
+    public activities: Array<Activity & {Subscription: Subscription}>;
 
     /**
      * Stores the id of the role that this user has.
@@ -164,6 +165,6 @@ export class User extends Model<User> {
     /**
      * Stores the session that belongs to this user (one-to-one relation)
      */
-    @HasOne(() => Session)
+    @HasOne(() => Session, {onDelete: "cascade"})
     public session: Session;
 }
