@@ -176,3 +176,5 @@ router.route("/:id")
             res.status(204).send({status: "Successful"});
         });
     });
+
+module.exports = router;
