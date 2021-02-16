@@ -1,7 +1,5 @@
 import {copyMatchingSourceKeyValues} from "../../src/helpers/web.model.copy.helper";
 import {GroupWeb} from "../../src/models/web/group.web.model";
-import {Group} from "../../src/models/database/group.model";
-import {User} from "../../src/models/database/user.model";
 import {UserGroupWeb} from "../../src/models/web/usergroup.web.model";
 import {UserWeb} from "../../src/models/web/user.web.model";
 

@@ -177,7 +177,6 @@ describe("auth.helper.ts", () => {
 
         after(async () => {
             await factory.close();
-            cleanRoles();
         });
 
         it("basic case", (done) => {
