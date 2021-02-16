@@ -50,5 +50,18 @@ describe("activity.route.ts '/api/activities'", () => {
                 }
             });
         });
+
+        it("Standard functionality when given nothing", (done) => {
+            resolveUserAndRole(null)
+                    .then(function(res: { dbUser: User, role: Role, loggedIn: boolean }): void {
+                if ((res.dbUser !== null) ||
+                    (res.role.name !== "Not logged in") ||
+                    (res.loggedIn !== false)) {
+                    done(new Error());
+                } else {
+                    done();
+                }
+            });
+        });
     });
 });
