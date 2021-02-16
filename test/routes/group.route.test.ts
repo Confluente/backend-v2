@@ -2,7 +2,7 @@ import {TestFactory} from "../testFactory";
 
 const factory: TestFactory = new TestFactory();
 
-describe("group.route.ts", () => {
+describe("group.route.ts '/api/group'", () => {
 
     /**
      * Syncs the database and server before all tests.

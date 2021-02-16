@@ -112,11 +112,13 @@ export async function setupServer(server: Express): Promise<void> {
             }).done();
     });
 
+    // TODO rework to be consistent either plural or singular for my OCD
     server.use("/api/auth", require("./routes/auth"));
     server.use("/api/activities", require("./routes/activity"));
     server.use("/api/group", require("./routes/group"));
     server.use("/api/user", require("./routes/user"));
     server.use("/api/page", require("./routes/page"));
+    server.use("/api/roles", require("./routes/role"));
     server.use("/api/notifications", require("./routes/notification"));
     server.use("/api/partners", require("./routes/partner"));
     server.use("/api/*", function(req: any, res: any): void {
