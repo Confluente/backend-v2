@@ -17,5 +17,5 @@ describe("partner.route.ts '/api/partners'", () => {
         await factory.close();
     });
 
-    describe("/")
+    // describe("/")
 });

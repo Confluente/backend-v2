@@ -25,7 +25,7 @@ describe("auth.ts '/api/auth'", () => {
         describe("get", () => {
 
             it("Test if standard auth call works", (done) => {
-                factory.agents.activeMemberAgent.get("/api/auth")
+                factory.agents.activeMemberAgent.get("/api/auth/")
                     .expect(200)
                     .then(function(_: any): any {
                         done();
@@ -35,7 +35,7 @@ describe("auth.ts '/api/auth'", () => {
             });
 
             it("Test if error if not logged in", (done) => {
-                factory.agents.nobodyUserAgent.get("/api/auth")
+                factory.agents.nobodyUserAgent.get("/api/auth/")
                     .expect(401)
                     .then((res: any) => {
                         if (res.body.message === "Request does not have a session." && res.statusCode === 401) {
