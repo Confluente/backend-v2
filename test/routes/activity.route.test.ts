@@ -1,13 +1,14 @@
 import {TestFactory} from "../testFactory";
+
 const factory: TestFactory = new TestFactory();
 
-describe("partner.route.ts '/api/partners'", () => {
+describe("activity.route.ts '/api/activities'", () => {
 
     /**
      * Syncs the database and server before all tests.
      */
     before(async () => {
-        await factory.init();
+        await factory.init(true);
     });
 
     /**
@@ -16,6 +17,4 @@ describe("partner.route.ts '/api/partners'", () => {
     after(async () => {
         await factory.close();
     });
-
-    describe("/")
 });

@@ -13,6 +13,7 @@ import {Session} from "../src/models/database/session.model";
 import {SuperAgentTest} from "supertest";
 import {setupServer} from "../src/expressServer";
 import {initTestData} from "./test.data";
+import {cleanDb} from "./test.helper";
 
 export class TestFactory {
     private _app: Express;
@@ -57,6 +58,7 @@ export class TestFactory {
     }
 
     public async close(): Promise<void> {
+        await cleanDb();
         this._server.close();
     }
 }

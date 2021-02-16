@@ -4,7 +4,7 @@ import {User} from "../../src/models/database/user.model";
 import {getAgent, nonActiveMember} from "../test.data";
 const factory: TestFactory = new TestFactory();
 
-describe("auth.ts (/api/auth)", () => {
+describe("auth.ts '/api/auth'", () => {
 
     /**
      * Syncs the database and server before all tests.
@@ -17,7 +17,6 @@ describe("auth.ts (/api/auth)", () => {
      * Closes database and server after all tests.
      */
     after(async () => {
-        await cleanDb();
         await factory.close();
     });
 

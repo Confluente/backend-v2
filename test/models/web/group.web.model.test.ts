@@ -23,7 +23,6 @@ describe("group.web.model.ts", () => {
      * Closes database and server after all tests.
      */
     after(async () => {
-        await cleanDb();
         await factory.close();
     });
 
