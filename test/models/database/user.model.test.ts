@@ -1,5 +1,5 @@
 import {TestFactory} from "../../testFactory";
-import {role, superAdmin} from "../../test.data";
+import {roleSuperAdmin, superAdmin} from "../../test.data";
 import {cleanRoles, cleanUsers} from "../../test.helper";
 import {User} from "../../../src/models/database/user.model";
 import {Role} from "../../../src/models/database/role.model";
@@ -17,7 +17,7 @@ describe("user.model.ts", () => {
     before(async () => {
         await factory.init();
 
-        await Role.create(role);
+        await Role.create(roleSuperAdmin);
     });
 
     /**

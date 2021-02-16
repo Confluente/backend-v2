@@ -1,5 +1,5 @@
 import {TestFactory} from "../../testFactory";
-import {page, role} from "../../test.data";
+import {page, roleSuperAdmin} from "../../test.data";
 import {Page} from "../../../src/models/database/page.model";
 import {PageWeb} from "../../../src/models/web/page.web.model";
 import {Role} from "../../../src/models/database/role.model";
@@ -48,7 +48,7 @@ describe("page.web.model.ts", () => {
         });
 
         it("checks exception", (done) => {
-            Role.create(role).then(function(dbRole: Role): void {
+            Role.create(roleSuperAdmin).then(function(dbRole: Role): void {
                 cleanRoles();
 
                 PageWeb.getWebModelFromDbModel(dbRole).then(function(pw: PageWeb): void {

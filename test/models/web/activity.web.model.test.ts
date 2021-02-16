@@ -1,6 +1,6 @@
 import {TestFactory} from "../../testFactory";
 import {Role} from "../../../src/models/database/role.model";
-import {organizingGroup, publishedActivityWithSubscriptionForm, role, superAdmin} from "../../test.data";
+import {organizingGroup, publishedActivityWithSubscriptionForm, roleSuperAdmin, superAdmin} from "../../test.data";
 import {User} from "../../../src/models/database/user.model";
 import {cleanDb} from "../../test.helper";
 import {ActivityWeb} from "../../../src/models/web/activity.web.model";
@@ -17,7 +17,7 @@ describe("activity.web.model.ts", () => {
      */
     before(async () => {
         await factory.init();
-        const dbRole = await Role.create(role);
+        const dbRole = await Role.create(roleSuperAdmin);
     });
 
     /**

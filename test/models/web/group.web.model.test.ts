@@ -1,6 +1,6 @@
 import {TestFactory} from "../../testFactory";
 import {Role} from "../../../src/models/database/role.model";
-import {organizingGroup, role, superAdmin} from "../../test.data";
+import {organizingGroup, roleSuperAdmin, superAdmin} from "../../test.data";
 import {User} from "../../../src/models/database/user.model";
 import {Group} from "../../../src/models/database/group.model";
 import {GroupWeb} from "../../../src/models/web/group.web.model";
@@ -15,7 +15,7 @@ describe("group.web.model.ts", () => {
      */
     before(async () => {
         await factory.init();
-        await Role.create(role);
+        await Role.create(roleSuperAdmin);
         await User.create(superAdmin);
     });
 

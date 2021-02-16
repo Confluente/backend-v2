@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import {TestFactory} from "../../testFactory";
 import {Role} from "../../../src/models/database/role.model";
-import {organizingGroup, publishedActivityWithSubscriptionForm, role, superAdmin} from "../../test.data";
+import {organizingGroup, publishedActivityWithSubscriptionForm, roleSuperAdmin, superAdmin} from "../../test.data";
 import {User} from "../../../src/models/database/user.model";
 import {UserWeb} from "../../../src/models/web/user.web.model";
 import {Group} from "../../../src/models/database/group.model";
@@ -24,7 +24,7 @@ describe("user.web.model.ts", () => {
         });
 
         beforeEach(async () => {
-            await Role.create(role);
+            await Role.create(roleSuperAdmin);
         });
 
         afterEach(async () => {
@@ -54,7 +54,7 @@ describe("user.web.model.ts", () => {
                 if (webUser.email !== dbUser.email) { correct = false; }
                 if (webUser.groups[0].group.fullName !== dbGroup.fullName) { correct = false; }
                 if (webUser.groups[0].func !== "Member") { correct = false; }
-                if (webUser.role.name !== role.name) { correct = false; }
+                if (webUser.role.name !== roleSuperAdmin.name) { correct = false; }
 
                 if (correct) {
                     resolve();

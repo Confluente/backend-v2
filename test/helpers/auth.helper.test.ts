@@ -7,7 +7,7 @@ import {
 } from "../../src/helpers/auth.helper";
 import { expect, assert } from "chai";
 import {User} from "../../src/models/database/user.model";
-import {role, superAdmin} from "../test.data";
+import {roleSuperAdmin, superAdmin} from "../test.data";
 import {TestFactory} from "../testFactory";
 import {Role} from "../../src/models/database/role.model";
 import {cleanRoles, cleanSessions, cleanUsers} from "../test.helper";
@@ -111,7 +111,7 @@ describe("auth.helper.ts", () => {
 
         before(async () => {
             await factory.init();
-            await Role.create(role);
+            await Role.create(roleSuperAdmin);
         });
 
         after(async () => {
@@ -172,7 +172,7 @@ describe("auth.helper.ts", () => {
 
         before(async () => {
             await factory.init();
-            await Role.create(role);
+            await Role.create(roleSuperAdmin);
         });
 
         after(async () => {

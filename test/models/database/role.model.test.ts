@@ -1,5 +1,5 @@
 import {TestFactory} from "../../testFactory";
-import {role} from "../../test.data";
+import {roleSuperAdmin} from "../../test.data";
 import {cleanRoles} from "../../test.helper";
 import {Role} from "../../../src/models/database/role.model";
 
@@ -29,7 +29,7 @@ describe("role.model.ts", () => {
      */
     it("Adding a valid page instance", (done) => {
         // Try to create instance
-        Role.create(role).then(function(_: Role): void {
+        Role.create(roleSuperAdmin).then(function(_: Role): void {
             // Successfully created, thus clean table and return successful.
             cleanRoles();
             done();
@@ -51,7 +51,7 @@ describe("role.model.ts", () => {
         needed_props.forEach(function(prop: string): void {
             it("Testing specific invalid instance that misses " + prop, (done) => {
                 // Copy valid role
-                const role_copy = {...role};
+                const role_copy = {...roleSuperAdmin};
 
                 // Delete needed property
                 // @ts-ignore
@@ -77,8 +77,8 @@ describe("role.model.ts", () => {
 
     it('should not be able to create 2 roles with the same name', (done) => {
         // create 2 valid role instances with the same name
-        const role_1 = {...role};
-        const role_2 = {...role};
+        const role_1 = {...roleSuperAdmin};
+        const role_2 = {...roleSuperAdmin};
         delete role_2.id;
 
         // Try to create both roles

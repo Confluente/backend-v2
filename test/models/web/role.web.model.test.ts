@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import {TestFactory} from "../../testFactory";
 import {Role} from "../../../src/models/database/role.model";
-import {page, role} from "../../test.data";
+import {page, roleSuperAdmin} from "../../test.data";
 import {RoleWeb} from "../../../src/models/web/role.web.model";
 import {Page} from "../../../src/models/database/page.model";
 import exp = require("constants");
@@ -28,7 +28,7 @@ describe("role.web.model.ts", () => {
     describe("getWebModelFromDbModel", () => {
 
         it("Checks basic case", (done) => {
-            Role.create(role).then(function(dbRole: Role): void {
+            Role.create(roleSuperAdmin).then(function(dbRole: Role): void {
                 RoleWeb.getWebModelFromDbModel(dbRole).then(function(webRole: RoleWeb): void {
                     cleanRoles();
 
