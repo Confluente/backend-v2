@@ -17,7 +17,6 @@ describe("auth.ts (/api/auth)", () => {
      * Closes database and server after all tests.
      */
     after(async () => {
-        await cleanDb();
         await factory.close();
     });
 

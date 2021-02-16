@@ -1,15 +1,14 @@
 import {TestFactory} from "../testFactory";
-import {cleanDb} from "../test.helper";
 
 const factory: TestFactory = new TestFactory();
 
-describe("partner.ts", () => {
+describe("user.route.ts", () => {
 
     /**
      * Syncs the database and server before all tests.
      */
     before(async () => {
-        await factory.init();
+        await factory.init(true);
     });
 
     /**
