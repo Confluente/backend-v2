@@ -1,4 +1,4 @@
-import {Promise, all} from "bluebird";
+import {all} from "bluebird";
 import {Request, Response} from "express";
 
 import {User} from "./models/database/user.model";
@@ -13,35 +13,8 @@ import {Role} from "./models/database/role.model";
  * @returns boolean
  */
 export function check(user: User | number, scope: any): Promise<boolean> {
-    let loggedIn = true;
-    return new Promise(function(resolve, reject): any {
-        if (!user) {
-            // User undefined
-            loggedIn = false;
-            Role.findOne({
-                where: {
-                    name: 'Not logged in'
-                }
-            }).then(function(role: Role): any {
-                if (role === null) {
-                    throw new Error("Permissions.check: 'Not logged in' role could not be found. " +
-                        "Be sure to have a correctly initialized database");
-                }
-
-                resolve({dbUser: null, role});
-            });
-        } else if (typeof user === 'number') {
-            User.findByPk(user).then(function(dbUser: User): void {
-                Role.findByPk(dbUser.roleId).then(function(role: Role): void {
-                    resolve({dbUser, role});
-                });
-            });
-        } else {
-            Role.findByPk(user.roleId).then(function(role: Role): void {
-                resolve({dbUser: user, role});
-            });
-        }
-    }).then(function(res: {dbUser: User, role: Role}): Promise<boolean> | boolean {
+    return resolveUserAndRole(user)
+            .then(function(res: {dbUser: User, role: Role, loggedIn: boolean}): Promise<boolean> | boolean {
 
         // Determine rule based on context
         switch (scope.type) {
@@ -76,7 +49,7 @@ export function check(user: User | number, scope: any): Promise<boolean> {
             case "GROUP_MANAGE":
                 return res.role.GROUP_MANAGE;
             case "GROUP_ORGANIZE":
-                if (!loggedIn) {
+                if (!res.loggedIn) {
                     return false;
                 }
                 return Group.findByPk(scope.value).then(function(group: Group): boolean {
@@ -101,7 +74,7 @@ export function check(user: User | number, scope: any): Promise<boolean> {
                     }
                     // Unpublished activities allowed to be seen by organizers
                     // const organizing = loggedIn ? dbUser.hasGroup(activity.OrganizerId) : false;
-                    const organizing = loggedIn ? res.dbUser.groups.some(
+                    const organizing = res.loggedIn ? res.dbUser.groups.some(
                         function(dbGroup: Group & {UserGroup: any}): boolean {
                             return dbGroup.id === activity.organizer.id;
                     }) : false;
@@ -110,7 +83,7 @@ export function check(user: User | number, scope: any): Promise<boolean> {
             case "ACTIVITY_EDIT":
                 return Activity.findByPk(scope.value).then(function(activity: Activity): boolean {
                     // Activities allowed to be edited by organizers
-                    const organizing = loggedIn ? res.dbUser.groups.some(
+                    const organizing = res.loggedIn ? res.dbUser.groups.some(
                         function(dbGroup: Group & {UserGroup: any}): boolean {
                             return dbGroup.id === activity.organizer.id;
                         })  : false;
@@ -122,15 +95,64 @@ export function check(user: User | number, scope: any): Promise<boolean> {
     });
 }
 
-export function allPromises(promises: Promise<any>[]): any {
-    return all(promises).then(function(results: any): any {
-        return results.every(function(e: any): any {
-            return e;
-        });
+/**
+ * Helper function for check function that resolves the user, role and whether the user is loggedIn from a given user
+ * (User | number).
+ *
+ * @param user  Either a User model instance or a number.
+ */
+export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User, role: Role, loggedIn: boolean}> {
+    return new Promise(function(resolve, reject): any {
+        let loggedIn = true;
+        if (!user) {
+
+            // User undefined
+            loggedIn = false;
+
+            // Find role associated to 'not logged in' user.
+            Role.findOne({
+                where: {
+                    name: 'Not logged in'
+                }
+            }).then(function(role: Role): any {
+                // If no role associated, throw error as this should always exist.
+                if (role === null) {
+                    throw new Error("Permissions.check: 'Not logged in' role could not be found. " +
+                        "Be sure to have a correctly initialized database");
+                }
+
+                resolve({dbUser: null, role: role, loggedIn: loggedIn});
+            });
+        } else if (typeof user === 'number') {
+            // If user is a number, then find the User model instance associated to it.
+            return User.findByPk(user).then(function(dbUser: User | null): any {
+
+                // If no user associated, reject promise
+                if (dbUser === null) {
+                    reject("permissions.resolveUserAndRole: user could not be resolved");
+                }
+
+                // If user associated, then find role associated to user.
+                return Role.findByPk(dbUser.roleId).then(function(role: Role): any {
+
+                    // Because of db constraints, role must exist, no need for error checking.
+                    resolve({dbUser: dbUser, role: role, loggedIn: loggedIn});
+                });
+            });
+        } else {
+            // If user is a User model instance, then find the associated role.
+            return Role.findByPk(user.roleId).then(function(role: Role): any {
+                resolve({dbUser: user, role: role, loggedIn: loggedIn});
+            });
+        }
     });
 }
 
-
+/**
+ * Checks whether all given scopes (permissions) are adhered to, and returns it as middleware.
+ *
+ * @param scopes    Scopes to check
+ */
 export function requireAll(scopes: any): any {
     if (!scopes.length) {
         scopes = [scopes];
