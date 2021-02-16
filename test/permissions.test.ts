@@ -27,7 +27,7 @@ describe("activity.route.ts '/api/activities'", () => {
         it("Standard functionality when given a User model instance", (done) => {
             User.findByPk(boardMember.id).then(function(user: User): void {
                 resolveUserAndRole(user).then(function(res: { dbUser: User, role: Role, loggedIn: boolean }): void {
-                    if ((res.dbUser.id !== user.id) ||
+                    if ((res.dbUser.id !== boardMember.id) ||
                         (res.role.name !== "Board member") ||
                         (res.loggedIn !== true)) {
                         done(new Error());
@@ -35,6 +35,19 @@ describe("activity.route.ts '/api/activities'", () => {
                         done();
                     }
                 });
+            });
+        });
+
+        it("Standard functionality when given a number", (done) => {
+            resolveUserAndRole(boardMember.id)
+                    .then(function(res: { dbUser: User, role: Role, loggedIn: boolean }): void {
+                if ((res.dbUser.id !== boardMember.id) ||
+                    (res.role.name !== "Board member") ||
+                    (res.loggedIn !== true)) {
+                    done(new Error());
+                } else {
+                    done();
+                }
             });
         });
     });

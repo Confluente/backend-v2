@@ -109,7 +109,7 @@ export async function setupServer(server: Express): Promise<void> {
                     }
                 }
                 return next();
-            }).done();
+            });
     });
 
     // TODO rework to be consistent either plural or singular for my OCD

@@ -31,14 +31,14 @@ describe("page.route.ts", () => {
     /**
      * Checks if retrieving all pages works.
      */
-    describe("Retrieving all pages", () => {
-        it("Returns error without proper permissions", (done) => {
-            factory.agents.nobodyUserAgent.get("/page/")
-                .expect(403).then(function(_: any): any {
-                done();
-            }).catch(function(_: any): any {
-                done(new Error());
-            });
-        });
-    });
+    // describe("Retrieving all pages", () => {
+    //     it("Returns error without proper permissions", (done) => {
+    //         factory.agents.nobodyUserAgent.get("/page/")
+    //             .expect(403).then(function(_: any): any {
+    //             done();
+    //         }).catch(function(_: any): any {
+    //             done(new Error());
+    //         });
+    //     });
+    // });
 });
