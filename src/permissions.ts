@@ -9,7 +9,9 @@ import {Role} from "./models/database/role.model";
 /**
  * Checks whether user has required permissions for a given scope
  * @param user          User to check permissions for. Either database object, user ID or null for 'not logged in' user.
- * @param scope         Type of permission requested.
+ * @param scope         Scope of the permission to be checked. Scope should be an object with a type attribute
+ *                          containing the name of the permission to be checked and possibly a value attribute
+ *                          containing the instance to be checked on (say, the group number that the user wants to see).
  * @returns boolean
  */
 export function checkPermission(user: User | number, scope: { type: string, value?: number }): Promise<boolean> {
