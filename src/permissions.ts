@@ -7,14 +7,12 @@ import {Activity} from "./models/database/activity.model";
 import {Role} from "./models/database/role.model";
 
 /**
- * TODO extent contract with more concrete info on parameters
- *
  * Checks whether user has required permissions for a given scope
  * @param user          User to check permissions for. Either database object, user ID or null for 'not logged in' user.
  * @param scope         Type of permission requested.
  * @returns boolean
  */
-export function checkPermission(user: User | number, scope: any): Promise<boolean> {
+export function checkPermission(user: User | number, scope: { type: string, value?: number }): Promise<boolean> {
     return resolveUserAndRole(user)
             .then(function(res: {dbUser: User, role: Role, loggedIn: boolean}): Promise<boolean> {
 
