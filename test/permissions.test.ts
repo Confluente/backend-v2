@@ -1,8 +1,9 @@
 import {TestFactory} from "./testFactory";
 import {User} from "../src/models/database/user.model";
 import {boardMember} from "./test.data";
-import {resolveUserAndRole} from "../src/permissions";
+import {check, resolveUserAndRole} from "../src/permissions";
 import {Role} from "../src/models/database/role.model";
+import {roles} from "../src/import_initial";
 
 const factory: TestFactory = new TestFactory();
 
@@ -76,5 +77,21 @@ describe("activity.route.ts '/api/activities'", () => {
                     }
                 });
         });
+    });
+
+    describe("check", () => {
+        
+        it("check standard role case (where the case simply returns the role boolean)", (done) => {
+            
+            // Result of this should be equal to the PAGE_VIEW permission of the "Not logged in" 
+            check(null, {type: "PAGE_VIEW"}).then(function(permission: boolean): void {
+                if (permission) {
+                    done();
+                } else {
+                    done(new Error());
+                }
+            });
+        });
+        
     });
 });
