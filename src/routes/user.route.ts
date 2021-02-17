@@ -139,7 +139,7 @@ router.route("/:id")
         const user: number = res.locals.session.user;
 
         // Check whether user has permission to see the information of the user requested
-        checkPermission(user, {type: "USER_VIEW", value: req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "USER_VIEW", value: +req.params.id}).then(function(result: boolean): any {
             // If no permission, return 403
             if (!result) { return res.sendStatus(403); }
 
@@ -257,7 +257,7 @@ router.route("/changePassword/:id")
         const user: number = res.locals.session ? res.locals.session.user : null;
 
         // Check if client has permission to change password of user
-        checkPermission(user, {type: "CHANGE_PASSWORD", value: req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "CHANGE_PASSWORD", value: +req.params.id}).then(function(result: boolean): any {
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
 

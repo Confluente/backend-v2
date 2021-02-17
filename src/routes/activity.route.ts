@@ -108,7 +108,7 @@ router.route("/")
                 // If logged in (and unpublished), check whether client has permission to view activity
                 return checkPermission(res.locals.session.user, {
                     type: "ACTIVITY_VIEW",
-                    value: singleActivity.id
+                    value: +singleActivity.id
                 }).then(function(result: boolean): ActivityWeb {
                     // If no permission, return null, otherwise return activity
                     return result ? singleActivity : null;
@@ -190,7 +190,7 @@ router.route("/pictures/:id")
         // Check permissions
         return checkPermission(res.locals.session.user, {
             type: "ACTIVITY_EDIT",
-            value: req.params.id
+            value: +req.params.id
         }).then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
@@ -250,7 +250,7 @@ router.route("/manage")
             const promises = activities.map(function(singleActivity: ActivityWeb): any {
                 return checkPermission(res.locals.session.user, {
                     type: "ACTIVITY_EDIT",
-                    value: singleActivity.id
+                    value: +singleActivity.id
                 }).then(function(result: boolean): ActivityWeb {
                     return result ? singleActivity : null;
                 });
@@ -372,7 +372,7 @@ router.route("/:id")
         const user = res.locals.session ? res.locals.session.user : null;
 
         // Check if client has permission to view the activity
-        checkPermission(user, {type: "ACTIVITY_VIEW", value: req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "ACTIVITY_VIEW", value: +req.params.id}).then(function(result: boolean): any {
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
 

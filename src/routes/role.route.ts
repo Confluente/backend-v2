@@ -168,7 +168,7 @@ router.route("/:id")
                 if (role === null) {
                     res.status(404).send({status: "Not Found"});
                 } else {
-                    // Destory role in database
+                    // Destroy role in database
                     role.destroy();
                 }
             });
