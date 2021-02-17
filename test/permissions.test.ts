@@ -6,7 +6,7 @@ import {Role} from "../src/models/database/role.model";
 
 const factory: TestFactory = new TestFactory();
 
-describe("activity.route.ts '/api/activities'", () => {
+describe("permissions.ts", () => {
 
     /**
      * Syncs the database and server before all tests.
@@ -92,14 +92,95 @@ describe("activity.route.ts '/api/activities'", () => {
             });
         });
 
-        it("Check if users can only see their own account if they do not have the USER_VIEW_ALL permission", (done) => {
-            checkPermission(2, { type: "USER_VIEW", value: 3}).then(function(permission: boolean): void {
-                // Should not have the permission to view user 3
-                if (!permission) {
+        it("Check unknown permission returning error", (done) => {
+            checkPermission(null, { type: "UNKNOWN_PERMISSION_THINGY" }).then(function(_: boolean): void {
+                done(new Error());
+            }).catch(function(err: Error): void {
+                if (err.message === "permissions.check: Unknown scope type: UNKNOWN_PERMISSION_THINGY") {
                     done();
                 } else {
                     done(new Error());
                 }
+            });
+        });
+
+        describe("USER_VIEW", () => {
+
+            it("Check standard functionality", (done) => {
+                checkPermission(4, { type: "USER_VIEW", value: 4 }).then(function(res: boolean): void {
+                    if (res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("Check if users can only see their own account " +
+                    "if they do not have the USER_VIEW_ALL permission", (done) => {
+                checkPermission(2, { type: "USER_VIEW", value: 3 }).then(function(permission: boolean): void {
+                    // Should not have the permission to view user 3
+                    if (!permission) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("Check if permission is false if requesting non existing user", (done) => {
+                checkPermission(1, {type: "USER_VIEW", value: 10 }).then(function(res: boolean): void {
+                    if (!res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+        });
+
+        describe("CHANGE_PASSWORD", () => {
+
+            it("User should be able to change their own password", (done) => {
+                checkPermission(4, { type: "CHANGE_PASSWORD", value: 4 }).then(function(res: boolean): void {
+                    if (res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("No one, except super admins, should be able to change other peoples passwords", (done) => {
+                checkPermission(2, { type: "CHANGE_PASSWORD", value: 4 }).then(function(res: boolean): void {
+                    if (!res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("Super admins should be able to change other people passwords", (done) => {
+                checkPermission(1, { type: "CHANGE_PASSWORD", value: 4 }).then(function(res: boolean): void {
+                    if (res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("Change password permission request for non existing user should throw an error", (done) => {
+                checkPermission(1, { type: "CHANGE_PASSWORD", value: 10 }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: Change password was requested for non existing user") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
             });
         });
 

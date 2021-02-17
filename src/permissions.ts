@@ -20,18 +20,8 @@ export function checkPermission(user: User | number, scope: { type: string, valu
 
         // Determine rule based on context
         switch (scope.type) {
-            case "PAGE_VIEW":
-                return new Promise(function(resolve): void {
-                    resolve(res.role.PAGE_VIEW);
-                });
-            case "PAGE_MANAGE":
-                return new Promise(function(resolve): void {
-                    resolve(res.role.PAGE_MANAGE);
-                });
-            case "USER_CREATE":
-                return new Promise(function(resolve): void {
-                    resolve(res.role.USER_CREATE);
-                });
+            // If scope type is not listed, default case is executed, and the permission stated in the role is returned.
+            // All more complicated permissions are listed here.
             case "USER_VIEW":
                 return User.findByPk(scope.value).then(function(user_considered: User): boolean {
                     if (!user_considered) {
@@ -41,26 +31,14 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                     const ownAccount: boolean = (res.dbUser.id === user_considered.id);
                     return ownAccount || res.role.USER_VIEW_ALL;
                 });
-            case "USER_MANAGE":
-                return new Promise(function(resolve): void {
-                    resolve(res.role.USER_MANAGE);
-                });
             case "CHANGE_PASSWORD":
                 return User.findByPk(scope.value).then(function(user_considered: User): boolean {
                     if (!user_considered) {
-                        return false;
+                        throw new Error("permissions.checkPermission: Change password was requested for non existing user");
                     }
                     // Users can change their own password
                     const ownAccount = (res.dbUser.id === user_considered.id);
                     return ownAccount || res.role.CHANGE_ALL_PASSWORDS;
-                });
-            case "GROUP_VIEW":
-                return new Promise(function(resolve): void {
-                    resolve(res.role.GROUP_VIEW);
-                });
-            case "GROUP_MANAGE":
-                return new Promise(function(resolve): void {
-                    resolve(res.role.GROUP_MANAGE);
                 });
             case "GROUP_ORGANIZE":
                 if (!res.loggedIn) {
@@ -106,7 +84,13 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                     return organizing || res.role.ACTIVITY_MANAGE;
                 });
             default:
-                throw new Error("permissions.check: Unknown scope type: " + scope.type);
+                if ((res.role as any)[scope.type] !== undefined) {
+                    return new Promise(function(resolve): void {
+                        resolve((res.role as any)[scope.type]);
+                    });
+                } else {
+                    throw new Error("permissions.check: Unknown scope type: " + scope.type);
+                }
         }
     });
 }
