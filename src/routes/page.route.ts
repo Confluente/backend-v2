@@ -1,10 +1,9 @@
 import express, {Request, Response, Router} from "express";
 
-import marked from "marked";
 import {Page} from "../models/database/page.model";
 import {PageWeb} from "../models/web/page.web.model";
 
-import {requireAll} from "../permissions";
+import {requireAllPermissions} from "../permissions";
 
 const router: Router = express.Router();
 
@@ -33,7 +32,7 @@ router.route("/:url([^\?]+)")
     /**
      * Edits a page
      */
-    .put(requireAll({type: "PAGE_MANAGE"}), function(req: Request, res: Response): any {
+    .put(requireAllPermissions([{type: "PAGE_MANAGE"}]), function(req: Request, res: Response): any {
 
         // Stores the edit parameters
         const values: any = req.body;
@@ -54,7 +53,7 @@ router.route("/:url([^\?]+)")
     /**
      * Deletes a page from the database
      */
-    .delete(requireAll({type: "PAGE_MANAGE"}), function(req: Request, res: Response): any {
+    .delete(requireAllPermissions([{type: "PAGE_MANAGE"}]), function(req: Request, res: Response): any {
         return Page.destroy({where: {url: req.params.url}}).then(function(result: any): any {
             return res.sendStatus(204);
         });
@@ -71,7 +70,7 @@ router.get("/:url/view", function(req: Request, res: Response): any {
     });
 });
 
-router.get("/", requireAll({type: "PAGE_MANAGE"}),
+router.get("/", requireAllPermissions([{type: "PAGE_MANAGE"}]),
     function(req: Request, res: Response): any {
     return Page.findAll({
         attributes: ["url", "title", "content", "author"]

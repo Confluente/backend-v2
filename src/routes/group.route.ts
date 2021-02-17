@@ -3,13 +3,13 @@ import express, {Request, Response, Router} from "express";
 import {Group} from "../models/database/group.model";
 import {User} from "../models/database/user.model";
 
-import {requireAll, checkPermission} from "../permissions";
+import {requireAllPermissions, checkPermission} from "../permissions";
 import {GroupWeb} from "../models/web/group.web.model";
 
 const router: Router = express.Router();
 
 router.route("/")
-    .all(requireAll({type: "GROUP_MANAGE"}))
+    .all(requireAllPermissions([{type: "GROUP_MANAGE"}]))
 
     /**
      * Gets all groups from the database
@@ -96,7 +96,7 @@ router.route("/:id")
         const user: number = res.locals.session ? res.locals.session.user : null;
 
         // Check if client has permission to view the group
-        checkPermission(user, {type: "GROUP_VIEW", value: req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "GROUP_VIEW", value: +req.params.id}).then(function(result: boolean): any {
 
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
