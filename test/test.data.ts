@@ -138,7 +138,9 @@ export const member = {
     approved: true,
     approvingHash: "approved_random_hash",
     passwordSalt: passwordSaltExample,
-    passwordHash: getPasswordHashSync(password, passwordSaltExample)
+    passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    password: password,
+    roleId: 3,
 };
 
 export const unpublishedActivity = {
