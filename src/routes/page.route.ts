@@ -4,7 +4,7 @@ import marked from "marked";
 import {Page} from "../models/database/page.model";
 import {PageWeb} from "../models/web/page.web.model";
 
-const permissions: any = require("../permissions");
+import {requireAll} from "../permissions";
 
 const router: Router = express.Router();
 
@@ -33,7 +33,7 @@ router.route("/:url([^\?]+)")
     /**
      * Edits a page
      */
-    .put(permissions.requireAll({type: "PAGE_MANAGE"}), function(req: Request, res: Response): any {
+    .put(requireAll({type: "PAGE_MANAGE"}), function(req: Request, res: Response): any {
 
         // Stores the edit parameters
         const values: any = req.body;
@@ -54,7 +54,7 @@ router.route("/:url([^\?]+)")
     /**
      * Deletes a page from the database
      */
-    .delete(permissions.requireAll({type: "PAGE_MANAGE"}), function(req: Request, res: Response): any {
+    .delete(requireAll({type: "PAGE_MANAGE"}), function(req: Request, res: Response): any {
         return Page.destroy({where: {url: req.params.url}}).then(function(result: any): any {
             return res.sendStatus(204);
         });
@@ -71,7 +71,7 @@ router.get("/:url/view", function(req: Request, res: Response): any {
     });
 });
 
-router.get("/", permissions.requireAll({type: "PAGE_MANAGE"}),
+router.get("/", requireAll({type: "PAGE_MANAGE"}),
     function(req: Request, res: Response): any {
     return Page.findAll({
         attributes: ["url", "title", "content", "author"]
