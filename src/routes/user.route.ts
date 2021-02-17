@@ -4,7 +4,7 @@ import {User} from "../models/database/user.model";
 import {Group} from "../models/database/group.model";
 import {Role} from "../models/database/role.model";
 
-const permissions: any = require("../permissions");
+import {checkPermission} from "../permissions";
 import {generateSalt, getPasswordHashSync} from "../helpers/auth.helper";
 import {createTestAccount, createTransport} from "nodemailer";
 import {UserWeb} from "../models/web/user.web.model";
@@ -21,7 +21,7 @@ router.route("/")
         const userId: number = res.locals.session ? res.locals.session.user : null;
 
         // Check if the client has permission to manage users
-        permissions.check(userId, {
+        checkPermission(userId, {
             type: "USER_MANAGE",
             value: userId
         }).then(function(result: boolean): void {
@@ -42,7 +42,7 @@ router.route("/")
                 // Send the users back to the client
                 res.send(users);
             });
-        }).done();
+        });
     })
 
     /**
@@ -139,7 +139,7 @@ router.route("/:id")
         const user: number = res.locals.session.user;
 
         // Check whether user has permission to see the information of the user requested
-        permissions.check(user, {type: "USER_VIEW", value: req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "USER_VIEW", value: req.params.id}).then(function(result: boolean): any {
             // If no permission, return 403
             if (!result) { return res.sendStatus(403); }
 
@@ -173,7 +173,7 @@ router.route("/:id")
         const user: number = res.locals.session.user;
 
         // Check whether the client has permission to manage (edit) users
-        permissions.check(user, {
+        checkPermission(user, {
             type: "USER_MANAGE",
             value: res.locals.user.id
         }).then(function(result: boolean): any {
@@ -234,7 +234,7 @@ router.route("/:id")
         const user: number = res.locals.session.user;
 
         // Check if client has the permission to manage (delete) users
-        permissions.check(user, {
+        checkPermission(user, {
             type: "USER_MANAGE",
             value: res.locals.user.id
         }).then(function(result: boolean): any {
@@ -257,7 +257,7 @@ router.route("/changePassword/:id")
         const user: number = res.locals.session ? res.locals.session.user : null;
 
         // Check if client has permission to change password of user
-        permissions.check(user, {type: "CHANGE_PASSWORD", value: req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "CHANGE_PASSWORD", value: req.params.id}).then(function(result: boolean): any {
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
 

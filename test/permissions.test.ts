@@ -1,7 +1,7 @@
 import {TestFactory} from "./testFactory";
 import {User} from "../src/models/database/user.model";
 import {boardMember} from "./test.data";
-import {check, resolveUserAndRole} from "../src/permissions";
+import {checkPermission, resolveUserAndRole} from "../src/permissions";
 import {Role} from "../src/models/database/role.model";
 
 const factory: TestFactory = new TestFactory();
@@ -83,7 +83,7 @@ describe("activity.route.ts '/api/activities'", () => {
         it("Check standard role case (where the case simply returns the role boolean)", (done) => {
             
             // Result of this should be equal to the PAGE_VIEW permission of the "Not logged in" 
-            check(null, {type: "PAGE_VIEW"}).then(function(permission: boolean): void {
+            checkPermission(null, {type: "PAGE_VIEW"}).then(function(permission: boolean): void {
                 if (permission) {
                     done();
                 } else {
@@ -93,7 +93,7 @@ describe("activity.route.ts '/api/activities'", () => {
         });
 
         it("Check if users can only see their own account if they do not have the USER_VIEW_ALL permission", (done) => {
-            check(2, { type: "USER_VIEW", value: 3}).then(function(permission: boolean): void {
+            checkPermission(2, { type: "USER_VIEW", value: 3}).then(function(permission: boolean): void {
                 // Should not have the permission to view user 3
                 if (!permission) {
                     done();

@@ -8,7 +8,7 @@ import {Op} from "sequelize";
 import {createTestAccount, createTransport} from 'nodemailer';
 import {log} from "./logger";
 
-const checkPermission: any = require("./permissions").check;
+import {checkPermission} from "./permissions";
 
 // Import db models
 import {User} from "./models/database/user.model";

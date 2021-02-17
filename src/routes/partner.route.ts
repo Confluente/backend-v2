@@ -3,7 +3,7 @@ import express, {Response, Request, Router} from "express";
 import {CompanyOpportunity} from "../models/database/company.opportunity.model";
 import {User} from "../models/database/user.model";
 
-const permissions: any = require("../permissions");
+import {checkPermission} from "../permissions";
 
 const router: Router = express.Router();
 
@@ -13,7 +13,7 @@ router.route("/companyOpportunities")
          * Route for getting all companyOpportunities from the database.
          */
         const user: User = res.locals.session ? res.locals.session.user : null;
-        permissions.check(user, {type: "COMPANY_OPPORTUNITY_VIEW"}).then(function(result: boolean): void {
+        checkPermission(user, {type: "COMPANY_OPPORTUNITY_VIEW"}).then(function(result: boolean): void {
             if (!result) {
                 res.status(403).send("You do not have the permissions to view internships");
             }
@@ -32,7 +32,7 @@ router.route("/companyOpportunities")
          * Route for creating a company opportunity.
          */
         const user: User = res.locals.session ? res.locals.session.user : null;
-        permissions.check(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: req.params.id})
+        checkPermission(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 res.status(403).send("You do not have permissions to create a company opportunity");
@@ -65,21 +65,21 @@ router.route("/companyOpportunities/:id")
          * Route for getting a specific company opportunity.
          */
         const user: User = res.locals.session ? res.locals.session.user : null;
-        permissions.check(user, {type: "COMPANY_OPPORTUNITY_VIEW", value: req.params.id})
+        checkPermission(user, {type: "COMPANY_OPPORTUNITY_VIEW", value: req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
             }
 
             res.send(res.locals.companyOpportunity);
-        }).done();
+        });
     })
     .put(function(req: Request, res: Response): any {
         /**
          * Route for editing a specific company opportunity.
          */
         const user: User = res.locals.session ? res.locals.session.user : null;
-        permissions.check(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: req.params.id})
+        checkPermission(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
@@ -99,7 +99,7 @@ router.route("/companyOpportunities/:id")
          * Route for deleting a company opportunity.
          */
         const user: User = res.locals.session ? res.locals.session.user : null;
-        permissions.check(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: req.params.id})
+        checkPermission(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);

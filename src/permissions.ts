@@ -14,7 +14,7 @@ import {Role} from "./models/database/role.model";
  * @param scope         Type of permission requested.
  * @returns boolean
  */
-export function check(user: User | number, scope: any): Promise<boolean> {
+export function checkPermission(user: User | number, scope: any): Promise<boolean> {
     return resolveUserAndRole(user)
             .then(function(res: {dbUser: User, role: Role, loggedIn: boolean}): Promise<boolean> {
 
@@ -178,7 +178,7 @@ export function requireAll(scopes: any): any {
     return function(req: Request, res: Response, next: any): any {
         const user = res.locals.session ? res.locals.session.user : null;
         const promises = scopes.map(function(scope: string): Promise<boolean> {
-            return check(user, scope);
+            return checkPermission(user, scope);
         });
         all(promises).then(function(result: any): any {
             if (!result) {

@@ -2,7 +2,7 @@ import express, {Router, Request, Response} from "express";
 
 import {Role} from "../models/database/role.model";
 
-import {check} from "../permissions";
+import {checkPermission} from "../permissions";
 import {RoleWeb} from "../models/web/role.web.model";
 
 const router: Router = express.Router();
@@ -16,7 +16,7 @@ router.route("/")
         const user = res.locals.session ? res.locals.session.user : null;
 
         // Check if the client has permission to manage roles
-        check(user, {
+        checkPermission(user, {
             type: "ROLE_MANAGE",
             value: user
         }).then(function(result: boolean): void {
@@ -73,7 +73,7 @@ router.route("/:id")
         // If client does not have a session, he does not have permission
         if (user === null) { return res.send(403); }
 
-        check(user, {
+        checkPermission(user, {
             type: "ROLE_MANAGE",
             value: user
         }).then(function(result: boolean): void {
@@ -111,7 +111,7 @@ router.route("/:id")
         if (user === null) { return res.send(403); }
 
         // Check whether the client has permission to manage (edit) roles
-        check(user, {
+        checkPermission(user, {
             type: "ROLE_MANAGE",
             value: res.locals.user.id
         }).then(function(result: boolean): any {
@@ -151,7 +151,7 @@ router.route("/:id")
         if (user === null) { return res.send(403); }
 
         // Check if client has the permission to manage (delete) roles
-        check(user, {
+        checkPermission(user, {
             type: "ROLE_MANAGE",
             value: res.locals.user.id
         }).then(function(result: boolean): any {

@@ -10,7 +10,7 @@ import {Group} from "../models/database/group.model";
 import {User} from "../models/database/user.model";
 import {Activity} from "../models/database/activity.model";
 
-const permissions: any = require("../permissions");
+import {checkPermission} from "../permissions";
 
 import {stringifyArrayOfStrings} from "../helpers/array.helper";
 
@@ -106,7 +106,7 @@ router.route("/")
                 if (!res.locals.session) { return Q(null); }
 
                 // If logged in (and unpublished), check whether client has permission to view activity
-                return permissions.check(res.locals.session.user, {
+                return checkPermission(res.locals.session.user, {
                     type: "ACTIVITY_VIEW",
                     value: singleActivity.id
                 }).then(function(result: boolean): ActivityWeb {
@@ -145,7 +145,7 @@ router.route("/")
         }
 
         // Check whether the client has permission to organize events
-        permissions.check(res.locals.session.user, {
+        checkPermission(res.locals.session.user, {
             type: "GROUP_ORGANIZE",
             value: activity.organizer
         }).then(function(result: boolean): any {
@@ -173,7 +173,7 @@ router.route("/")
             }).catch(function(err: Error): void {
                 console.error(err);
             });
-        }).done();
+        });
     });
 
 // This route is for handling pictures on activities.
@@ -188,7 +188,7 @@ router.route("/pictures/:id")
         }
 
         // Check permissions
-        return permissions.check(res.locals.session.user, {
+        return checkPermission(res.locals.session.user, {
             type: "ACTIVITY_EDIT",
             value: req.params.id
         }).then(function(result: boolean): any {
@@ -248,7 +248,7 @@ router.route("/manage")
 
             // For every activity, check if the client is allowed to edit it
             const promises = activities.map(function(singleActivity: ActivityWeb): any {
-                return permissions.check(res.locals.session.user, {
+                return checkPermission(res.locals.session.user, {
                     type: "ACTIVITY_EDIT",
                     value: singleActivity.id
                 }).then(function(result: boolean): ActivityWeb {
@@ -372,7 +372,7 @@ router.route("/:id")
         const user = res.locals.session ? res.locals.session.user : null;
 
         // Check if client has permission to view the activity
-        permissions.check(user, {type: "ACTIVITY_VIEW", value: req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "ACTIVITY_VIEW", value: req.params.id}).then(function(result: boolean): any {
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
 
@@ -380,7 +380,7 @@ router.route("/:id")
             const activity = ActivityWeb.getWebModelFromDbModel(res.locals.activity);
 
             res.send(activity);
-        }).done();
+        });
     })
 
     /**
@@ -391,7 +391,7 @@ router.route("/:id")
         const userId: number = res.locals.session ? res.locals.session.user : null;
 
         // Check if client has permission to edit the activity
-        permissions.check(userId, {
+        checkPermission(userId, {
             type: "ACTIVITY_EDIT",
             value: res.locals.activity.id
         }).then(function(result: boolean): any {
@@ -419,7 +419,7 @@ router.route("/:id")
                     console.error(err);
                 });
             });
-        }).done();
+        });
     })
 
     /*
@@ -430,7 +430,7 @@ router.route("/:id")
         const user = res.locals.session ? res.locals.session.user : null;
 
         // Check if the client has permission to edit the activity
-        permissions.check(user, {
+        checkPermission(user, {
             type: "ACTIVITY_EDIT",
             value: res.locals.activity.id
         }).then(function(result: boolean): any {

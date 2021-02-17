@@ -3,7 +3,7 @@ import express, {Request, Response, Router} from "express";
 import {Group} from "../models/database/group.model";
 import {User} from "../models/database/user.model";
 
-import {requireAll, check} from "../permissions";
+import {requireAll, checkPermission} from "../permissions";
 import {GroupWeb} from "../models/web/group.web.model";
 
 const router: Router = express.Router();
@@ -44,7 +44,7 @@ router.route("/")
         }
 
         // Checks if the client has permission to create a group
-        check(res.locals.session.user, {
+        checkPermission(res.locals.session.user, {
             type: "GROUP_CREATE",
             value: req.body.organizer
         }).then(function(result: boolean): any {
@@ -96,7 +96,7 @@ router.route("/:id")
         const user: number = res.locals.session ? res.locals.session.user : null;
 
         // Check if client has permission to view the group
-        check(user, {type: "GROUP_VIEW", value: req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "GROUP_VIEW", value: req.params.id}).then(function(result: boolean): any {
 
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
@@ -118,7 +118,7 @@ router.route("/:id")
         const user: number = res.locals.session ? res.locals.session.user : null;
 
         // Check if client has permission to manage groups
-        check(user, {
+        checkPermission(user, {
             type: "GROUP_MANAGE",
             value: res.locals.group.id
         }).then(function(result: boolean): any {
@@ -159,7 +159,7 @@ router.route("/:id")
         const user: number = res.locals.session ? res.locals.session.user : null;
 
         // Check if client has permission to manage groups
-        check(user, {
+        checkPermission(user, {
             type: "GROUP_MANAGE",
             value: res.locals.group.id
         }).then(function(result: boolean): any {
