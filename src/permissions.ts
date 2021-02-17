@@ -16,16 +16,22 @@ import {Role} from "./models/database/role.model";
  */
 export function check(user: User | number, scope: any): Promise<boolean> {
     return resolveUserAndRole(user)
-            .then(function(res: {dbUser: User, role: Role, loggedIn: boolean}): Promise<boolean> | boolean {
+            .then(function(res: {dbUser: User, role: Role, loggedIn: boolean}): Promise<boolean> {
 
         // Determine rule based on context
         switch (scope.type) {
             case "PAGE_VIEW":
-                return res.role.PAGE_VIEW;
+                return new Promise(function(resolve): void {
+                    resolve(res.role.PAGE_VIEW);
+                });
             case "PAGE_MANAGE":
-                return res.role.PAGE_MANAGE;
+                return new Promise(function(resolve): void {
+                    resolve(res.role.PAGE_MANAGE);
+                });
             case "USER_CREATE":
-                return res.role.USER_CREATE;
+                return new Promise(function(resolve): void {
+                    resolve(res.role.USER_CREATE);
+                });
             case "USER_VIEW":
                 return User.findByPk(scope.value).then(function(user_considered: User): boolean {
                     if (!user_considered) {
@@ -36,7 +42,9 @@ export function check(user: User | number, scope: any): Promise<boolean> {
                     return ownAccount || res.role.USER_VIEW_ALL;
                 });
             case "USER_MANAGE":
-                return res.role.USER_MANAGE;
+                return new Promise(function(resolve): void {
+                    resolve(res.role.USER_MANAGE);
+                });
             case "CHANGE_PASSWORD":
                 return User.findByPk(scope.value).then(function(user_considered: User): boolean {
                     if (!user_considered) {
@@ -47,12 +55,18 @@ export function check(user: User | number, scope: any): Promise<boolean> {
                     return ownAccount || res.role.CHANGE_ALL_PASSWORDS;
                 });
             case "GROUP_VIEW":
-                return res.role.GROUP_VIEW;
+                return new Promise(function(resolve): void {
+                    resolve(res.role.GROUP_VIEW);
+                });
             case "GROUP_MANAGE":
-                return res.role.GROUP_MANAGE;
+                return new Promise(function(resolve): void {
+                    resolve(res.role.GROUP_MANAGE);
+                });
             case "GROUP_ORGANIZE":
                 if (!res.loggedIn) {
-                    return false;
+                    return new Promise(function(resolve): void {
+                        resolve(false);
+                    });
                 }
                 return Group.findByPk(scope.value).then(function(group: Group): boolean {
                     // Check whether group is allowed to organize
@@ -92,7 +106,7 @@ export function check(user: User | number, scope: any): Promise<boolean> {
                     return organizing || res.role.ACTIVITY_MANAGE;
                 });
             default:
-                throw new Error("Unknown scope type");
+                throw new Error("permissions.check: Unknown scope type: " + scope.type);
         }
     });
 }
