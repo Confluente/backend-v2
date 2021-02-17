@@ -63,5 +63,18 @@ describe("activity.route.ts '/api/activities'", () => {
                 }
             });
         });
+
+        it("Check error throwing on non existent user number", (done) => {
+            resolveUserAndRole(10)
+                .then(function(_: any): void {
+                    done(new Error());
+                }).catch(function(err): void {
+                    if (err === "permissions.resolveUserAndRole: user could not be resolved") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+        });
     });
 });
