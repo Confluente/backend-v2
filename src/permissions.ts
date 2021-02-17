@@ -133,14 +133,14 @@ export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User,
                 // If no user associated, reject promise
                 if (dbUser === null) {
                     reject("permissions.resolveUserAndRole: user could not be resolved");
+                } else {
+                    // If user associated, then find role associated to user.
+                    return Role.findByPk(dbUser.roleId).then(function(role: Role): any {
+
+                        // Because of db constraints, role must exist, no need for error checking.
+                        resolve({dbUser: dbUser, role: role, loggedIn: loggedIn});
+                    });
                 }
-
-                // If user associated, then find role associated to user.
-                return Role.findByPk(dbUser.roleId).then(function(role: Role): any {
-
-                    // Because of db constraints, role must exist, no need for error checking.
-                    resolve({dbUser: dbUser, role: role, loggedIn: loggedIn});
-                });
             });
         } else {
             // If user is a User model instance, then find the associated role.
