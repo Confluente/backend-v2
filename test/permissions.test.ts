@@ -96,7 +96,19 @@ describe("permissions.ts", () => {
             checkPermission(null, { type: "UNKNOWN_PERMISSION_THINGY" }).then(function(_: boolean): void {
                 done(new Error());
             }).catch(function(err: Error): void {
-                if (err.message === "permissions.check: Unknown scope type: UNKNOWN_PERMISSION_THINGY") {
+                if (err.message === "permissions.checkPermission: Unknown scope type: UNKNOWN_PERMISSION_THINGY") {
+                    done();
+                } else {
+                    done(new Error());
+                }
+            });
+        });
+
+        it("Should throw error when scope type is null", (done) => {
+            checkPermission(null, { type: null }).then(function(_: boolean): void {
+                done(new Error());
+            }).catch(function(err: Error): void {
+                if (err.message === "permissions.checkPermission: scope.type is missing") {
                     done();
                 } else {
                     done(new Error());
@@ -171,7 +183,7 @@ describe("permissions.ts", () => {
         describe("CHANGE_PASSWORD", () => {
 
             it("User should be able to change their own password", (done) => {
-                checkPermission(4, { type: "CHANGE_PASSWORD", value: 4 }).then(function(res: boolean): void {
+                checkPermission(6, { type: "CHANGE_PASSWORD", value: 6 }).then(function(res: boolean): void {
                     if (res) {
                         done();
                     } else {
@@ -392,5 +404,74 @@ describe("permissions.ts", () => {
 
         });
 
+        describe("ACTIVITY_EDIT", () => {
+
+            it("Should throw error when scope value is undefined", (done) => {
+                checkPermission(1, { type: "ACTIVITY_EDIT" }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: ACTIVITY_EDIT requires a scope but was not " +
+                        "given one.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("Should return false if not logged in", (done) => {
+                checkPermission(null, { type: "ACTIVITY_EDIT", value: 2 }).then(function(res: boolean): void {
+                    if (!res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("Should throw error if requested for non existing activity", (done) => {
+                checkPermission(1, { type: "ACTIVITY_EDIT", value: 100 }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: ACTIVITY_EDIT permission was requested for " +
+                        "non existing activity.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("Should return false if member is not in organizing group", (done) => {
+                checkPermission(5, { type: "ACTIVITY_EDIT", value: 1 }).then(function(res: boolean): void {
+                    if (!res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("Should return true if member is in organizing group", (done) => {
+                checkPermission(4, { type: "ACTIVITY_EDIT", value: 1 }).then(function(res: boolean): void {
+                    if (res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("Should return true if user has activity manage rights", (done) => {
+                checkPermission(3, { type: "ACTIVITY_EDIT", value: 1 }).then(function(res: boolean): void {
+                    if (res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+        });
     });
 });

@@ -75,8 +75,8 @@ export function getPasswordHashSync(password: string, salt: string): Buffer {
  */
 export function authenticate(email: string, password: string): any {
     email = email.toLowerCase();
-    return User.findOne({where: {email}}).then(function(user: User): any {
-        if (!user) {
+    return User.findOne({where: {email}}).then(function(user: User | null): any {
+        if (user === null) {
             throw new Error("Email address " + email + " not associated to any account.");
         }
 

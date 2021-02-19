@@ -142,21 +142,49 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                     return organizing || res.role.ACTIVITY_VIEW_ALL_UNPUBLISHED;
                 });
             case "ACTIVITY_EDIT":
-                return Activity.findByPk(scope.value).then(function(activity: Activity): boolean {
-                    // Activities allowed to be edited by organizers
-                    const organizing = res.loggedIn ? res.dbUser.groups.some(
-                        function(dbGroup: Group & {UserGroup: any}): boolean {
-                            return dbGroup.id === activity.organizer.id;
-                        })  : false;
+                // If requested without specified scope value, throw error.
+                if (scope.value === undefined) {
+                    throw new Error("permissions.checkPermission: ACTIVITY_EDIT requires a scope but was not given " +
+                        "one.");
+                }
+
+                // If you are not logged in, you are not allowed to edit the activity.
+                if (!res.loggedIn) {
+                    return new Promise(function(resolve): void {
+                        resolve(false);
+                    });
+                }
+
+                return Activity.findByPk(scope.value, {include: [{model: Group, include: [User]}]})
+                        .then(function(activity: Activity | null): boolean {
+
+                    // If requested for non existing activity, throw error.
+                    if (activity === null) {
+                        throw new Error("permissions.checkPermission: ACTIVITY_EDIT permission was requested for " +
+                            "non existing activity.");
+                    }
+
+                    // Activities allowed to be edited by organizers1
+                    // Check if user is member of the group that organizes this activity
+                    const organizing = activity.organizer.members.some(
+                        function(us: User & {UserGroup: any}): boolean {
+                            return us.id === res.dbUser.id;
+                        });
+
+                    // Return if member is organizing, or whether member is allowed to manage activities.
                     return organizing || res.role.ACTIVITY_MANAGE;
                 });
             default:
+                if (scope.type === undefined || scope.type === null) {
+                    throw new Error("permissions.checkPermission: scope.type is missing");
+                }
+
                 if ((res.role as any)[scope.type] !== undefined) {
                     return new Promise(function(resolve): void {
                         resolve((res.role as any)[scope.type]);
                     });
                 } else {
-                    throw new Error("permissions.check: Unknown scope type: " + scope.type);
+                    throw new Error("permissions.checkPermission: Unknown scope type: " + scope.type);
                 }
         }
     });
