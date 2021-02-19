@@ -210,6 +210,14 @@ export const page = {
     author: "Marijn Stijvers"
 };
 
+// Not originally in the database.
+export const newPage = {
+    url: "newcoolpage",
+    title: "new cool page",
+    content: "new cool content",
+    author: "Bestest newest author"
+};
+
 export const roleSuperAdmin = {
     id: 1,
     name: "Super admin",
