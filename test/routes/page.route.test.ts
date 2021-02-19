@@ -1,5 +1,5 @@
 import {TestFactory} from "../testFactory";
-import {page} from "../test.data";
+import {page, newPage} from "../test.data";
 
 const factory: TestFactory = new TestFactory();
 
@@ -28,7 +28,7 @@ describe("page.route.ts '/api/page'", () => {
     describe("Get a specific page", () => {
         it("Returns error without proper permissions", (done) => {
             factory.agents.zeroPermissionsAgent.get("/api/page/" + page.url)
-                .expect(200).then(function(_: any): any {
+                .expect(403).then(function(_: any): any {
                 done();
             }).catch(function(_: any): any {
                 done(new Error());
@@ -61,9 +61,42 @@ describe("page.route.ts '/api/page'", () => {
             });
         });
 
-        // it("Correctly create new page", (done) => {
-        //    factory.agents.superAdminAgent.put("/api/page" + page.url)
-        // });
+        it("Correctly create new page", (done) => {
+           factory.agents.superAdminAgent.put("/api/page/" + newPage.url).send(newPage)
+               .expect(201).then(function(_: any): any {
+              factory.agents.superAdminAgent.get("/api/page/" + newPage.url).then(function(res: any): any {
+                  if (res.body.author === newPage.author) {
+                      done();
+                  } else {
+                      done(new Error());
+                  }
+              }).catch(function(error: any): any {
+                  done(new Error());
+              });
+           }).catch(function(_: any): any {
+               done(new Error());
+           });
+        });
+
+        it("Correctly edit existing page", (done) => {
+            const editedPage = newPage;
+            editedPage.content = "CHANGED CONTENT";
+
+            factory.agents.superAdminAgent.put("/api/page/" + newPage.url).send(editedPage)
+                .expect(201).then(function(_: any): any {
+                factory.agents.superAdminAgent.get("/api/page/" + newPage.url).then(function(res: any): any {
+                    if (res.body.author === newPage.author && res.body.content === "CHANGED CONTENT") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                }).catch(function(error: any): any {
+                    done(new Error());
+                });
+            }).catch(function(_: any): any {
+                done(new Error());
+            });
+        });
     });
 
     /**
