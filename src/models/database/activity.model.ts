@@ -5,7 +5,7 @@ import {
     AllowNull,
     Default,
     BelongsToMany,
-    Model, ForeignKey
+    Model, ForeignKey, BelongsTo
 } from 'sequelize-typescript';
 
 import {Group} from './group.model';
@@ -143,8 +143,18 @@ export class Activity extends Model {
     public participants: Array<User & {Subscription: Subscription}>;
 
     /**
-     * Stores the group that organizes this activity (one-to-many relation)
+     * Stores the id of the group that organizes this activity
      */
     @ForeignKey(() => Group)
+    @AllowNull(false)
+    @Column
+    public organizerId!: number;
+
+    /**
+     * Stores the Group that organizes this activity.
+     * By including the Group model in your query you can, via this property, directly get and access the group model
+     * associated to this activity.
+     */
+    @BelongsTo(() => Group)
     public organizer: Group;
 }

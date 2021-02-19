@@ -1,6 +1,6 @@
 import {
     AllowNull,
-    AutoIncrement,
+    AutoIncrement, BelongsTo,
     BelongsToMany,
     Column,
     DataType,
@@ -160,6 +160,14 @@ export class User extends Model<User> {
     @AllowNull(false)
     @Column
     public roleId!: number;
+
+    /**
+     * Stores the Role that this user has.
+     * By including the Role model in your query you can, via this property, directly get and access the role model
+     * associated to the user.
+     */
+    @BelongsTo(() => Role)
+    public role!: Role;
 
     /**
      * Stores the session that belongs to this user (one-to-one relation)
