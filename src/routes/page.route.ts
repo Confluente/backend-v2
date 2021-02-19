@@ -3,7 +3,7 @@ import express, {Request, Response, Router} from "express";
 import {Page} from "../models/database/page.model";
 import {PageWeb} from "../models/web/page.web.model";
 
-import {checkPermission, requireAllPermissions} from "../permissions";
+import {checkPermission} from "../permissions";
 
 const router: Router = express.Router();
 
@@ -75,9 +75,21 @@ router.route("/:url([^\?]+)")
     /**
      * Deletes a page from the database
      */
-    .delete(requireAllPermissions([{type: "PAGE_MANAGE"}]), function(req: Request, res: Response): any {
-        return Page.destroy({where: {url: req.params.url}}).then(function(result: any): any {
-            return res.sendStatus(204);
+    .delete(function(req: Request, res: Response): any {
+        // Check if client is logged in
+        const userId = res.locals.session ? res.locals.session.userId : null;
+
+        checkPermission(userId, { type: "PAGE_MANAGE" }).then(function(result: boolean): any {
+            // If false, then the client has no permission
+            if (!result) { return res.sendStatus(403); }
+
+            return Page.destroy({where: {url: req.params.url}}).then(function(_: any): any {
+                return res.sendStatus(204);
+            });
+
+        }).catch(function(err: Error): any {
+            console.error(err.name + " " + err.message);
+            res.sendStatus(400);
         });
     });
 
