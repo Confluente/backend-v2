@@ -10,7 +10,7 @@ router.route("/portraitRight/:id")
      */
     .put(function(req: Request, res: Response): any {
         // Check if user is logged in
-        const userId: number = res.locals.session ? res.locals.session.user : null;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if user id of logged in user is the same as user id for which request was send
         if (parseInt(req.params.id, undefined) !== userId) { return res.sendStatus(403); }

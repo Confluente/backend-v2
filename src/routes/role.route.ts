@@ -13,7 +13,7 @@ router.route("/")
      */
     .get(function(req: Request, res: Response, next: any): void {
         // Check if the client is logged in
-        const user = res.locals.session ? res.locals.session.user : null;
+        const user = res.locals.session ? res.locals.session.userId : null;
 
         // Check if the client has permission to manage roles
         checkPermission(user, {
@@ -68,7 +68,7 @@ router.route("/:id")
      */
     .get(function(req: Request, res: Response): any {
         // Check if client has a session
-        const user = res.locals.session ? res.locals.session.user : null;
+        const user = res.locals.session ? res.locals.session.userId : null;
 
         // If client does not have a session, he does not have permission
         if (user === null) { return res.send(403); }
@@ -105,7 +105,7 @@ router.route("/:id")
      */
     .put(function(req: Request, res: Response): any {
         // Check if client has a session
-        const user = res.locals.session ? res.locals.session.user : null;
+        const user = res.locals.session ? res.locals.session.userId : null;
 
         // If client does not have a session, he does not have permission
         if (user === null) { return res.send(403); }
@@ -145,7 +145,7 @@ router.route("/:id")
      */
     .delete(function(req: Request, res: Response): any {
         // Check if client has a session
-        const user = res.locals.session ? res.locals.session.user : null;
+        const user = res.locals.session ? res.locals.session.userId : null;
 
         // If client does not have a session, he does not have permission
         if (user === null) { return res.send(403); }

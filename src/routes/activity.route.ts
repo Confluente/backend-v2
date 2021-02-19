@@ -93,8 +93,8 @@ router.route("/")
                 {model: Group, attributes: ["id", "displayName", "fullName", "email"]},
                 {model: User, attributes: ["id", "displayName", "firstName", "lastName", "email"]}
             ]
-        }).then(function(foundActivities: Activity[]): any {
-            const activities = ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
+        }).then(async function(foundActivities: Activity[]): Promise<any> {
+            const activities = await ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
 
             // Check for every activity if the client can view them
             const promises = activities.map(function(singleActivity: ActivityWeb): any {
@@ -241,10 +241,10 @@ router.route("/manage")
                 as: "Organizer",
                 attributes: ["id", "displayName", "fullName", "email"]
             }]
-        }).then(function(foundActivities: Activity[]): void {
+        }).then(async function(foundActivities: Activity[]): Promise<void> {
 
             // Transform all db activities into web activities
-            const activities: ActivityWeb[] = ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
+            const activities: ActivityWeb[] = await ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
 
             // For every activity, check if the client is allowed to edit it
             const promises = activities.map(function(singleActivity: ActivityWeb): any {
@@ -275,7 +275,7 @@ router.route("/subscriptions/:id")
      */
     .post(function(req: Request, res: Response, next: any): any {
         // check if client is logged in
-        const userId: number = res.locals.session ? res.locals.session.user : null;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // If client is not logged in, send 403
         if (userId == null) { return res.status(403).send({status: "Not logged in"}); }
@@ -308,7 +308,7 @@ router.route("/subscriptions/:id")
      */
     .delete(function(req: Request, res: Response): any {
         // checking if client is logged in
-        const userId: number = res.locals.session ? res.locals.session.user : null;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // If client is not logged in, send 403
         if (userId == null) { return res.status(403).send({status: "Not logged in"}); }
@@ -369,7 +369,7 @@ router.route("/:id")
      */
     .get(function(req: Request, res: Response): any {
         // Check if client is logged in
-        const user = res.locals.session ? res.locals.session.user : null;
+        const user = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to view the activity
         checkPermission(user, {type: "ACTIVITY_VIEW", value: +req.params.id}).then(function(result: boolean): any {
@@ -388,7 +388,7 @@ router.route("/:id")
      */
     .put(function(req: Request, res: Response): void {
         // Check if client is logged in
-        const userId: number = res.locals.session ? res.locals.session.user : null;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to edit the activity
         checkPermission(userId, {
@@ -427,7 +427,7 @@ router.route("/:id")
      */
     .delete(function(req: Request, res: Response): void {
         // Check if the client is logged in
-        const user = res.locals.session ? res.locals.session.user : null;
+        const user = res.locals.session ? res.locals.session.userId : null;
 
         // Check if the client has permission to edit the activity
         checkPermission(user, {

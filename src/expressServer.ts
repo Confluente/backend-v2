@@ -98,7 +98,7 @@ export async function setupServer(server: Express): Promise<void> {
 
 
     server.use(function(req: any, res: any, next: any): any {
-        const user: any = res.locals.session ? res.locals.session.user : null;
+        const user: any = res.locals.session ? res.locals.session.userId : null;
         checkPermission(user, {type: "PAGE_VIEW", value: req.path})
             .then(function(hasPermission: any): any {
                 if (!hasPermission) {

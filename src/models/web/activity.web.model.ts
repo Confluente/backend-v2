@@ -139,11 +139,11 @@ export class ActivityWeb extends AbstractWebModel {
      */
     public organizer!: GroupWeb;
 
-    public static getArrayOfWebModelsFromArrayOfDbModels(dbModels: Model[]): ActivityWeb[] {
+    public static async getArrayOfWebModelsFromArrayOfDbModels(dbModels: Model[]): Promise<ActivityWeb[]> {
         const transformed: ActivityWeb[] = [];
 
         for (const obj of dbModels) {
-            this.getWebModelFromDbModel(obj).then(function(aw: ActivityWeb): void {
+            await this.getWebModelFromDbModel(obj).then(function(aw: ActivityWeb): void {
                 transformed.push(aw);
             });
         }

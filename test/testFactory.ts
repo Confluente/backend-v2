@@ -50,7 +50,7 @@ export class TestFactory {
         this._app = express();
         this._connection = await this.db.sync({force: true});
         await setupServer(this.app);
-        this._server = createServer(this.app).listen("80");
+        this._server = createServer(this.app).listen("3000");
 
         if (inTestData) {
             this.agents = await initTestData(this.app);

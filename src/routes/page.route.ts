@@ -3,7 +3,7 @@ import express, {Request, Response, Router} from "express";
 import {Page} from "../models/database/page.model";
 import {PageWeb} from "../models/web/page.web.model";
 
-import {requireAllPermissions} from "../permissions";
+import {checkPermission, requireAllPermissions} from "../permissions";
 
 const router: Router = express.Router();
 
@@ -70,16 +70,26 @@ router.get("/:url/view", function(req: Request, res: Response): any {
     });
 });
 
-router.get("/", requireAllPermissions([{type: "PAGE_MANAGE"}]),
-    function(req: Request, res: Response): any {
-    return Page.findAll({
-        attributes: ["url", "title", "content", "author"]
-    }).then(function(foundPages: Page[]): void {
+router.get("/", function(req: Request, res: Response): any {
+    // Check if client is logged in
+    const user = res.locals.session ? res.locals.session.userId : null;
 
-        // Transform dbPages to webPages
-        const pages = PageWeb.getArrayOfWebModelsFromArrayOfDbModels(foundPages);
+    checkPermission(user, {
+        type: "PAGE_MANAGE",
+    }).then(function(result: boolean): any {
+        // If no result, then the client has no permission
+        if (!result) { return res.sendStatus(403); }
 
-        res.send(pages);
+        // Retrieve all pages
+        Page.findAll({
+            attributes: ["url", "title", "content", "author"]
+        }).then(async function(foundPages: Page[]): Promise<void> {
+
+            // Transform dbPages to webPages
+            const pages = await PageWeb.getArrayOfWebModelsFromArrayOfDbModels(foundPages);
+
+            res.send(pages);
+        });
     });
 });
 
