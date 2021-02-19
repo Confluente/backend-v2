@@ -153,6 +153,19 @@ describe("permissions.ts", () => {
                     }
                 });
             });
+
+            it("USER_VIEW should throw error when requested without source user", (done) => {
+                checkPermission(null, { type: "USER_VIEW", value: 2 }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: USER_VIEW requires a user for which the request is" +
+                        " made, but non was given") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
         });
 
         describe("CHANGE_PASSWORD", () => {
@@ -211,6 +224,20 @@ describe("permissions.ts", () => {
                     }
                 });
             });
+
+            it("CHANGE_PASSWORD should throw error if no user is passed", (done) => {
+                checkPermission(null, { type: "CHANGE_PASSWORD", value: 2 }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: CHANGE_PASSWORD requires a user for which the " +
+                        "request is made, but non was given.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
         });
 
         describe("GROUP_ORGANIZE", () => {
@@ -291,6 +318,58 @@ describe("permissions.ts", () => {
                 }).catch(function(err: Error): void {
                     if (err.message === "permissions.checkPermission: ACTIVITY_VIEW requires a scope value but was " +
                         "not given one.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("ACTIVITY_VIEW should return true if activity is published", (done) => {
+                checkPermission(null, { type: "ACTIVITY_VIEW", value: 2 }).then(function(res: boolean): void {
+                    if (res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("ACTIVITY_VIEW should return false for unpublished activities when user is not logged in", (done) => {
+                checkPermission(null, { type: "ACTIVITY_VIEW", value: 1 }).then(function(res: boolean): void {
+                    if (!res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("ACTIVITY_VIEW should return true for unpublished activities " +
+                "when user is organizing the act", (done) => {
+                checkPermission(4, { type: "ACTIVITY_VIEW", value: 1 }).then(function(res: boolean): void {
+                    if (res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("ACTIVITY_VIEW should return false for unpublished activity when user is not organizing " +
+                "the activity", (done) => {
+                checkPermission(5, { type: "ACTIVITY_VIEW", value: 1 }).then(function(res: boolean): void {
+                    if (!res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("ACTIVITY_VIEW should return true if user is allowed to see all unpublished activities", (done) => {
+                checkPermission(1, { type: "ACTIVITY_VIEW", value: 1 }).then(function(res: boolean): void {
+                    if (res) {
                         done();
                     } else {
                         done(new Error());
