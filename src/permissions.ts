@@ -30,6 +30,12 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                         "one");
                 }
 
+                // If request is submitted without a source user, throw error
+                if (res.dbUser === null) {
+                    throw new Error("permissions.checkPermission: USER_VIEW requires a user for which the request is" +
+                        " made, but non was given");
+                }
+
                 return User.findByPk(scope.value).then(function(user_considered: User | null): boolean {
                     // If requested for non existing user, throw error.
                     if (user_considered === null) {
@@ -46,6 +52,12 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                 if (scope.value === undefined) {
                     throw new Error("permissions.checkPermission: CHANGE_PASSWORD requires a scope value but was not " +
                         "given one.");
+                }
+
+                // If request is submitted without a source user, throw error.
+                if (res.dbUser === null) {
+                    throw new Error("permissions.checkPermission: CHANGE_PASSWORD requires a user for which the " +
+                        "request is made, but non was given.");
                 }
 
                 return User.findByPk(scope.value).then(function(user_considered: User | null): boolean {
@@ -101,21 +113,32 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                         "given one.");
                 }
 
-                return Activity.findByPk(scope.value).then(function(activity: Activity | null): boolean {
+                return Activity.findByPk(scope.value, {include: [{model: Group, include: [User]}]})
+                        .then(function(activity: Activity | null): boolean {
                     // If requested for non existing activity, throw error.
                     if (activity === null) {
                         throw new Error("permissions.checkPermission: ACTIVITY_VIEW permission was requested for non " +
                             "existing activity.");
                     }
 
+                    // If activity is published, return whether the user is allowed to see published activities.
                     if (activity.published) {
                         return res.role.ACTIVITY_VIEW_PUBLISHED;
                     }
-                    // Unpublished activities allowed to be seen by organizers
-                    const organizing = res.loggedIn ? res.dbUser.groups.some(
-                        function(dbGroup: Group & {UserGroup: any}): boolean {
-                            return dbGroup.id === activity.organizer.id;
-                    }) : false;
+
+                    // If not logged in and unpublished, you are not allowed to view the activity
+                    if (!res.loggedIn) {
+                        return false;
+                    }
+
+                    // Unpublished activities allowed to be seen by organizers.
+                    // Check if user is member of the group that organizes this activity.
+                    const organizing = activity.organizer.members.some(
+                        function(us: User & {UserGroup: any}): boolean {
+                            return us.id === res.dbUser.id;
+                        });
+
+                    // Return if member is organizing, or whether member is allowed to see all unpublished activities.
                     return organizing || res.role.ACTIVITY_VIEW_ALL_UNPUBLISHED;
                 });
             case "ACTIVITY_EDIT":
@@ -148,11 +171,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
  */
 export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User, role: Role, loggedIn: boolean}> {
     return new Promise(function(resolve, reject): any {
-        let loggedIn = true;
         if (!user) {
-
-            // User undefined
-            loggedIn = false;
 
             // Find role associated to 'not logged in' user.
             Role.findOne({
@@ -166,7 +185,7 @@ export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User,
                         "Be sure to have a correctly initialized database");
                 }
 
-                resolve({dbUser: null, role: role, loggedIn: loggedIn});
+                resolve({dbUser: null, role: role, loggedIn: false});
             });
         } else if (typeof user === 'number') {
             // If user is a number, then find the User model instance associated to it.
@@ -180,14 +199,14 @@ export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User,
                     return Role.findByPk(dbUser.roleId).then(function(role: Role): any {
 
                         // Because of db constraints, role must exist, no need for error checking.
-                        resolve({dbUser: dbUser, role: role, loggedIn: loggedIn});
+                        resolve({dbUser: dbUser, role: role, loggedIn: true});
                     });
                 }
             });
         } else {
             // If user is a User model instance, then find the associated role.
             return Role.findByPk(user.roleId).then(function(role: Role): any {
-                resolve({dbUser: user, role: role, loggedIn: loggedIn});
+                resolve({dbUser: user, role: role, loggedIn: true});
             });
         }
     });
