@@ -100,6 +100,34 @@ describe("page.route.ts '/api/page'", () => {
     });
 
     /**
+     * Checks if deleting a page works.
+     */
+    describe("Deleting a page", () => {
+        it("Returns error without proper permissions", (done) => {
+            factory.agents.zeroPermissionsAgent.delete("/api/page/" + newPage.url)
+                .expect(403).then(function(_: any): any {
+                done();
+            }).catch(function(_: any): any {
+                done(new Error());
+            });
+        });
+
+        it("Deletes correct page", (done) => {
+            factory.agents.superAdminAgent.delete("/api/page/" + newPage.url)
+                .expect(204).then(function(_: any): any {
+                factory.agents.superAdminAgent.get("/api/page/" + newPage.url)
+                    .expect(404).then(function(res: any): any {
+                    done();
+                }).catch(function(error: any): any {
+                    done(new Error());
+                });
+            }).catch(function(_: any): any {
+                done(new Error());
+            });
+        });
+    });
+
+    /**
      * Checks if retrieving all pages works.
      */
     describe("Retrieving all pages", () => {
