@@ -50,6 +50,23 @@ describe("page.route.ts '/api/page'", () => {
     });
 
     /**
+     * Checks if editing a page works.
+     */
+    describe("Editing a page", () => {
+        it("Returns error without proper permissions", (done) => {
+            factory.agents.zeroPermissionsAgent.put("/api/page/newurl").expect(403).then(function(_: any): any {
+                done();
+            }).catch(function(_: any): any {
+                done(new Error());
+            });
+        });
+
+        // it("Correctly create new page", (done) => {
+        //    factory.agents.superAdminAgent.put("/api/page" + page.url)
+        // });
+    });
+
+    /**
      * Checks if retrieving all pages works.
      */
     describe("Retrieving all pages", () => {

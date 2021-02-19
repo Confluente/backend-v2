@@ -44,20 +44,30 @@ router.route("/:url([^\?]+)")
     /**
      * Edits a page
      */
-    .put(requireAllPermissions([{type: "PAGE_MANAGE"}]), function(req: Request, res: Response): any {
+    .put(function(req: Request, res: Response): any {
+        // Check if client is logged in
+        const user = res.locals.session ? res.locals.session.userId : null;
 
-        // Stores the edit parameters
-        const values: any = req.body;
+        checkPermission(user, {
+            type: "PAGE_MANAGE",
+        }).then(function(result: boolean): any {
+            // If no result, then the client has no permission
+            if (!result) { return res.sendStatus(403); }
 
-        if (!req.body.url || req.body.url === req.params.url) {
-            values.url = req.params.url;
-        } else {
-            throw new Error("Not implemented: change page.url");
-        }
 
-        return Page.upsert(values).then(function(result: any): any {
-            return Page.findAll().then(function(foundPages: Page[]): any {
-                return res.status(201).send(foundPages);
+            // Stores the edit parameters
+            const values: any = req.body;
+
+            if (!req.body.url || req.body.url === req.params.url) {
+                values.url = req.params.url;
+            } else {
+                throw new Error("Not implemented: change page.url");
+            }
+
+            return Page.upsert(values).then(function(pageResult: any): any {
+                return Page.findAll().then(function(foundPages: Page[]): any {
+                    return res.status(201).send(foundPages);
+                });
             });
         });
     })
