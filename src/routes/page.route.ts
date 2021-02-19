@@ -12,20 +12,32 @@ router.route("/:url([^\?]+)")
      * Gets a specific page from the database
      */
     .get(function(req: Request, res: Response): any {
-        Page.findOne({
-            where: {
-                url: req.params.url
-            },
-            attributes: ["url", "title", "content", "author"]
-        }).then(function(page: Page): any {
+        // Check if client is logged in
+        const user = res.locals.session ? res.locals.session.userId : null;
 
-            // If page is not found, send 404
-            if (!page) { return res.sendStatus(404); }
+        checkPermission(user, {
+            type: "PAGE_VIEW",
+        }).then(function(result: boolean): any {
+            // If no result, then the client has no permission
+            if (!result) { return res.sendStatus(403); }
 
-            const webPage = PageWeb.getWebModelFromDbModel(page);
+            Page.findOne({
+                where: {
+                    url: req.params.url
+                },
+                attributes: ["url", "title", "content", "author"]
+            }).then(async function(page: Page): Promise<any> {
 
-            // Send page to the client
-            res.send(webPage);
+                // If page is not found, send 404
+                if (!page) {
+                    return res.sendStatus(404);
+                }
+
+                const webPage = await PageWeb.getWebModelFromDbModel(page);
+
+                // Send page to the client
+                res.send(webPage);
+            });
         });
     })
 
