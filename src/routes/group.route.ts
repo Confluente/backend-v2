@@ -1,20 +1,33 @@
-import express, {Request, Response, Router} from "express";
+import express, {NextFunction, Request, Response, Router} from "express";
 
 import {Group} from "../models/database/group.model";
 import {User} from "../models/database/user.model";
 
-import {requireAllPermissions, checkPermission} from "../permissions";
+import {checkPermission} from "../permissions";
 import {GroupWeb} from "../models/web/group.web.model";
 
 const router: Router = express.Router();
 
 router.route("/")
-    .all(requireAllPermissions([{type: "GROUP_MANAGE"}]))
+    .all(function(req: Request, res: Response, next: NextFunction): void {
+        // Check if client is logged in
+        const userId = res.locals.session ? res.locals.session.userId : null;
+
+        checkPermission(userId, { type: "GROUP_MANAGE" }).then(function(result: boolean): any {
+            // If false then return 403
+            if (!result) { return res.sendStatus(403); }
+
+            next();
+        }).catch(function(_: Error): any {
+            // Bad request
+            return res.sendStatus(400);
+        });
+    })
 
     /**
      * Gets all groups from the database
      */
-    .get(function(req: Request, res: Response, next: any): void {
+    .get(function(req: Request, res: Response): void {
         Group.findAll({
             attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type", "createdAt"],
             order: [
@@ -33,7 +46,7 @@ router.route("/")
     /**
      * Creates a new group
      */
-    .post(function(req: Request, res: Response, next: any): any {
+    .post(function(req: Request, res: Response): any {
 
         // Checks if the client is logged in
         if (!res.locals.session) { return res.sendStatus(401); }
@@ -53,7 +66,7 @@ router.route("/")
             if (!result) { return res.sendStatus(403); }
 
             // Create group in the database
-            return Group.create(req.body).then(function(createdGroup: Group): void {
+            return Group.create(req.body).then(function(_: Group): void {
                 // Send created group back to the client
                 res.status(201).send(result);
             }).catch(function(err: Error): void {

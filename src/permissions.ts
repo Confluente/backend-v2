@@ -199,7 +199,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
  */
 export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User, role: Role, loggedIn: boolean}> {
     return new Promise(function(resolve, reject): any {
-        if (!user) {
+        if (user === null || user === undefined) {
 
             // Find role associated to 'not logged in' user.
             Role.findOne({
@@ -238,27 +238,4 @@ export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User,
             });
         }
     });
-}
-
-/**
- * Checks whether all given scopes (permissions) are adhered to, and returns it as middleware.
- *
- * @param scopes    Scopes to check
- */
-export function requireAllPermissions(scopes: [ {type: string, value?: number} ]): any {
-
-    return function(req: Request, res: Response, next: any): any {
-        const user = res.locals.session ? res.locals.session.userId : null;
-        const promises = scopes.map(function(scope: { type: string, value?: number }): Promise<boolean> {
-            return checkPermission(user, scope);
-        });
-        all(promises).then(function(result: any): any {
-            if (!result) {
-                return res.sendStatus(403);
-            }
-            return next();
-        }).catch(function(err: Error): void {
-            next(err);
-        }).done();
-    };
 }
