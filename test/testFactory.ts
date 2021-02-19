@@ -26,6 +26,7 @@ export class TestFactory {
         activeMemberAgent: SuperAgentTest;
         nonActiveMemberAgent: SuperAgentTest;
         nobodyUserAgent: SuperAgentTest;
+        zeroPermissionsAgent: SuperAgentTest;
     };
 
     // DB testDb

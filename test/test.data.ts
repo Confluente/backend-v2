@@ -98,6 +98,21 @@ export const nonActiveMember = {
     roleId: 3,
 };
 
+export const zeroPermissionsMember = {
+    id: 6,
+    email: "zeropermissions@student.tue.nl",
+    displayName: "Zero Permissions",
+    firstName: "Zero",
+    lastName: "Permissions",
+    honorsMembership: "member",
+    approvingHash: "da;lkfjda;fjkad;fj",
+    passwordSalt: passwordSaltExample,
+    passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    password: password,
+    approved: true,
+    roleId: 6,
+};
+
 export function getAgent(server: any): supertest.SuperAgentTest {
     const agent = request.agent(server);
 
@@ -175,7 +190,6 @@ export const publishedActivityWithSubscriptionForm = {
     subscriptionDeadline: (new Date()).setDate((new Date()).getDate() + 1),
     published: true,
     organizerId: 1
-
 };
 
 export const companyOpportunity = {
@@ -220,14 +234,14 @@ export const roleSuperAdmin = {
     ACTIVITY_MANAGE: true
 };
 
-export const roleNotLoggedIn = {
-    id: 5,
-    name: "Not logged in",
+export const zeroPermissionsRole = {
+    id: 6,
+    name: "Zero permissions",
     // Pages
-    PAGE_VIEW: true,
+    PAGE_VIEW: false,
     PAGE_MANAGE: false,
     // Users
-    USER_CREATE: true,
+    USER_CREATE: false,
     USER_VIEW_ALL: false,
     USER_MANAGE: false,
     CHANGE_ALL_PASSWORDS: false,
@@ -235,11 +249,11 @@ export const roleNotLoggedIn = {
     ROLE_VIEW: false,
     ROLE_MANAGE: false,
     // Groups
-    GROUP_VIEW: true,
+    GROUP_VIEW: false,
     GROUP_MANAGE: false,
     GROUP_ORGANIZE_WITH_ALL: false,
     // Activities
-    ACTIVITY_VIEW_PUBLISHED: true,
+    ACTIVITY_VIEW_PUBLISHED: false,
     ACTIVITY_VIEW_ALL_UNPUBLISHED: false,
     ACTIVITY_MANAGE: false
 };
@@ -257,6 +271,7 @@ const activities = [unpublishedActivity, publishedActivityWithSubscriptionForm];
 export async function initTestData(server: any): Promise<any> {
     return all([
         await Role.bulkCreate(roles),
+        await Role.create(zeroPermissionsRole),
         await User.bulkCreate(users),
         await Group.bulkCreate([organizingGroup, nonOrganizingGroup]),
         await Activity.bulkCreate(activities),
@@ -303,12 +318,14 @@ export async function initTestData(server: any): Promise<any> {
         const activeMemberAgent = getAgent(server);
         const nonActiveMemberAgent = getAgent(server);
         const nobodyUserAgent = getAgent(server);
+        const zeroPermissionsAgent = getAgent(server);
 
         await authenticate(superAdminAgent, superAdmin);
         await authenticate(adminAgent, admin);
         await authenticate(boardMemberAgent, boardMember);
         await authenticate(activeMemberAgent, activeMember);
         await authenticate(nonActiveMemberAgent, nonActiveMember);
+        await authenticate(zeroPermissionsAgent, zeroPermissionsMember);
 
         const agents = {
             superAdminAgent,
@@ -317,6 +334,7 @@ export async function initTestData(server: any): Promise<any> {
             activeMemberAgent,
             nonActiveMemberAgent,
             nobodyUserAgent,
+            zeroPermissionsAgent,
         };
 
         agents.superAdminAgent = superAdminAgent;
@@ -325,6 +343,7 @@ export async function initTestData(server: any): Promise<any> {
         agents.activeMemberAgent = activeMemberAgent;
         agents.nonActiveMemberAgent = nonActiveMemberAgent;
         agents.nobodyUserAgent = nobodyUserAgent;
+        agents.zeroPermissionsAgent = zeroPermissionsAgent;
 
         return agents;
     });
