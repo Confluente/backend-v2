@@ -265,7 +265,7 @@ export const session = {
     expires: new Date()
 };
 
-const users = [superAdmin, admin, boardMember, activeMember, nonActiveMember];
+const users = [superAdmin, admin, boardMember, activeMember, nonActiveMember, zeroPermissionsMember];
 const activities = [unpublishedActivity, publishedActivityWithSubscriptionForm];
 
 export async function initTestData(server: any): Promise<any> {
