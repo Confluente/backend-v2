@@ -95,15 +95,23 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                     return member || res.role.GROUP_ORGANIZE_WITH_ALL;
                 });
             case "ACTIVITY_VIEW":
-                return Activity.findByPk(scope.value).then(function(activity: Activity): boolean {
-                    if (!activity) {
-                        return false;
+                // If requested without specified scope value, throw error.
+                if (scope.value === undefined) {
+                    throw new Error("permissions.checkPermission: ACTIVITY_VIEW requires a scope value but was not " +
+                        "given one.");
+                }
+
+                return Activity.findByPk(scope.value).then(function(activity: Activity | null): boolean {
+                    // If requested for non existing activity, throw error.
+                    if (activity === null) {
+                        throw new Error("permissions.checkPermission: ACTIVITY_VIEW permission was requested for non " +
+                            "existing activity.");
                     }
+
                     if (activity.published) {
                         return res.role.ACTIVITY_VIEW_PUBLISHED;
                     }
                     // Unpublished activities allowed to be seen by organizers
-                    // const organizing = loggedIn ? dbUser.hasGroup(activity.OrganizerId) : false;
                     const organizing = res.loggedIn ? res.dbUser.groups.some(
                         function(dbGroup: Group & {UserGroup: any}): boolean {
                             return dbGroup.id === activity.organizer.id;

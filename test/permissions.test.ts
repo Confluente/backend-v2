@@ -283,5 +283,35 @@ describe("permissions.ts", () => {
 
         });
 
+        describe("ACTIVITY_VIEW", () => {
+
+            it("ACTIVITY_VIEW should throw error if requested without specified scope value", (done) => {
+                checkPermission(1, { type: "ACTIVITY_VIEW" }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: ACTIVITY_VIEW requires a scope value but was " +
+                        "not given one.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("ACTIVITY_VIEW should throw error if requested for non existing activity", (done) => {
+                checkPermission(1, { type: "ACTIVITY_VIEW", value: 100 }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: ACTIVITY_VIEW permission was requested for non " +
+                        "existing activity.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+        });
+
     });
 });
