@@ -192,11 +192,11 @@ export class ActivityWeb extends AbstractWebModel {
             }
         }
 
-        await Group.findByPk(Number(castedAct.organizer)).then(function(dbGroup: Group): void {
-            GroupWeb.getWebModelFromDbModel(dbGroup).then(function(gw: GroupWeb): void {
+        if (castedAct.organizer !== undefined) {
+            await GroupWeb.getWebModelFromDbModel(castedAct.organizer).then(function(gw: GroupWeb): void {
                 webActivity.organizer = gw;
             });
-        });
+        }
 
         // Save the name of the cover image
         if (castedAct.hasCoverImage) {

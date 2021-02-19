@@ -121,10 +121,8 @@ export class UserWeb extends AbstractWebModel {
             }
         }
 
-        if ((dbUser as User).roleId !== undefined && (dbUser as User).roleId !== null) {
-            const dbRole = await Role.findOne({where: {id: (dbUser as User).roleId}});
-
-            webUser.role = await RoleWeb.getWebModelFromDbModel(dbRole);
+        if ((dbUser as User).role !== undefined) {
+            webUser.role = await RoleWeb.getWebModelFromDbModel((dbUser as User).role);
 
             webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(
                 function(groupOfUser: UserGroupWeb): boolean {
