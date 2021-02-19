@@ -43,6 +43,21 @@ export class PageWeb extends AbstractWebModel {
         return webPage;
     }
 
+    // public static getArrayOfWebModelsFromArrayOfDbModels(dbPages: Model[]): PageWeb[] {
+    //     const transformed: PageWeb[] = [];
+    //
+    //     for (const obj of dbPages) {
+    //
+    //         this.getWebModelFromDbModel(obj).then(function(res: PageWeb): void {
+    //             transformed.push(res);
+    //         });
+    //         // const webModel: PageWeb = await this.getWebModelFromDbModel(obj);
+    //         // transformed.push(webModel);
+    //     }
+    //
+    //     return transformed;
+    // }
+
     public getCopyable(): string[] {
         return ["url", "title", "content", "author"];
     }
