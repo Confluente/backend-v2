@@ -1,8 +1,5 @@
 import {TestFactory} from "../testFactory";
 import {page} from "../test.data";
-import {cleanDb, cleanPages} from "../test.helper";
-import {Page} from "../../src/models/database/page.model";
-import {PageWeb} from "../../src/models/web/page.web.model";
 
 const factory: TestFactory = new TestFactory();
 
@@ -26,11 +23,38 @@ describe("page.route.ts '/api/page'", () => {
     });
 
     /**
+     * Checks if retrieving a specific page works.
+     */
+    describe("Get a specific page", () => {
+        it("Returns error without proper permissions", (done) => {
+            factory.agents.zeroPermissionsAgent.get("/api/page/" + page.url)
+                .expect(200).then(function(_: any): any {
+                done();
+            }).catch(function(_: any): any {
+                done(new Error());
+            });
+        });
+
+        it("Returns correct page", (done) => {
+            factory.agents.superAdminAgent.get("/api/page/" + page.url)
+                .expect(200).then(function(res: any): any {
+                    if (res.body.title === page.title) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+            }).catch(function(_: any): any {
+                done(new Error());
+            });
+        });
+    });
+
+    /**
      * Checks if retrieving all pages works.
      */
     describe("Retrieving all pages", () => {
         it("Returns error without proper permissions", (done) => {
-            factory.agents.nobodyUserAgent.get("/api/page/")
+            factory.agents.zeroPermissionsAgent.get("/api/page/")
                 .expect(403).then(function(_: any): any {
                 done();
             }).catch(function(_: any): any {
@@ -40,7 +64,7 @@ describe("page.route.ts '/api/page'", () => {
 
         it("Returns all pages", (done) => {
             factory.agents.superAdminAgent.get("/api/page/").expect(200).then(function(res: any): any {
-                if (res.body[0].url === "super cool url") {
+                if (res.body[0].url === page.url) {
                     done();
                 } else {
                     done(new Error());
