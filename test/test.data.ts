@@ -113,7 +113,7 @@ export const organizingGroup = {
     displayName: "OG",
     fullName: "Organizing Group",
     description: "Non empty description",
-    canOrganize: false,
+    canOrganize: true,
     email: "og@hsaconfluente.nl",
     type: "committee"
 };

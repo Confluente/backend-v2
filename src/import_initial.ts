@@ -346,7 +346,7 @@ const activities: any[] = [
         startTime: "18:00",
         endTime: "20:00",
         participationFee: 8.5,
-        OrganizerId: 2,
+        organizerId: 2,
         published: false
     },
     {
@@ -366,7 +366,7 @@ const activities: any[] = [
         required: "true#,#true#,#true#,#false",
         subscriptionDeadline: (new Date()).setDate((new Date()).getDate() + 1),
         published: true,
-        OrganizerId: 3
+        organizerId: 3
     }
 ];
 
@@ -375,8 +375,6 @@ if (process.env.NODE_ENV !== "test") {
     (async () => {
 
         await db.sync({force: true});
-        //
-
 
         all([
             await Role.bulkCreate(roles).then(function(result: any): void {
@@ -419,15 +417,6 @@ if (process.env.NODE_ENV !== "test") {
                                         console.log("Usergroup add error!");
                                         console.log(err);
                                     });
-                            });
-                        }
-                    }
-
-                    if (!userData.activities) {
-                    } else if (userData.activities && userData.activities.length === userData.answers.length) {
-                        for (let i = 0; i < userData.activities.length; i++) {
-                            Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
-                                user.$add('activities', activity, {through: {answers: userData.answers[i]}});
                             });
                         }
                     }

@@ -128,9 +128,25 @@ describe("permissions.ts", () => {
                 });
             });
 
-            it("Check if permission is false if requesting non existing user", (done) => {
-                checkPermission(1, {type: "USER_VIEW", value: 10 }).then(function(res: boolean): void {
-                    if (!res) {
+            it("USER_VIEW should throw error when requested for non existing user", (done) => {
+                checkPermission(1, {type: "USER_VIEW", value: 10 }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: USER_VIEW permission was requested for non " +
+                        "existing user.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("USER_VIEW should throw error when requested without scope value", (done) => {
+                checkPermission(1, { type: "USER_VIEW" }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: USER_VIEW requires a scope value but was not given " +
+                        "one") {
                         done();
                     } else {
                         done(new Error());
@@ -182,6 +198,119 @@ describe("permissions.ts", () => {
                     }
                 });
             });
+
+            it("CHANGE_PASSWORD should throw error if no scope value is passed", (done) => {
+                checkPermission(1, { type: "CHANGE_PASSWORD" }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: CHANGE_PASSWORD requires a scope value but was " +
+                        "not given one.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+        });
+
+        describe("GROUP_ORGANIZE", () => {
+
+            it("GROUP_ORGANIZE should always be false if not logged in", (done) => {
+                checkPermission(null, { type: "GROUP_ORGANIZE", value: 100 }).then(function(res: boolean): void {
+                    if (!res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("GROUP_ORGANIZE should be true if member is part of group that is allowed to organize", (done) => {
+                checkPermission(4, { type: "GROUP_ORGANIZE", value: 1 }).then(function(res: boolean): void {
+                    if (res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("GROUP_ORGANIZE should be false if group is not allowed to organize", (done) => {
+                checkPermission(4, { type: "GROUP_ORGANIZE", value: 2 }).then(function(res: boolean): void {
+                    if (!res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("GROUP_ORGANIZE should be true if member is allowed to organize with all groups", (done) => {
+                checkPermission(3, { type: "GROUP_ORGANIZE", value: 2 }).then(function(res: boolean): void {
+                    if (res) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("GROUP_ORGANIZE should throw error if requested for non existing group", (done) => {
+                checkPermission(1, { type: "GROUP_ORGANIZE", value: 100 }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permission.checkPermission: GROUP_ORGANIZE permission requested for non " +
+                        "existing group. scope.value: 100") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("GROUP_ORGANIZE should throw error if scope value is not submitted", (done) => {
+                checkPermission(1, { type: "GROUP_ORGANIZE" }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permission.checkPermission: GROUP_ORGANIZE requires a scope value but was " +
+                        "not given one.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+        });
+
+        describe("ACTIVITY_VIEW", () => {
+
+            it("ACTIVITY_VIEW should throw error if requested without specified scope value", (done) => {
+                checkPermission(1, { type: "ACTIVITY_VIEW" }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: ACTIVITY_VIEW requires a scope value but was " +
+                        "not given one.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
+            it("ACTIVITY_VIEW should throw error if requested for non existing activity", (done) => {
+                checkPermission(1, { type: "ACTIVITY_VIEW", value: 100 }).then(function(_: boolean): void {
+                    done(new Error());
+                }).catch(function(err: Error): void {
+                    if (err.message === "permissions.checkPermission: ACTIVITY_VIEW permission was requested for non " +
+                        "existing activity.") {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            });
+
         });
 
     });

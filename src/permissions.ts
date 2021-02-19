@@ -5,6 +5,7 @@ import {User} from "./models/database/user.model";
 import {Group} from "./models/database/group.model";
 import {Activity} from "./models/database/activity.model";
 import {Role} from "./models/database/role.model";
+import {UserGroup} from "./models/database/usergroup.model";
 
 /**
  * Checks whether user has required permissions for a given scope
@@ -23,51 +24,94 @@ export function checkPermission(user: User | number, scope: { type: string, valu
             // If scope type is not listed, default case is executed, and the permission stated in the role is returned.
             // All more complicated permissions are listed here.
             case "USER_VIEW":
-                return User.findByPk(scope.value).then(function(user_considered: User): boolean {
-                    if (!user_considered) {
-                        return false;
+                // If requested without specified scope value, throw error.
+                if (scope.value === undefined) {
+                    throw new Error("permissions.checkPermission: USER_VIEW requires a scope value but was not given " +
+                        "one");
+                }
+
+                return User.findByPk(scope.value).then(function(user_considered: User | null): boolean {
+                    // If requested for non existing user, throw error.
+                    if (user_considered === null) {
+                        throw new Error("permissions.checkPermission: USER_VIEW permission was requested for non " +
+                            "existing user.");
                     }
+
                     // Users can view their own account
                     const ownAccount: boolean = (res.dbUser.id === user_considered.id);
                     return ownAccount || res.role.USER_VIEW_ALL;
                 });
             case "CHANGE_PASSWORD":
-                return User.findByPk(scope.value).then(function(user_considered: User): boolean {
-                    if (!user_considered) {
+                // If requested without specified scope value, throw error.
+                if (scope.value === undefined) {
+                    throw new Error("permissions.checkPermission: CHANGE_PASSWORD requires a scope value but was not " +
+                        "given one.");
+                }
+
+                return User.findByPk(scope.value).then(function(user_considered: User | null): boolean {
+                    // If requested for non existing user, throw error.
+                    if (user_considered === null) {
                         throw new Error("permissions.checkPermission: Change password was requested for non existing user");
                     }
+
                     // Users can change their own password
                     const ownAccount = (res.dbUser.id === user_considered.id);
                     return ownAccount || res.role.CHANGE_ALL_PASSWORDS;
                 });
             case "GROUP_ORGANIZE":
+                // If requested without specified scope, throw error.
+                if (scope.value === undefined) {
+                    throw new Error("permission.checkPermission: GROUP_ORGANIZE requires a scope value but was not " +
+                        "given one.");
+                }
+
+                // If not logged in, resolve as false.
                 if (!res.loggedIn) {
                     return new Promise(function(resolve): void {
                         resolve(false);
                     });
                 }
-                return Group.findByPk(scope.value).then(function(group: Group): boolean {
+                return Group.findByPk(scope.value, {include: [User]})
+                        .then(function(group: Group | null): boolean {
+
+                    // If requested for non existing group, throw error.
+                    if (group === null) {
+                        throw new Error("permission.checkPermission: GROUP_ORGANIZE permission requested for non " +
+                            "existing group. scope.value: " + scope.value);
+                    }
+
                     // Check whether group is allowed to organize
                     if (!group.canOrganize) {
-                        return false;
+                        return res.role.GROUP_ORGANIZE_WITH_ALL;
                     }
-                    // If the group is allowed to organize, members are allowed to organize
-                    const member = res.dbUser.groups.some(
-                        function(dbGroup: Group & {UserGroup: any}): boolean {
-                            return dbGroup.id === group.id;
+
+                    // If the group is allowed to organize, check if user is in this group
+                    const member = group.members.some(
+                        function(mem: User & {UserGroup: any}): boolean {
+                            return mem.id === res.dbUser.id;
                         });
+
+                    // Return if user is in the group, or user is allowed to organize with all groups
                     return member || res.role.GROUP_ORGANIZE_WITH_ALL;
                 });
             case "ACTIVITY_VIEW":
-                return Activity.findByPk(scope.value).then(function(activity: Activity): boolean {
-                    if (!activity) {
-                        return false;
+                // If requested without specified scope value, throw error.
+                if (scope.value === undefined) {
+                    throw new Error("permissions.checkPermission: ACTIVITY_VIEW requires a scope value but was not " +
+                        "given one.");
+                }
+
+                return Activity.findByPk(scope.value).then(function(activity: Activity | null): boolean {
+                    // If requested for non existing activity, throw error.
+                    if (activity === null) {
+                        throw new Error("permissions.checkPermission: ACTIVITY_VIEW permission was requested for non " +
+                            "existing activity.");
                     }
+
                     if (activity.published) {
                         return res.role.ACTIVITY_VIEW_PUBLISHED;
                     }
                     // Unpublished activities allowed to be seen by organizers
-                    // const organizing = loggedIn ? dbUser.hasGroup(activity.OrganizerId) : false;
                     const organizing = res.loggedIn ? res.dbUser.groups.some(
                         function(dbGroup: Group & {UserGroup: any}): boolean {
                             return dbGroup.id === activity.organizer.id;

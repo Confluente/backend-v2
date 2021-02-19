@@ -1,8 +1,9 @@
 import {Activity} from "../../../src/models/database/activity.model";
-import {unpublishedActivity} from "../../test.data";
+import {organizingGroup, unpublishedActivity} from "../../test.data";
 import {assert} from "chai";
 import {TestFactory} from "../../testFactory";
 import {cleanActivities} from "../../test.helper";
+import {Group} from "../../../src/models/database/group.model";
 
 const factory: TestFactory = new TestFactory();
 
@@ -29,15 +30,19 @@ describe("activity.model.ts", () => {
      * Check if adding a valid instance works.
      */
     it("Adding a valid activity instance", (done) => {
-        // Try to create instance
-        Activity.create(unpublishedActivity).then(function(_: Activity): void {
-            // Successfully created, thus clean table and return successful.
-            cleanActivities();
-            done();
-        }).catch(function(_: Error): void {
-            // Failed, thus clean table and raise error.
-            cleanActivities();
-            done(new Error("Could not create instance from valid model"));
+        // First instantiate the group that organizes the activity
+        Group.create(organizingGroup).then(function(_: Group): void {
+
+            // Try to create instance
+            Activity.create(unpublishedActivity).then(function(__: Activity): void {
+                // Successfully created, thus clean table and return successful.
+                cleanActivities();
+                done();
+            }).catch(function(__: Error): void {
+                // Failed, thus clean table and raise error.
+                cleanActivities();
+                done(new Error("Could not create instance from valid model"));
+            });
         });
     });
 
