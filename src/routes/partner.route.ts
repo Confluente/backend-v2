@@ -12,7 +12,7 @@ router.route("/companyOpportunities")
         /**
          * Route for getting all companyOpportunities from the database.
          */
-        const user: User = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
         checkPermission(user, {type: "COMPANY_OPPORTUNITY_VIEW"}).then(function(result: boolean): void {
             if (!result) {
                 res.status(403).send("You do not have the permissions to view internships");
@@ -31,7 +31,7 @@ router.route("/companyOpportunities")
         /**
          * Route for creating a company opportunity.
          */
-        const user: User = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
         checkPermission(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
@@ -64,7 +64,7 @@ router.route("/companyOpportunities/:id")
         /**
          * Route for getting a specific company opportunity.
          */
-        const user: User = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
         checkPermission(user, {type: "COMPANY_OPPORTUNITY_VIEW", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
@@ -78,7 +78,7 @@ router.route("/companyOpportunities/:id")
         /**
          * Route for editing a specific company opportunity.
          */
-        const user: User = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
         checkPermission(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
@@ -98,7 +98,7 @@ router.route("/companyOpportunities/:id")
         /**
          * Route for deleting a company opportunity.
          */
-        const user: User = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
         checkPermission(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {

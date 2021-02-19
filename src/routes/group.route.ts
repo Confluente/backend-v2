@@ -44,7 +44,7 @@ router.route("/")
         }
 
         // Checks if the client has permission to create a group
-        checkPermission(res.locals.session.user, {
+        checkPermission(res.locals.session.userId, {
             type: "GROUP_CREATE",
             value: req.body.organizer
         }).then(function(result: boolean): any {
@@ -93,7 +93,7 @@ router.route("/:id")
      */
     .get(function(req: Request, res: Response): any {
         // Check if client is logged in
-        const user: number = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to view the group
         checkPermission(user, {type: "GROUP_VIEW", value: +req.params.id}).then(function(result: boolean): any {
@@ -115,7 +115,7 @@ router.route("/:id")
     .put(function(req: Request, res: Response): any {
 
         // Check if client is logged in
-        const user: number = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to manage groups
         checkPermission(user, {
@@ -156,7 +156,7 @@ router.route("/:id")
     .delete(function(req: Request, res: Response): any {
 
         // Check if client is logged in
-        const user: number = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to manage groups
         checkPermission(user, {

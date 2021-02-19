@@ -157,7 +157,7 @@ export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User,
 export function requireAllPermissions(scopes: [ {type: string, value?: number} ]): any {
 
     return function(req: Request, res: Response, next: any): any {
-        const user = res.locals.session ? res.locals.session.user : null;
+        const user = res.locals.session ? res.locals.session.userId : null;
         const promises = scopes.map(function(scope: { type: string, value?: number }): Promise<boolean> {
             return checkPermission(user, scope);
         });

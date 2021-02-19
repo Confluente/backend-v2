@@ -18,7 +18,7 @@ router.route("/")
      */
     .get(function(req: Request, res: Response): void {
         // Check if the client is logged in
-        const userId: number = res.locals.session ? res.locals.session.user : null;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if the client has permission to manage users
         checkPermission(userId, {
@@ -109,7 +109,7 @@ router.route("/:id")
      */
     .all(function(req: Request, res: Response, next: any): any {
         // Check if client has a session
-        const user: number = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
 
         // If client does not have a session, he does not have permission
         if (user === null) { return res.send(403); }
@@ -254,7 +254,7 @@ router.route("/changePassword/:id")
      */
     .put(function(req: Request, res: Response): any {
         // Check if client has a session
-        const user: number = res.locals.session ? res.locals.session.user : null;
+        const user: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to change password of user
         checkPermission(user, {type: "CHANGE_PASSWORD", value: +req.params.id}).then(function(result: boolean): any {
