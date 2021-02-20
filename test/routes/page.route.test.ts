@@ -35,6 +35,15 @@ describe("page.route.ts '/api/page'", () => {
             });
         });
 
+        it("Returns error when page does not exist", (done) => {
+           factory.agents.superAdminAgent.get("/api/page/thispagedefinitelydoesnotexist")
+               .expect(404).then(function(_: any): any {
+               done();
+           }).catch(function(_: any): any {
+               done(new Error());
+           });
+        });
+
         it("Returns correct page", (done) => {
             factory.agents.superAdminAgent.get("/api/page/" + page.url)
                 .expect(200).then(function(res: any): any {
