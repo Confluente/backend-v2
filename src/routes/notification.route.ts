@@ -15,7 +15,6 @@ router.route("/portraitRight/:id")
         if (userId === null) {
             return res.status(400).send({message: "Session needs to be active for changing portrait " +
                     "right preferences."});
-            // return res.sendStatus(400);
         }
 
         // Check if user id of logged in user is the same as user id for which request was send
