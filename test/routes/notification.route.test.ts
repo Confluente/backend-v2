@@ -41,10 +41,9 @@ describe("notification.route.ts '/api/notifications", () => {
 
             it("Should return 400 if requested for other users", (done) => {
                 factory.agents.nonActiveMemberAgent.put("/api/notifications/portraitRight/4")
-                    .expect(400)
+                    .expect(403)
                     .then(res => {
-                        if (res.body.message === "Change of portrait right settings not allowed " +
-                            "for other users.") {
+                        if (res.body.message === "User unauthorized to update requested user.") {
                             done();
                         } else {
                             done(new Error());
@@ -52,6 +51,17 @@ describe("notification.route.ts '/api/notifications", () => {
                     }).catch(res => {
                         done(new Error());
                     });
+            });
+
+            it("Board member should be able to change notification of other user", (done) => {
+                factory.agents.boardMemberAgent.put("/api/notifications/portraitRight/4")
+                    .send({answer: true})
+                    .expect(200)
+                    .then(_ => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                });
             });
 
             it("Standard case should update user", (done) => {
