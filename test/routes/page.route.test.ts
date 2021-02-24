@@ -26,12 +26,14 @@ describe("page.route.ts '/api/page'", () => {
      * Checks if retrieving a specific page works.
      */
     describe("Get a specific page", () => {
+
         it("Returns error without proper permissions", (done) => {
             factory.agents.zeroPermissionsAgent.get("/api/page/" + page.url)
-                .expect(403).then(function(_: any): any {
-                done();
-            }).catch(function(_: any): any {
-                done(new Error());
+                .expect(403)
+                .then(_ => {
+                    done();
+                }).catch(_ => {
+                    done(new Error());
             });
         });
 
