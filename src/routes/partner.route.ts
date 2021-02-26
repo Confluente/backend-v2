@@ -1,23 +1,28 @@
 import express, {Response, Request, Router} from "express";
 
 import {CompanyOpportunity} from "../models/database/company.opportunity.model";
-import {User} from "../models/database/user.model";
 
 import {checkPermission} from "../permissions";
 
 const router: Router = express.Router();
 
 router.route("/companyOpportunities")
+    /**
+     * Route for getting all companyOpportunities from the database.
+     */
     .get(function(req: Request, res: Response): void {
-        /**
-         * Route for getting all companyOpportunities from the database.
-         */
-        const user: number = res.locals.session ? res.locals.session.userId : null;
-        checkPermission(user, {type: "COMPANY_OPPORTUNITY_VIEW"}).then(function(result: boolean): void {
+        // Get user id if request has session
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
+
+        // Check permission
+        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_VIEW"}).then(function(result: boolean): void {
+
+            // If no permission, return
             if (!result) {
                 res.status(403).send("You do not have the permissions to view internships");
             }
 
+            // If permission, get all company opportunities (in order)
             CompanyOpportunity.findAll({
                 order: [
                     ["id", "ASC"]
@@ -27,21 +32,31 @@ router.route("/companyOpportunities")
             });
         });
     })
+
+    /**
+     * Route for creating a company opportunity.
+     */
     .post(function(req: Request, res: Response): any {
-        /**
-         * Route for creating a company opportunity.
-         */
-        const user: number = res.locals.session ? res.locals.session.userId : null;
-        checkPermission(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
+        // Get user id if request has session
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
+
+        // Check permission
+        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
             .then(function(result: boolean): any {
+
+            // Return if no permission
             if (!result) {
                 res.status(403).send("You do not have permissions to create a company opportunity");
             }
 
+            // Create instance
             return CompanyOpportunity.create(req.body)
                 .then(function(createdCompanyOpportunity: CompanyOpportunity): void {
+
+                // send back new instance
                 res.status(201).send(createdCompanyOpportunity);
             }).catch(function(err: Error): void {
+
                 console.error(err);
                 res.sendStatus(400).send("Something went wrong in creating the company opportunity. " +
                     "Check the logs for a detailed message.");
@@ -60,12 +75,15 @@ router.route("/companyOpportunities/:id")
             }
         });
     })
+
+    /**
+     * Route for getting a specific company opportunity.
+     */
     .get(function(req: Request, res: Response): any {
-        /**
-         * Route for getting a specific company opportunity.
-         */
-        const user: number = res.locals.session ? res.locals.session.userId : null;
-        checkPermission(user, {type: "COMPANY_OPPORTUNITY_VIEW", value: +req.params.id})
+        // Get user id if request has session
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
+
+        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_VIEW", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
@@ -74,12 +92,15 @@ router.route("/companyOpportunities/:id")
             res.send(res.locals.companyOpportunity);
         });
     })
+
+    /**
+     * Route for editing a specific company opportunity.
+     */
     .put(function(req: Request, res: Response): any {
-        /**
-         * Route for editing a specific company opportunity.
-         */
-        const user: number = res.locals.session ? res.locals.session.userId : null;
-        checkPermission(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
+        // Get user id if request has session
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
+
+        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
@@ -94,12 +115,15 @@ router.route("/companyOpportunities/:id")
             });
         });
     })
+
+    /**
+     * Route for deleting a company opportunity.
+     */
     .delete(function(req: Request, res: Response): any {
-        /**
-         * Route for deleting a company opportunity.
-         */
-        const user: number = res.locals.session ? res.locals.session.userId : null;
-        checkPermission(user, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
+        // Get user id if request has session
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
+
+        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
