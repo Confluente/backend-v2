@@ -220,30 +220,6 @@ export const newPage = {
     author: "Bestest newest author"
 };
 
-export const roleSuperAdmin = {
-    id: 1,
-    name: "Super admin",
-    // Pages
-    PAGE_VIEW: true,
-    PAGE_MANAGE: true,
-    // Users
-    USER_CREATE: true,
-    USER_VIEW_ALL: true,
-    USER_MANAGE: true,
-    CHANGE_ALL_PASSWORDS: true,
-    // Roles
-    ROLE_VIEW: true,
-    ROLE_MANAGE: true,
-    // Groups
-    GROUP_VIEW: true,
-    GROUP_MANAGE: true,
-    GROUP_ORGANIZE_WITH_ALL: true,
-    // Activities
-    ACTIVITY_VIEW_PUBLISHED: true,
-    ACTIVITY_VIEW_ALL_UNPUBLISHED: true,
-    ACTIVITY_MANAGE: true
-};
-
 export const zeroPermissionsRole = {
     id: 6,
     name: "Zero permissions",
@@ -265,7 +241,36 @@ export const zeroPermissionsRole = {
     // Activities
     ACTIVITY_VIEW_PUBLISHED: false,
     ACTIVITY_VIEW_ALL_UNPUBLISHED: false,
-    ACTIVITY_MANAGE: false
+    ACTIVITY_MANAGE: false,
+    // Partner content
+    PARTNER_VIEW: false,
+    PARTNER_MANAGE: false
+};
+
+export const newRole = {
+    name: "Random new role",
+    // Pages
+    PAGE_VIEW: false,
+    PAGE_MANAGE: true,
+    // Users
+    USER_CREATE: false,
+    USER_VIEW_ALL: true,
+    USER_MANAGE: false,
+    CHANGE_ALL_PASSWORDS: true,
+    // Roles
+    ROLE_VIEW: false,
+    ROLE_MANAGE: true,
+    // Groups
+    GROUP_VIEW: false,
+    GROUP_MANAGE: true,
+    GROUP_ORGANIZE_WITH_ALL: false,
+    // Activities
+    ACTIVITY_VIEW_PUBLISHED: true,
+    ACTIVITY_VIEW_ALL_UNPUBLISHED: false,
+    ACTIVITY_MANAGE: true,
+    // Partner content
+    PARTNER_VIEW: false,
+    PARTNER_MANAGE: true
 };
 
 export const session = {

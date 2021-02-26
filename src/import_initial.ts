@@ -43,7 +43,10 @@ export const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: true,
-        ACTIVITY_MANAGE: true
+        ACTIVITY_MANAGE: true,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: true
     },
     {
         id: 2,
@@ -66,7 +69,10 @@ export const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: false,
-        ACTIVITY_MANAGE: false
+        ACTIVITY_MANAGE: false,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: false
     },
     {
         id: 3,
@@ -89,7 +95,10 @@ export const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: false,
-        ACTIVITY_MANAGE: false
+        ACTIVITY_MANAGE: false,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: false
     },
     {
         id: 4,
@@ -112,7 +121,10 @@ export const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: true,
-        ACTIVITY_MANAGE: true
+        ACTIVITY_MANAGE: true,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: true
     },
     {
         id: 5,
@@ -135,7 +147,10 @@ export const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: false,
-        ACTIVITY_MANAGE: false
+        ACTIVITY_MANAGE: false,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: false
     }
 ];
 
