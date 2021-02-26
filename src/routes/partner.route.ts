@@ -15,7 +15,7 @@ router.route("/companyOpportunities")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check permission
-        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_VIEW"}).then(function(result: boolean): void {
+        checkPermission(userId, {type: "PARTNER_VIEW"}).then(function(result: boolean): void {
 
             // If no permission, return
             if (!result) {
@@ -44,26 +44,28 @@ router.route("/companyOpportunities")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check permission
-        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
+        checkPermission(userId, {type: "PARTNER_MANAGE", value: +req.params.id})
             .then(function(result: boolean): any {
 
             // Return if no permission
             if (!result) {
-                res.status(403).send("You do not have permissions to create a company opportunity");
+                return res.status(403).send("You do not have permissions to create a company opportunity");
             }
 
             // Create instance
-            return CompanyOpportunity.create(req.body)
-                .then(function(createdCompanyOpportunity: CompanyOpportunity): void {
+            CompanyOpportunity.create(req.body)
+                .then(function(createdCompanyOpportunity: CompanyOpportunity): any {
 
                 // send back new instance
-                res.status(201).send(createdCompanyOpportunity);
-            }).catch(function(err: Error): void {
+                return res.status(201).send(createdCompanyOpportunity);
+            }).catch(function(err: Error): any {
 
                 console.error(err);
-                res.sendStatus(400).send("Something went wrong in creating the company opportunity. " +
+                return res.sendStatus(400).send("Something went wrong in creating the company opportunity. " +
                     "Check the logs for a detailed message.");
             });
+        }).catch(function(err: Error): any {
+            return res.sendStatus(804).send("smth");
         });
     });
 
@@ -86,7 +88,7 @@ router.route("/companyOpportunities/:id")
         // Get user id if request has session
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
-        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_VIEW", value: +req.params.id})
+        checkPermission(userId, {type: "PARTNER_VIEW", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
@@ -103,7 +105,7 @@ router.route("/companyOpportunities/:id")
         // Get user id if request has session
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
-        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
+        checkPermission(userId, {type: "PARTNER_MANAGE", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
@@ -126,7 +128,7 @@ router.route("/companyOpportunities/:id")
         // Get user id if request has session
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
-        checkPermission(userId, {type: "COMPANY_OPPORTUNITY_MANAGE", value: +req.params.id})
+        checkPermission(userId, {type: "PARTNER_MANAGE", value: +req.params.id})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);

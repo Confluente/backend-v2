@@ -46,10 +46,7 @@ router.route("/")
      */
     .post(function(req: Request, res: Response, next: any): any {
         // Check if required fields are filled in
-        if (!req.body.name || req.body.PAGE_VIEW == null || req.body.PAGE_MANAGE == null || req.body.USER_CREATE == null
-            || req.body.USER_VIEW_ALL == null || req.body.USER_MANAGE == null || req.body.CHANGE_ALL_PASSWORDS == null
-            || req.body.ROLE_VIEW == null || req.body.ROLE_MANAGE == null || req.body.ACTIVITY_VIEW_PUBLISHED == null
-            || req.body.ACTIVITY_VIEW_ALL_UNPUBLISHED == null || req.body.ACTIVITY_MANAGE == null) {
+        if (!req.body.name) {
             return res.sendStatus(400);
         }
 

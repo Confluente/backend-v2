@@ -131,6 +131,20 @@ export class Role extends Model<Role> {
     public ACTIVITY_MANAGE: boolean;
 
     /**
+     * Permission to manage partners
+     */
+    @Default(false)
+    @Column(DataType.BOOLEAN)
+    public PARTNER_MANAGE: boolean;
+
+    /**
+     * Permission to view partner content.
+     */
+    @Default(false)
+    @Column(DataType.BOOLEAN)
+    public PARTNER_VIEW!: boolean;
+
+    /**
      * Users that have this particular role (one-to-many relation)
      */
     @HasMany(() => User, {})

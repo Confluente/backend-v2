@@ -80,6 +80,16 @@ export class RoleWeb extends AbstractWebModel {
      */
     public ACTIVITY_MANAGE!: boolean;
 
+    /**
+     * Permission to manage partners.
+     */
+    public PARTNER_MANAGE!: boolean;
+
+    /**
+     * Permission to view partner content.
+     */
+    public PARTNER_VIEW!: boolean;
+
     public static async getWebModelFromDbModel(dbRole: Model): Promise<RoleWeb> {
         if (!(dbRole instanceof Role)) {
             throw new Error("role.web.model.getWebModelFromDbModel: dbRole was not a Role instance.");
