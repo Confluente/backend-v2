@@ -88,8 +88,7 @@ router.route("/:url([^\?]+)")
             });
 
         }).catch(function(err: Error): any {
-            console.error(err.name + " " + err.message);
-            res.sendStatus(400);
+            res.status(400).send("Error in deleting the page.");
         });
     });
 
