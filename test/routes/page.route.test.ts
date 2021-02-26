@@ -6,7 +6,7 @@ const factory: TestFactory = new TestFactory();
 /**
  * Tests the page route.
  */
-describe("page.route.ts '/api/page'", () => {
+describe("page.route.ts '/api/pages'", () => {
 
     /**
      * Syncs the database and server before all tests.
@@ -26,12 +26,14 @@ describe("page.route.ts '/api/page'", () => {
      * Checks if retrieving a specific page works.
      */
     describe("Get a specific page", () => {
+
         it("Returns error without proper permissions", (done) => {
-            factory.agents.zeroPermissionsAgent.get("/api/page/" + page.url)
-                .expect(403).then(function(_: any): any {
-                done();
-            }).catch(function(_: any): any {
-                done(new Error());
+            factory.agents.zeroPermissionsAgent.get("/api/pages/" + page.url)
+                .expect(403)
+                .then(_ => {
+                    done();
+                }).catch(_ => {
+                    done(new Error());
             });
         });
 
@@ -45,7 +47,7 @@ describe("page.route.ts '/api/page'", () => {
         });
 
         it("Returns correct page", (done) => {
-            factory.agents.superAdminAgent.get("/api/page/" + page.url)
+            factory.agents.superAdminAgent.get("/api/pages/" + page.url)
                 .expect(200).then(function(res: any): any {
                     if (res.body.title === page.title) {
                         done();
@@ -63,7 +65,7 @@ describe("page.route.ts '/api/page'", () => {
      */
     describe("Editing a page", () => {
         it("Returns error without proper permissions", (done) => {
-            factory.agents.zeroPermissionsAgent.put("/api/page/newurl").expect(403).then(function(_: any): any {
+            factory.agents.zeroPermissionsAgent.put("/api/pages/newurl").expect(403).then(function(_: any): any {
                 done();
             }).catch(function(_: any): any {
                 done(new Error());
@@ -71,9 +73,9 @@ describe("page.route.ts '/api/page'", () => {
         });
 
         it("Correctly create new page", (done) => {
-           factory.agents.superAdminAgent.put("/api/page/" + newPage.url).send(newPage)
+           factory.agents.superAdminAgent.put("/api/pages/" + newPage.url).send(newPage)
                .expect(201).then(function(_: any): any {
-              factory.agents.superAdminAgent.get("/api/page/" + newPage.url).then(function(res: any): any {
+              factory.agents.superAdminAgent.get("/api/pages/" + newPage.url).then(function(res: any): any {
                   if (res.body.author === newPage.author) {
                       done();
                   } else {
@@ -91,9 +93,9 @@ describe("page.route.ts '/api/page'", () => {
             const editedPage = newPage;
             editedPage.content = "CHANGED CONTENT";
 
-            factory.agents.superAdminAgent.put("/api/page/" + newPage.url).send(editedPage)
+            factory.agents.superAdminAgent.put("/api/pages/" + newPage.url).send(editedPage)
                 .expect(201).then(function(_: any): any {
-                factory.agents.superAdminAgent.get("/api/page/" + newPage.url).then(function(res: any): any {
+                factory.agents.superAdminAgent.get("/api/pages/" + newPage.url).then(function(res: any): any {
                     if (res.body.author === newPage.author && res.body.content === "CHANGED CONTENT") {
                         done();
                     } else {
@@ -113,7 +115,7 @@ describe("page.route.ts '/api/page'", () => {
      */
     describe("Deleting a page", () => {
         it("Returns error without proper permissions", (done) => {
-            factory.agents.zeroPermissionsAgent.delete("/api/page/" + newPage.url)
+            factory.agents.zeroPermissionsAgent.delete("/api/pages/" + newPage.url)
                 .expect(403).then(function(_: any): any {
                 done();
             }).catch(function(_: any): any {
@@ -122,9 +124,9 @@ describe("page.route.ts '/api/page'", () => {
         });
 
         it("Deletes correct page", (done) => {
-            factory.agents.superAdminAgent.delete("/api/page/" + newPage.url)
+            factory.agents.superAdminAgent.delete("/api/pages/" + newPage.url)
                 .expect(204).then(function(_: any): any {
-                factory.agents.superAdminAgent.get("/api/page/" + newPage.url)
+                factory.agents.superAdminAgent.get("/api/pages/" + newPage.url)
                     .expect(404).then(function(res: any): any {
                     done();
                 }).catch(function(error: any): any {
@@ -141,7 +143,7 @@ describe("page.route.ts '/api/page'", () => {
      */
     describe("Retrieving all pages", () => {
         it("Returns error without proper permissions", (done) => {
-            factory.agents.zeroPermissionsAgent.get("/api/page/")
+            factory.agents.zeroPermissionsAgent.get("/api/pages/")
                 .expect(403).then(function(_: any): any {
                 done();
             }).catch(function(_: any): any {
@@ -150,7 +152,7 @@ describe("page.route.ts '/api/page'", () => {
         });
 
         it("Returns all pages", (done) => {
-            factory.agents.superAdminAgent.get("/api/page/").expect(200).then(function(res: any): any {
+            factory.agents.superAdminAgent.get("/api/pages/").expect(200).then(function(res: any): any {
                 if (res.body[0].url === page.url) {
                     done();
                 } else {
