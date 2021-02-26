@@ -38,7 +38,7 @@ describe("page.route.ts '/api/pages'", () => {
         });
 
         it("Returns error when page does not exist", (done) => {
-           factory.agents.superAdminAgent.get("/api/page/thispagedefinitelydoesnotexist")
+           factory.agents.superAdminAgent.get("/api/pages/thispagedefinitelydoesnotexist")
                .expect(404).then(function(_: any): any {
                done();
            }).catch(function(_: any): any {

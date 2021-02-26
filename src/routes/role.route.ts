@@ -31,9 +31,9 @@ router.route("/")
                 order: [
                     ["id", "ASC"]
                 ]
-            }).then(function(foundRoles: Role[]): void {
+            }).then(async function(foundRoles: Role[]): Promise<void> {
                 // Transform dbRoles to webRoles
-                const roles = RoleWeb.getArrayOfWebModelsFromArrayOfDbModels(foundRoles);
+                const roles = await RoleWeb.getArrayOfWebModelsFromArrayOfDbModels(foundRoles);
 
                 // Send the roles back to the client
                 res.send(roles);
