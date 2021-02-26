@@ -30,6 +30,9 @@ router.route("/companyOpportunities")
             }).then(function(results: CompanyOpportunity[]): void {
                 res.send(results);
             });
+        }).catch((err: Error) => {
+            console.error(err);
+            res.status(400).send("Error in getting all company opportunities");
         });
     })
 
