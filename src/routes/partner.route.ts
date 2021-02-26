@@ -44,7 +44,7 @@ router.route("/companyOpportunities")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check permission
-        checkPermission(userId, {type: "PARTNER_MANAGE", value: +req.params.id})
+        checkPermission(userId, {type: "PARTNER_MANAGE"})
             .then(function(result: boolean): any {
 
             // Return if no permission
@@ -61,11 +61,12 @@ router.route("/companyOpportunities")
             }).catch(function(err: Error): any {
 
                 console.error(err);
-                return res.sendStatus(400).send("Something went wrong in creating the company opportunity. " +
+                return res.status(400).send("Something went wrong in creating the company opportunity. " +
                     "Check the logs for a detailed message.");
             });
         }).catch(function(err: Error): any {
-            return res.sendStatus(804).send("smth");
+            console.error(err);
+            return res.sendStatus(500);
         });
     });
 
@@ -105,7 +106,7 @@ router.route("/companyOpportunities/:id")
         // Get user id if request has session
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
-        checkPermission(userId, {type: "PARTNER_MANAGE", value: +req.params.id})
+        checkPermission(userId, {type: "PARTNER_MANAGE"})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
@@ -128,7 +129,7 @@ router.route("/companyOpportunities/:id")
         // Get user id if request has session
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
-        checkPermission(userId, {type: "PARTNER_MANAGE", value: +req.params.id})
+        checkPermission(userId, {type: "PARTNER_MANAGE"})
             .then(function(result: boolean): any {
             if (!result) {
                 return res.sendStatus(403);
