@@ -19,7 +19,8 @@ router.route("/companyOpportunities")
 
             // If no permission, return
             if (!result) {
-                return res.status(403).send("You do not have the permissions to view internships");
+                return res.status(403).send({message: "You do not have the permissions to view company " +
+                        "opportunities."});
             }
 
             // If permission, get all company opportunities (in order)
@@ -28,7 +29,7 @@ router.route("/companyOpportunities")
                     ["id", "ASC"]
                 ]
             }).then((results: CompanyOpportunity[]) => {
-                return res.send(results);
+                return res.status(200).send(results);
             }).catch((err: Error) => {
                 console.error(err);
                 return res.sendStatus(500);

@@ -13,15 +13,17 @@ router.route("/")
      */
     .get((req: Request, res: Response) => {
         // Check if the client is logged in
-        const user = res.locals.session ? res.locals.session.userId : null;
+        const userId = res.locals.session ? res.locals.session.userId : null;
 
         // Check if the client has permission to manage roles
-        checkPermission(user, {
+        checkPermission(userId, {
             type: "ROLE_MANAGE",
-            value: user
-        }).then(function(result: boolean): void {
+            value: userId
+        }).then(function(result: boolean): any {
             // If no result, then the client has no permission
-            if (!result) { res.sendStatus(403); }
+            if (!result) {
+                return res.sendStatus(403);
+            }
 
             // If client has permission, find all roles in database
             Role.findAll({
@@ -31,12 +33,12 @@ router.route("/")
                 order: [
                     ["id", "ASC"]
                 ]
-            }).then(async function(foundRoles: Role[]): Promise<void> {
+            }).then(async function(foundRoles: Role[]): Promise<any> {
                 // Transform dbRoles to webRoles
                 const roles = await RoleWeb.getArrayOfWebModelsFromArrayOfDbModels(foundRoles);
 
                 // Send the roles back to the client
-                res.send(roles);
+                return res.send(roles);
             });
         });
     })
@@ -51,11 +53,11 @@ router.route("/")
         }
 
         // Create new role in database
-        return Role.create(req.body).then(function(createdRole: Role): void {
-            res.status(201).send(createdRole);
-        }).catch(function(err: Error): void {
-            res.status(406).send("Role with identical name already exists");
-        }).done();
+        return Role.create(req.body).then(function(createdRole: Role): any {
+            return res.status(201).send(createdRole);
+        }).catch(function(err: Error): any {
+            return res.status(406).send("Role with identical name already exists");
+        });
     });
 
 // Specific role route
