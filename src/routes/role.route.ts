@@ -11,7 +11,7 @@ router.route("/")
     /**
      * Gets all roles from the database
      */
-    .get(function(req: Request, res: Response, next: any): void {
+    .get((req: Request, res: Response) => {
         // Check if the client is logged in
         const user = res.locals.session ? res.locals.session.userId : null;
 
@@ -44,7 +44,7 @@ router.route("/")
     /**
      * Creates a new role in the database
      */
-    .post(function(req: Request, res: Response, next: any): any {
+    .post((req: Request, res: Response) => {
         // Check if required fields are filled in
         if (!req.body.name) {
             return res.sendStatus(400);
@@ -63,7 +63,7 @@ router.route("/:id")
     /**
      * Get a specific role from the database and return to the client
      */
-    .get(function(req: Request, res: Response): any {
+    .get((req: Request, res: Response) => {
         // Check if client has a session
         const user = res.locals.session ? res.locals.session.userId : null;
 
@@ -100,7 +100,7 @@ router.route("/:id")
     /**
      * Edit a role
      */
-    .put(function(req: Request, res: Response): any {
+    .put((req: Request, res: Response) => {
         // Check if client has a session
         const user = res.locals.session ? res.locals.session.userId : null;
 
@@ -140,7 +140,7 @@ router.route("/:id")
     /**
      * Delete role from the database
      */
-    .delete(function(req: Request, res: Response): any {
+    .delete((req: Request, res: Response) => {
         // Check if client has a session
         const user = res.locals.session ? res.locals.session.userId : null;
 

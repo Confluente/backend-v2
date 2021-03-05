@@ -1,4 +1,4 @@
-import express, {Request, Response, Router} from "express";
+import express, {NextFunction, Request, Response, Router} from "express";
 
 import {User} from "../models/database/user.model";
 import {Group} from "../models/database/group.model";
@@ -16,7 +16,7 @@ router.route("/")
     /**
      * Gets all users from the database
      */
-    .get(function(req: Request, res: Response): void {
+    .get((req: Request, res: Response) => {
         // Check if the client is logged in
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
@@ -48,7 +48,7 @@ router.route("/")
     /**
      * Creates a new user in the database
      */
-    .post(function(req: Request, res: Response): any {
+    .post((req: Request, res: Response) => {
         // Check if required fields are filled in
         if (!req.body.displayName || !req.body.email || !req.body.password) {
             return res.sendStatus(400);
@@ -107,7 +107,7 @@ router.route("/:id")
     /**
      * Gets the user and stores it in res.locals.user
      */
-    .all(function(req: Request, res: Response, next: any): any {
+    .all((req: Request, res: Response, next: NextFunction) => {
         // Check if client has a session
         const user: number = res.locals.session ? res.locals.session.userId : null;
 
@@ -134,7 +134,7 @@ router.route("/:id")
     /**
      * Get a specific user from the database and return to the client
      */
-    .get(function(req: Request, res: Response): any {
+    .get((req: Request, res: Response) => {
         // store user in variable
         const user: number = res.locals.session.user;
 
@@ -168,7 +168,7 @@ router.route("/:id")
     /**
      * Edit a user
      */
-    .put(function(req: Request, res: Response): any {
+    .put((req: Request, res: Response) => {
         // Store user in variable
         const user: number = res.locals.session.user;
 
@@ -229,7 +229,7 @@ router.route("/:id")
     /**
      * Delete user from the database
      */
-    .delete(function(req: Request, res: Response): any {
+    .delete((req: Request, res: Response) => {
         // Store user in variable
         const user: number = res.locals.session.user;
 
@@ -252,7 +252,7 @@ router.route("/changePassword/:id")
     /**
      * Change the password of a user
      */
-    .put(function(req: Request, res: Response): any {
+    .put((req: Request, res: Response) => {
         // Check if client has a session
         const user: number = res.locals.session ? res.locals.session.userId : null;
 
@@ -307,7 +307,7 @@ router.route("/approve/:approvalString")
     /**
      * Function for approving a user account based on the approvalString
      */
-    .all(function(req: Request, res: Response): any {
+    .all((req: Request, res: Response) => {
         // Get the approval string
         const approvalString = req.params.approvalString;
 

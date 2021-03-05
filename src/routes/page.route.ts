@@ -11,7 +11,7 @@ router.route("/:url([^\?]+)")
     /**
      * Gets a specific page from the database
      */
-    .get(function(req: Request, res: Response): any {
+    .get((req: Request, res: Response) => {
         // Check if client is logged in
         const user = res.locals.session ? res.locals.session.userId : null;
 
@@ -44,7 +44,7 @@ router.route("/:url([^\?]+)")
     /**
      * Edits a page
      */
-    .put(function(req: Request, res: Response): any {
+    .put((req: Request, res: Response) => {
         // Check if client is logged in
         const user = res.locals.session ? res.locals.session.userId : null;
 
@@ -75,7 +75,7 @@ router.route("/:url([^\?]+)")
     /**
      * Deletes a page from the database
      */
-    .delete(function(req: Request, res: Response): any {
+    .delete((req: Request, res: Response) => {
         // Check if client is logged in
         const userId = res.locals.session ? res.locals.session.userId : null;
 
@@ -93,7 +93,7 @@ router.route("/:url([^\?]+)")
         });
     });
 
-router.get("/:url/view", function(req: Request, res: Response): any {
+router.get("/:url/view", (req: Request, res: Response) => {
     return Page.findOne({where: {url: req.params.url}}).then(function(foundPage: Page): any {
         if (!foundPage) { return res.redirect("/404.html"); }
 
@@ -104,7 +104,7 @@ router.get("/:url/view", function(req: Request, res: Response): any {
     });
 });
 
-router.get("/", function(req: Request, res: Response): any {
+router.get("/", (req: Request, res: Response) => {
     // Check if client is logged in
     const user = res.locals.session ? res.locals.session.userId : null;
 

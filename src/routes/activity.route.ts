@@ -1,4 +1,4 @@
-import express, {Request, Response, Router} from "express";
+import express, {NextFunction, Request, Response, Router} from "express";
 
 import Q from 'q';
 import marked from 'marked';
@@ -76,7 +76,7 @@ router.route("/")
     /**
      * Gets every activity in the database happening from today onwards
      */
-    .get(function(req: Request, res: Response, next: any): any {
+    .get((req: Request, res: Response) => {
         // Get all activities from the database
         Activity.findAll({
             attributes: ["id", "name", "description", "location", "date", "startTime", "endTime", "published", "subscriptionDeadline", "canSubscribe", "hasCoverImage"],
@@ -130,7 +130,7 @@ router.route("/")
     /**
      * Creates a new activity.
      */
-    .post(function(req: Request, res: Response, next: any): any {
+    .post((req: Request, res: Response) => {
         // Check whether the client is logged in
         if (!res.locals.session) {
             return res.sendStatus(401);
@@ -181,7 +181,7 @@ router.route("/pictures/:id")
     /**
      * Checks permissions for handling pictures for activity
      */
-    .all(function(req: Request, res: Response, next: any): any {
+    .all((req: Request, res: Response, next: any) => {
         // check for people to be logged in
         if (!res.locals.session) {
             return res.sendStatus(401);
@@ -203,7 +203,7 @@ router.route("/pictures/:id")
     /**
      * Uploads a picture
      */
-    .post(function(req: Request, res: Response, next: any): void {
+    .post((req: Request, res: Response) => {
         upload(req, res, function(result: any): void {
             res.send();
         });
@@ -212,7 +212,7 @@ router.route("/pictures/:id")
     /**
      * Edits a picture
      */
-    .put(function(req: Request, res: Response, next: any): void {
+    .put((req: Request, res: Response) => {
         // delete old picture
         // TODO check if this casting works
         deletePicture((req.params.id as unknown as number));
@@ -229,7 +229,7 @@ router.route("/manage")
      * Gets all activities for the manage page.
      * @return List of activities that the client is allowed to edit
      */
-    .get(function(req: Request, res: Response, next: any): any {
+    .get((req: Request, res: Response) => {
         // Get all activities from the database
         Activity.findAll({
             attributes: ["id", "name", "description", "location", "date", "startTime", "endTime", "published", "subscriptionDeadline"],
@@ -273,7 +273,7 @@ router.route("/subscriptions/:id")
     /*
      * Adds a subscription to a specific activity
      */
-    .post(function(req: Request, res: Response, next: any): any {
+    .post((req: Request, res: Response) => {
         // check if client is logged in
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
@@ -306,7 +306,7 @@ router.route("/subscriptions/:id")
     /**
      * Deletes a subscription from an activity
      */
-    .delete(function(req: Request, res: Response): any {
+    .delete((req: Request, res: Response) => {
         // checking if client is logged in
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
@@ -339,7 +339,7 @@ router.route("/:id")
     /**
      * Gets activity with id from database and stores it in res.locals.activity
      */
-    .all(function(req: Request, res: Response, next: any): void {
+    .all((req: Request, res: Response, next: NextFunction) => {
         // Getting specific activity from database
         Activity.findByPk(req.params.id, {
             include: [{
@@ -367,7 +367,7 @@ router.route("/:id")
     /**
      * Sends specific activity to the client
      */
-    .get(function(req: Request, res: Response): any {
+    .get((req: Request, res: Response) => {
         // Check if client is logged in
         const user = res.locals.session ? res.locals.session.userId : null;
 
@@ -386,7 +386,7 @@ router.route("/:id")
     /**
      * Edits a specific activity
      */
-    .put(function(req: Request, res: Response): void {
+    .put((req: Request, res: Response) => {
         // Check if client is logged in
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
@@ -425,7 +425,7 @@ router.route("/:id")
     /*
      * Deletes a specific activity
      */
-    .delete(function(req: Request, res: Response): void {
+    .delete((req: Request, res: Response) => {
         // Check if the client is logged in
         const user = res.locals.session ? res.locals.session.userId : null;
 
