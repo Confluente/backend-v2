@@ -13,7 +13,7 @@ router.route("/")
     /**
      * Function for getting the profile of the user.
      */
-    .get(function(req: Request, res: Response): any {
+    .get((req: Request, res: Response) => {
         // Check whether the response has a session (handled by express)
         if (!res.locals.session) {
             return res.status(401).send({message: "Request does not have a session."});
@@ -48,7 +48,7 @@ router.route("/login")
     /**
      * Function for logging a user in.
      */
-    .post(function(req: Request, res: Response): any {
+    .post((req: Request, res: Response) => {
         // Check if both the email and password field were filled in
         if (!req.body.email || !req.body.password) {
             return res.sendStatus(400);

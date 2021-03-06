@@ -9,7 +9,7 @@ import {GroupWeb} from "../models/web/group.web.model";
 const router: Router = express.Router();
 
 router.route("/")
-    .all(function(req: Request, res: Response, next: NextFunction): void {
+    .all((req: Request, res: Response, next: NextFunction) => {
         // Check if client is logged in
         const userId = res.locals.session ? res.locals.session.userId : null;
 
@@ -27,7 +27,7 @@ router.route("/")
     /**
      * Gets all groups from the database
      */
-    .get(function(req: Request, res: Response): void {
+    .get((req: Request, res: Response) => {
         Group.findAll({
             attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type", "createdAt"],
             order: [
@@ -46,7 +46,7 @@ router.route("/")
     /**
      * Creates a new group
      */
-    .post(function(req: Request, res: Response): any {
+    .post((req: Request, res: Response) => {
 
         // Checks if the client is logged in
         if (!res.locals.session) { return res.sendStatus(401); }
@@ -79,7 +79,7 @@ router.route("/:id")
     /**
      * Gets a specific group from the database and stores it in res.locals.group
      */
-    .all(function(req: Request, res: Response, next: any): any {
+    .all((req: Request, res: Response, next: any) => {
         Group.findByPk(req.params.id, {
             attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type", "createdAt"],
             include: [
@@ -104,7 +104,7 @@ router.route("/:id")
     /**
      * Sends group from the database to the client
      */
-    .get(function(req: Request, res: Response): any {
+    .get((req: Request, res: Response) => {
         // Check if client is logged in
         const user: number = res.locals.session ? res.locals.session.userId : null;
 
@@ -125,7 +125,7 @@ router.route("/:id")
     /**
      * Edits a group in the database
      */
-    .put(function(req: Request, res: Response): any {
+    .put((req: Request, res: Response) => {
 
         // Check if client is logged in
         const user: number = res.locals.session ? res.locals.session.userId : null;
@@ -166,7 +166,7 @@ router.route("/:id")
     /**
      * Deletes a group from the database
      */
-    .delete(function(req: Request, res: Response): any {
+    .delete((req: Request, res: Response) => {
 
         // Check if client is logged in
         const user: number = res.locals.session ? res.locals.session.userId : null;
@@ -191,7 +191,7 @@ router.route("/type/:type")
     /**
      * Gets all groups of a certain type from the database
      */
-    .get(function(req: Request, res: Response): void {
+    .get((req: Request, res: Response) => {
         Group.findAll({
             attributes: ["id", "fullName", "displayName", "description", "email"],
             where: {type: req.params.type},

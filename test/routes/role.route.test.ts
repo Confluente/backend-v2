@@ -56,7 +56,7 @@ describe("role.route.ts '/api/role'", () => {
            factory.agents.zeroPermissionsAgent.post("/api/roles/")
                .send(newRole).expect(403).then(_ => {
               done();
-           }).catch(_ => {
+           }).catch((res: any) => {
                done(new Error());
            });
         });

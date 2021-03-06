@@ -96,22 +96,6 @@ export async function setupServer(server: Express): Promise<void> {
         });
     }
 
-
-    server.use(function(req: any, res: any, next: any): any {
-        const user: any = res.locals.session ? res.locals.session.userId : null;
-        checkPermission(user, {type: "PAGE_VIEW", value: req.path})
-            .then(function(hasPermission: any): any {
-                if (!hasPermission) {
-                    if (user) {
-                        return res.status(403).send();
-                    } else {
-                        return res.status(401).send();
-                    }
-                }
-                return next();
-            });
-    });
-
     server.use("/api/auth", require("./routes/auth.route"));
     server.use("/api/activities", require("./routes/activity.route"));
     server.use("/api/groups", require("./routes/group.route"));
@@ -122,6 +106,21 @@ export async function setupServer(server: Express): Promise<void> {
     server.use("/api/partners", require("./routes/partner.route"));
     server.use("/api/*", function(req: any, res: any): void {
         res.sendStatus(404);
+    });
+
+    server.use(function(req: any, res: any, next: any): any {
+        const user: any = res.locals.session ? res.locals.session.userId : null;
+        checkPermission(user, {type: "PAGE_VIEW", value: req.path})
+            .then(function(hasPermission: any): any {
+                if (!hasPermission) {
+                    if (user) {
+                        return res.status(403).send("User does not have the permission to view this page!");
+                    } else {
+                        return res.status(401).send("Page error?");
+                    }
+                }
+                return next();
+            });
     });
 
     if (process.env.NODE_ENV === "production") {
