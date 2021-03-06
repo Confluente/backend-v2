@@ -44,18 +44,32 @@ router.route("/")
     /**
      * Creates a new role in the database
      */
-    .post(function(req: Request, res: Response, next: any): any {
-        // Check if required fields are filled in
-        if (!req.body.name) {
-            return res.sendStatus(400);
-        }
+    .post(function(req: Request, res: Response, next: any): void {
+        // Check if the client is logged in
+        const user = res.locals.session ? res.locals.session.userId : null;
 
-        // Create new role in database
-        return Role.create(req.body).then(function(createdRole: Role): void {
-            res.status(201).send(createdRole);
-        }).catch(function(err: Error): void {
-            res.status(406).send("Role with identical name already exists");
-        }).done();
+        // Check if the client has permission to manage roles
+        checkPermission(user, {
+            type: "ROLE_MANAGE",
+            value: user
+        }).then(function(result: boolean): void {
+            // If no result, then the client has no permission
+            if (!result) {
+                res.sendStatus(403);
+            }
+
+            // Check if required fields are filled in
+            if (!req.body.name) {
+                res.sendStatus(400);
+            }
+
+            // Create new role in database
+            return Role.create(req.body).then(function(createdRole: Role): void {
+                res.status(201).send(createdRole);
+            }).catch(function(err: Error): void {
+                res.status(406).send("Role with identical name already exists");
+            }).done();
+        });
     });
 
 // Specific role route
