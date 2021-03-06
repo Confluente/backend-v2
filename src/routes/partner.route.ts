@@ -19,8 +19,10 @@ router.route("/companyOpportunities")
 
             // If no permission, return
             if (!result) {
-                return res.status(403).send({message: "You do not have the permissions to view company " +
-                        "opportunities."});
+                return res.status(403).send({
+                    message: "You do not have the permissions to view company " +
+                        "opportunities."
+                });
             }
 
             // If permission, get all company opportunities (in order)
@@ -51,23 +53,27 @@ router.route("/companyOpportunities")
         checkPermission(userId, {type: "PARTNER_MANAGE"})
             .then((result: boolean) => {
 
-            // Return if no permission
-            if (!result) {
-                return res.status(403).send({message: "You do not have permissions to create a company " +
-                        "opportunity"});
-            }
+                // Return if no permission
+                if (!result) {
+                    return res.status(403).send({
+                        message: "You do not have permissions to create a company " +
+                            "opportunity"
+                    });
+                }
 
-            // Create instance
-            CompanyOpportunity.create(req.body).then((createdCompanyOpportunity: CompanyOpportunity) => {
+                // Create instance
+                CompanyOpportunity.create(req.body).then((createdCompanyOpportunity: CompanyOpportunity) => {
 
-                // send back new instance
-                return res.status(201).send(createdCompanyOpportunity);
+                    // send back new instance
+                    return res.status(201).send(createdCompanyOpportunity);
+                }).catch((err: Error) => {
+                    console.error(err);
+                    return res.status(400).send({
+                        message: "Something went wrong in creating the company " +
+                            "opportunity. Check the logs for a detailed message."
+                    });
+                });
             }).catch((err: Error) => {
-                console.error(err);
-                return res.status(400).send({message: "Something went wrong in creating the company " +
-                        "opportunity. Check the logs for a detailed message."});
-            });
-        }).catch((err: Error) => {
             console.error(err);
             return res.sendStatus(500);
         });
@@ -75,13 +81,35 @@ router.route("/companyOpportunities")
 
 router.route("/companyOpportunities/:id")
     .all((req: Request, res: Response, next: NextFunction) => {
-        CompanyOpportunity.findByPk(req.params.id).then((foundCompanyOpportunity: CompanyOpportunity) => {
-            if (foundCompanyOpportunity === null) {
-                return res.status(404).send({status: "Company opportunity could not be found in the database."});
-            } else {
-                res.locals.companyOpportunity = foundCompanyOpportunity;
-                next();
+        // Get user id if request has session
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
+
+        // Check for PARTNER_VIEW permission, which is needed for every sub route
+        checkPermission(userId, {type: "PARTNER_VIEW"}).then((result: boolean) => {
+
+            // If no permission, return 403
+            if (!result) {
+                return res.status(403).send("Unauthorized for actions with specific company opportunities.");
             }
+
+            // Find the specific company opportunity in the database
+            CompanyOpportunity.findByPk(req.params.id).then((foundCompanyOpportunity: CompanyOpportunity | null) => {
+
+                // If not found in the database, then return 404
+                if (foundCompanyOpportunity === null) {
+                    return res.status(404).send({status: "Company opportunity could not be found in the database."});
+                } else {
+                    // Store found opportunity in response for future processing.
+                    res.locals.companyOpportunity = foundCompanyOpportunity;
+                    next();
+                }
+            }).catch(function(err: Error): any {
+                console.error(err);
+                return res.send(500);
+            });
+        }).catch(function(err: Error): any {
+            console.error(err);
+            return res.send(500);
         });
     })
 
@@ -89,23 +117,8 @@ router.route("/companyOpportunities/:id")
      * Route for getting a specific company opportunity.
      */
     .get((req: Request, res: Response) => {
-        // Get user id if request has session
-        const userId: number = res.locals.session ? res.locals.session.userId : null;
-
-        // Check whether allowed to view
-        checkPermission(userId, {type: "PARTNER_VIEW", value: +req.params.id}).then((result: boolean) => {
-
-            // Return if no permission.
-            if (!result) {
-                return res.status(403).send("Unauthorized to get company opportunity with id " + req.params.id);
-            }
-
-            // Otherwise, send company opportunity;
-            res.status(200).send(res.locals.companyOpportunity);
-        }).catch((err: Error) => {
-            console.error(err);
-            return res.sendStatus(500);
-        });
+        // Send company opportunity;
+        res.status(200).send(res.locals.companyOpportunity);
     })
 
     /**
@@ -120,16 +133,19 @@ router.route("/companyOpportunities/:id")
 
             // Return if no permission
             if (!result) {
-                return res.status(403).send("Unauthorized to edit company opportunity with id " + req.params.id);
+                return res.status(403).send("Unauthorized to edit company opportunity.");
             }
 
-            //
+            // Update company opportunity in database
             res.locals.companyOpportunity.update(req.body).then((putCompanyOpportunity: CompanyOpportunity) => {
                 return res.send(putCompanyOpportunity);
             }).catch((err: Error) => {
-                console.error("Could not update company opportunity with id " + res.locals.companyOpportunity.id);
                 console.error(err);
+                return res.status(400).send("Could not update company opportunity.");
             });
+        }).catch(function(err: Error): any {
+            console.error(err);
+            return res.sendStatus(500);
         });
     })
 
@@ -142,14 +158,21 @@ router.route("/companyOpportunities/:id")
 
         checkPermission(userId, {type: "PARTNER_MANAGE"})
             .then(function(result: boolean): any {
-            if (!result) {
-                return res.sendStatus(403);
-            }
+                if (!result) {
+                    return res.status(403).send("Unauthorized to delete company opportunity.");
+                }
 
-            return res.locals.companyOpportunity.destroy();
-        }).then(function(): void {
-            res.status(204).send({status: "Successful"});
-        });
+                // Destroy company opportunity in database
+                res.locals.companyOpportunity.destroy().then(() => {
+                    return res.status(204);
+                }).catch(function(err: Error): any {
+                    console.error(err);
+                    return res.status(500);
+                });
+            }).catch(function(err: Error): any {
+                console.error(err);
+                res.sendStatus(500);
+            });
     });
 
 router.route("/companyOpportunities/category/:category")
@@ -157,11 +180,29 @@ router.route("/companyOpportunities/category/:category")
      * Gets all company opportunities of a certain category from the database.
      */
     .get((req: Request, res: Response) => {
-        CompanyOpportunity.findAll({
-            where: {category: req.params.category}
-        }).then(function(foundCompanyOpportunities: CompanyOpportunity[]): void {
-            res.send(foundCompanyOpportunities);
-        });
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
+
+        checkPermission(userId, {type: "PARTNER_VIEW"})
+            .then(function(result: boolean): any {
+                if (!result) {
+                    return res.status(403).send("Unauthorized to get all company opportunities of one " +
+                        "category.");
+                }
+
+                // Find all company opportunities of requested category.
+                CompanyOpportunity.findAll({
+                    where: {category: req.params.category}
+                }).then(function(foundCompanyOpportunities: CompanyOpportunity[]): any {
+                    // Return status
+                    return res.status(200).send(foundCompanyOpportunities);
+                }).catch(function(err: Error): any {
+                    console.error(err);
+                    return res.sendStatus(500);
+                });
+            }).catch(function(err: Error): any {
+                console.error(err);
+                return res.sendStatus(500);
+            });
     });
 
 module.exports = router;

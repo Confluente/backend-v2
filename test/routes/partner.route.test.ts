@@ -19,7 +19,7 @@ describe("partner.route.ts '/api/partners'", () => {
         await factory.close();
     });
 
-    describe("/", () => {
+    describe("/companyOpportunities", () => {
 
         describe("get", () => {
 
@@ -130,5 +130,15 @@ describe("partner.route.ts '/api/partners'", () => {
             });
 
         });
+    });
+
+    describe("/companyOpportunities/:id", () => {
+
+        describe("all (via the get)", () => {
+
+            // it("")
+
+        });
+
     });
 });
