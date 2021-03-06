@@ -87,7 +87,17 @@ describe("role.route.ts '/api/role'", () => {
                 } else {
                     done(new Error());
                 }
+            }).catch(_ => {
+                done(new Error());
             });
+        });
+
+        it("Error on duplicate role creation", (done) => {
+           factory.agents.superAdminAgent.post("/api/roles/").send(newPartialRole).expect(406).then(_ => {
+               done();
+           }).catch(_ => {
+               done(new Error());
+           });
         });
     });
 });

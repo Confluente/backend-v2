@@ -81,14 +81,11 @@ router.route("/:id")
      */
     .get((req: Request, res: Response) => {
         // Check if client has a session
-        const user = res.locals.session ? res.locals.session.userId : null;
+        const userId = res.locals.session ? res.locals.session.userId : null;
 
-        // If client does not have a session, he does not have permission
-        if (user === null) { return res.send(403); }
-
-        checkPermission(user, {
+        checkPermission(userId, {
             type: "ROLE_MANAGE",
-            value: user
+            value: userId
         }).then(function(result: boolean): void {
             // If no result, then the client has no permission
             if (!result) { res.sendStatus(403); }
@@ -118,15 +115,12 @@ router.route("/:id")
      */
     .put((req: Request, res: Response) => {
         // Check if client has a session
-        const user = res.locals.session ? res.locals.session.userId : null;
-
-        // If client does not have a session, he does not have permission
-        if (user === null) { return res.send(403); }
+        const userId = res.locals.session ? res.locals.session.userId : null;
 
         // Check whether the client has permission to manage (edit) roles
-        checkPermission(user, {
+        checkPermission(userId, {
             type: "ROLE_MANAGE",
-            value: res.locals.user.id
+            value: userId
         }).then(function(result: boolean): any {
             // If no permission, send 403
             if (!result) {
@@ -158,15 +152,12 @@ router.route("/:id")
      */
     .delete((req: Request, res: Response) => {
         // Check if client has a session
-        const user = res.locals.session ? res.locals.session.userId : null;
-
-        // If client does not have a session, he does not have permission
-        if (user === null) { return res.send(403); }
+        const userId = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has the permission to manage (delete) roles
-        checkPermission(user, {
+        checkPermission(userId, {
             type: "ROLE_MANAGE",
-            value: res.locals.user.id
+            value: userId
         }).then(function(result: boolean): any {
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
