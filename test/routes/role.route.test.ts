@@ -1,5 +1,5 @@
 import {TestFactory} from "../testFactory";
-import {newRole, newPartialRole} from "../test.data";
+import {newRole, newPartialRole, roleSuperAdmin} from "../test.data";
 
 const factory: TestFactory = new TestFactory();
 
@@ -92,12 +92,46 @@ describe("role.route.ts '/api/role'", () => {
             });
         });
 
-        it("Error on duplicate role creation", (done) => {
+        it("Returns error on duplicate role creation", (done) => {
            factory.agents.superAdminAgent.post("/api/roles/").send(newPartialRole).expect(406).then(_ => {
                done();
            }).catch(_ => {
                done(new Error());
            });
+        });
+    });
+
+    /**
+     * Checks if retrieving a role works.
+     */
+    describe("Get role", () => {
+
+        it("Returns error without proper permissions", (done) => {
+            factory.agents.zeroPermissionsAgent.get("/api/roles/" + roleSuperAdmin.id).expect(403).then(_ => {
+                done();
+            }).catch((res: any) => {
+                done(new Error());
+            });
+        });
+
+        it("Returns error when requesting non-existing role", (done) => {
+            factory.agents.superAdminAgent.get("/api/roles/9999").expect(404).then(_ => {
+                done();
+            }).catch((res: any) => {
+                done(new Error());
+            });
+        });
+
+        it("Correctly returns role", (done) => {
+            factory.agents.superAdminAgent.get("/api/roles/" + roleSuperAdmin.id).expect(200).then(res => {
+                if (res.body.name === "Super admin") {
+                    done();
+                } else {
+                    done(new Error());
+                }
+            }).catch((res: any) => {
+                done(new Error());
+            });
         });
     });
 });

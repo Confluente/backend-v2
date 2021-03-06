@@ -86,7 +86,7 @@ router.route("/:id")
         checkPermission(userId, {
             type: "ROLE_MANAGE",
             value: userId
-        }).then(function(result: boolean): void {
+        }).then(function(result: boolean): any {
             // If no result, then the client has no permission
             if (!result) { res.sendStatus(403); }
 
@@ -95,16 +95,16 @@ router.route("/:id")
                 attributes: ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE",
                     "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "ACTIVITY_VIEW_PUBLISHED",
                     "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"],
-            }).then(function(foundRole: Role): void {
+            }).then(async function(foundRole: Role): Promise<any> {
                 // Return if role not found
                 if (foundRole === null) {
-                    res.status(404).send({status: "Not Found"});
+                    return res.status(404).send({status: "Not Found"});
                 } else {
                     // Transform dbRole into webRole
-                    const role = RoleWeb.getWebModelFromDbModel(foundRole);
+                    const role = await RoleWeb.getWebModelFromDbModel(foundRole);
 
                     // Return the role
-                    res.send(role);
+                    return res.send(role);
                 }
             });
         });
@@ -138,7 +138,7 @@ router.route("/:id")
                     res.status(404).send({status: "Not Found"});
                 } else {
                     return role.update(req.body).then(function(updatedRole: Role): void {
-                        res.send(updatedRole);
+                        res.status(200).send(updatedRole);
                     }, function(err: Error): void {
                         console.log(err);
                     });
