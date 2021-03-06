@@ -53,18 +53,19 @@ router.route("/companyOpportunities")
 
             // Return if no permission
             if (!result) {
-                return res.status(403).send("You do not have permissions to create a company opportunity");
+                return res.status(403).send({message: "You do not have permissions to create a company " +
+                        "opportunity"});
             }
 
             // Create instance
-            CompanyOpportunity.create(req.body) .then((createdCompanyOpportunity: CompanyOpportunity) => {
+            CompanyOpportunity.create(req.body).then((createdCompanyOpportunity: CompanyOpportunity) => {
 
                 // send back new instance
                 return res.status(201).send(createdCompanyOpportunity);
             }).catch((err: Error) => {
                 console.error(err);
-                return res.status(400).send("Something went wrong in creating the company opportunity. " +
-                    "Check the logs for a detailed message.");
+                return res.status(400).send({message: "Something went wrong in creating the company " +
+                        "opportunity. Check the logs for a detailed message."});
             });
         }).catch((err: Error) => {
             console.error(err);
