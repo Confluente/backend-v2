@@ -89,7 +89,8 @@ router.route("/companyOpportunities/:id")
 
             // If no permission, return 403
             if (!result) {
-                return res.status(403).send("Unauthorized for actions with specific company opportunities.");
+                return res.status(403).send({message: "Unauthorized for actions with specific company " +
+                        "opportunities."});
             }
 
             // Find the specific company opportunity in the database
@@ -97,7 +98,8 @@ router.route("/companyOpportunities/:id")
 
                 // If not found in the database, then return 404
                 if (foundCompanyOpportunity === null) {
-                    return res.status(404).send({status: "Company opportunity could not be found in the database."});
+                    return res.status(404).send({message: "Company opportunity could not be found in the " +
+                            "database."});
                 } else {
                     // Store found opportunity in response for future processing.
                     res.locals.companyOpportunity = foundCompanyOpportunity;

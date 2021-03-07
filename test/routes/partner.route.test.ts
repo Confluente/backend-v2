@@ -134,9 +134,56 @@ describe("partner.route.ts '/api/partners'", () => {
 
     describe("/companyOpportunities/:id", () => {
 
-        describe("all (via the get)", () => {
+        describe("get (and all)", () => {
 
-            // it("")
+            it("Should return company opportunity", (done) => {
+                factory.agents.superAdminAgent
+                    .get("/api/partners/companyOpportunities/1")
+                    .expect(200)
+                    .then((res: any) => {
+                        const opportunity = res.body;
+
+                        if (opportunity.title === "Super duper cool vacancy") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_: Error) => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return unauthorized for zero permissions user", (done) => {
+                factory.agents.zeroPermissionsAgent
+                    .get("/api/partners/companyOpportunities/1")
+                    .expect(403)
+                    .then((res: any) => {
+                        if (res.body.message === "Unauthorized for actions with specific company " +
+                            "opportunities.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_: any) => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return 404 for unknown opportunity", (done) => {
+                factory.agents.superAdminAgent
+                    .get("/api/partners/companyOpportunities/100")
+                    .expect(404)
+                    .then((res: any) => {
+                        if (res.body.message === "Company opportunity could not be found in the " +
+                            "database.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_: any) => {
+                        done(new Error());
+                    });
+            });
 
         });
 
