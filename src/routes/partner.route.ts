@@ -135,15 +135,15 @@ router.route("/companyOpportunities/:id")
 
             // Return if no permission
             if (!result) {
-                return res.status(403).send("Unauthorized to edit company opportunity.");
+                return res.status(403).send({message: "Unauthorized to edit company opportunity."});
             }
 
             // Update company opportunity in database
             res.locals.companyOpportunity.update(req.body).then((putCompanyOpportunity: CompanyOpportunity) => {
-                return res.send(putCompanyOpportunity);
+                return res.status(200).send(putCompanyOpportunity);
             }).catch((err: Error) => {
                 console.error(err);
-                return res.status(400).send("Could not update company opportunity.");
+                return res.status(400).send({message: "Could not update company opportunity."});
             });
         }).catch(function(err: Error): any {
             console.error(err);
