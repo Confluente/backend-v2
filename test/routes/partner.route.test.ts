@@ -187,5 +187,74 @@ describe("partner.route.ts '/api/partners'", () => {
 
         });
 
+        describe("put", () => {
+
+            it("Should return unauthorized for user with PARTNER_VIEW permission, " +
+                "but no PARTNER_MANAGE permission", (done) => {
+
+                factory.agents.nobodyUserAgent
+                    .put("/api/partners/companyOpportunities/1")
+                    .send({title: "edited title"})
+                    .expect(403)
+                    .then((res: any) => {
+                        if (res.body.message === "Unauthorized to edit company opportunity.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_: any) => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return 400 if wrongfully typed update", (done) => {
+                factory.agents.superAdminAgent
+                    .put("/api/partners/companyOpportunities/1")
+                    .send({title: true})
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "Could not update company opportunity.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((res: any) => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return 400 if trying to set mandatory property to null", (done) => {
+                factory.agents.superAdminAgent
+                    .put("/api/partners/companyOpportunities/1")
+                    .send({title: null})
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "Could not update company opportunity.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_: any) => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should update companyOpportunity correctly", (done) => {
+                factory.agents.superAdminAgent
+                    .put("/api/partners/companyOpportunities/1")
+                    .send({title: "edited title"})
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.title === "edited title") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_: any) => {
+                        done(new Error());
+                    });
+            });
+
+        });
     });
 });
