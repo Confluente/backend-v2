@@ -107,11 +107,11 @@ router.route("/companyOpportunities/:id")
                 }
             }).catch(function(err: Error): any {
                 console.error(err);
-                return res.send(500);
+                return res.sendStatus(500);
             });
         }).catch(function(err: Error): any {
             console.error(err);
-            return res.send(500);
+            return res.sendStatus(500);
         });
     })
 
@@ -161,19 +161,19 @@ router.route("/companyOpportunities/:id")
         checkPermission(userId, {type: "PARTNER_MANAGE"})
             .then(function(result: boolean): any {
                 if (!result) {
-                    return res.status(403).send("Unauthorized to delete company opportunity.");
+                    return res.status(403).send({message: "Unauthorized to delete company opportunity."});
                 }
 
                 // Destroy company opportunity in database
                 res.locals.companyOpportunity.destroy().then(() => {
-                    return res.status(204);
+                    return res.sendStatus(204);
                 }).catch(function(err: Error): any {
                     console.error(err);
-                    return res.status(500);
+                    return res.sendStatus(500);
                 });
             }).catch(function(err: Error): any {
                 console.error(err);
-                res.sendStatus(500);
+                return res.sendStatus(500);
             });
     });
 

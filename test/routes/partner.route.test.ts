@@ -19,6 +19,17 @@ describe("partner.route.ts '/api/partners'", () => {
         await factory.close();
     });
 
+    const companyOpportunity = {
+        title: "Titles",
+        companyName: "Some sponsor",
+        description: "Super cool description",
+        imageUrl: "some url",
+        contactEmail: "some email",
+        link: "A link to vacancy of the sponsor",
+        educationLevel: "Pleb",
+        category: "Vacancy"
+    };
+
     describe("/companyOpportunities", () => {
 
         describe("get", () => {
@@ -58,17 +69,6 @@ describe("partner.route.ts '/api/partners'", () => {
         });
 
         describe("post", () => {
-
-            const companyOpportunity = {
-                title: "Titles",
-                companyName: "Some sponsor",
-                description: "Super cool description",
-                imageUrl: "some url",
-                contactEmail: "some email",
-                link: "A link to vacancy of the sponsor",
-                educationLevel: "Pleb",
-                category: "Vacancy"
-            };
 
             it("Should create a company opportunity", (done) => {
                 factory.agents.superAdminAgent
@@ -255,6 +255,39 @@ describe("partner.route.ts '/api/partners'", () => {
                     });
             });
 
+        });
+
+        describe("delete", () => {
+
+            it("Should return unauthorized for user with PARTNER_VIEW permission, " +
+                "but no PARTNER_MANAGE permission", (done) => {
+
+                factory.agents.nobodyUserAgent
+                    .delete("/api/partners/companyOpportunities/1")
+                    .expect(403)
+                    .then((res: any) => {
+                        if (res.body.message === "Unauthorized to delete company opportunity.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_: any) => {
+                    done(new Error());
+                });
+            });
+
+            it("Should delete company opportunity correctly", (done) => {
+                CompanyOpportunity.create(companyOpportunity).then((co: CompanyOpportunity) => {
+                    factory.agents.superAdminAgent
+                        .delete("/api/partners/companyOpportunities/" + co.id)
+                        .expect(204)
+                        .then((_: any) => {
+                            done();
+                        }).catch((_: any) => {
+                            done(new Error());
+                        });
+                });
+            });
         });
     });
 });
