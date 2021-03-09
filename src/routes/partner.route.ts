@@ -187,8 +187,8 @@ router.route("/companyOpportunities/category/:category")
         checkPermission(userId, {type: "PARTNER_VIEW"})
             .then(function(result: boolean): any {
                 if (!result) {
-                    return res.status(403).send("Unauthorized to get all company opportunities of one " +
-                        "category.");
+                    return res.status(403).send({message: "Unauthorized to get all company opportunities " +
+                            "of one category."});
                 }
 
                 // Find all company opportunities of requested category.

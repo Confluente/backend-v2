@@ -80,13 +80,13 @@ describe("partner.route.ts '/api/partners'", () => {
 
                         CompanyOpportunity.findByPk(opportunity.id).then(function(co: CompanyOpportunity): void {
                             co.destroy();
-                        });
 
-                        if (opportunity.description === "Super cool description") {
-                            done();
-                        } else {
-                            done(new Error());
-                        }
+                            if (opportunity.description === "Super cool description") {
+                                done();
+                            } else {
+                                done(new Error());
+                            }
+                        });
                     }).catch(function(_: any): void {
                     done(new Error());
                 });
@@ -218,7 +218,7 @@ describe("partner.route.ts '/api/partners'", () => {
                         } else {
                             done(new Error());
                         }
-                    }).catch((res: any) => {
+                    }).catch((_: any) => {
                         done(new Error());
                     });
             });
@@ -282,12 +282,53 @@ describe("partner.route.ts '/api/partners'", () => {
                         .delete("/api/partners/companyOpportunities/" + co.id)
                         .expect(204)
                         .then((_: any) => {
-                            done();
+                            co.destroy().then((__: any) => {
+                                done();
+                            });
                         }).catch((_: any) => {
                             done(new Error());
                         });
                 });
             });
         });
+    });
+
+    describe("/companyOpportunities/category/:category", () => {
+
+        describe("get", () => {
+
+            it("Should return 403 for unauthorized request", (done) => {
+                factory.agents.zeroPermissionsAgent
+                    .get("/api/partners/companyOpportunities/category/hi")
+                    .expect(403)
+                    .then((res: any) => {
+                        if (res.body.message === "Unauthorized to get all company opportunities " +
+                            "of one category.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_: any) => {
+                        done(new Error());
+                });
+            });
+
+            it("Should return all company opportunities of category", (done) => {
+                factory.agents.superAdminAgent
+                    .get("/api/partners/companyOpportunities/category/Vacancy")
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.length === 1 && res.body[0].category === "Vacancy") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_: Error) => {
+                        done(new Error());
+                    });
+            });
+
+        });
+
     });
 });
