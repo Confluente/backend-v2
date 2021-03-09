@@ -53,17 +53,6 @@ describe("notification.route.ts '/api/notifications", () => {
                     });
             });
 
-            it("Board member should be able to change notification of other user", (done) => {
-                factory.agents.boardMemberAgent.put("/api/notifications/portraitRight/4")
-                    .send({answer: true})
-                    .expect(200)
-                    .then(_ => {
-                        done();
-                    }).catch(_ => {
-                        done(new Error());
-                });
-            });
-
             it("Standard case should update user", (done) => {
                 factory.agents.activeMemberAgent.put("/api/notifications/portraitRight/4")
                     .send({answer: true})
