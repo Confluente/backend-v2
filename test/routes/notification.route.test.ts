@@ -34,7 +34,7 @@ describe("notification.route.ts '/api/notifications", () => {
                         } else {
                             done(new Error());
                         }
-                    }).catch(res => {
+                    }).catch(_ => {
                         done(new Error());
                 });
             });
@@ -48,7 +48,7 @@ describe("notification.route.ts '/api/notifications", () => {
                         } else {
                             done(new Error());
                         }
-                    }).catch(res => {
+                    }).catch(_ => {
                         done(new Error());
                     });
             });
@@ -56,7 +56,7 @@ describe("notification.route.ts '/api/notifications", () => {
             it("Standard case should update user", (done) => {
                 factory.agents.activeMemberAgent.put("/api/notifications/portraitRight/4")
                     .send({answer: true})
-                    .then(res => {
+                    .then(_ => {
                         User.findByPk(4).then(function(user: User): void {
                             if (user.consentWithPortraitRight) {
                                 done();
@@ -71,7 +71,7 @@ describe("notification.route.ts '/api/notifications", () => {
                 factory.agents.nonActiveMemberAgent.put("/api/notifications/portraitRight/5")
                     .send({answer: false})
                     .expect(200)
-                    .then(res => {
+                    .then(_ => {
                         User.findByPk(5).then(function(user: User): void {
                             if (!user.consentWithPortraitRight) {
                                 done();

@@ -70,7 +70,7 @@ router.route("/")
                 return res.status(201).send(createdRole);
             }).catch(function(err: Error): any {
                 return res.status(406).send("Role with identical name already exists");
-            }).done();
+            });
         });
     });
 
@@ -143,7 +143,7 @@ router.route("/:id")
                         console.log(err);
                     });
                 }
-            }).done();
+            });
         });
     })
 

@@ -81,7 +81,7 @@ describe("page.route.ts '/api/pages'", () => {
                   } else {
                       done(new Error());
                   }
-              }).catch(function(error: any): any {
+              }).catch(function(__: any): any {
                   done(new Error());
               });
            }).catch(function(_: any): any {
@@ -101,7 +101,7 @@ describe("page.route.ts '/api/pages'", () => {
                     } else {
                         done(new Error());
                     }
-                }).catch(function(error: any): any {
+                }).catch(function(__: any): any {
                     done(new Error());
                 });
             }).catch(function(_: any): any {
@@ -127,9 +127,9 @@ describe("page.route.ts '/api/pages'", () => {
             factory.agents.superAdminAgent.delete("/api/pages/" + newPage.url)
                 .expect(204).then(function(_: any): any {
                 factory.agents.superAdminAgent.get("/api/pages/" + newPage.url)
-                    .expect(404).then(function(res: any): any {
+                    .expect(404).then(function(__: any): any {
                     done();
-                }).catch(function(error: any): any {
+                }).catch(function(__: any): any {
                     done(new Error());
                 });
             }).catch(function(_: any): any {

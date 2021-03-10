@@ -6,7 +6,7 @@ import {User} from "./user.model";
  * Table for storing the many-to-many relation between activities and users that have subscribed to an activity.
  */
 @Table({timestamps: false})
-export  class Subscription extends Model<Subscription> {
+export  class Subscription extends Model {
 
     @ForeignKey(() => User)
     @AllowNull(false)

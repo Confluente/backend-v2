@@ -330,7 +330,7 @@ router.route("/subscriptions/:id")
 
             // Send confirmation to client
             return res.send(200);
-        }).done();
+        });
     });
 
 // This route is for handling activity specific operations such as getting an activity, editing an activity and
@@ -361,7 +361,7 @@ router.route("/:id")
 
                 next();
             }
-        }).done();
+        });
     })
 
     /**

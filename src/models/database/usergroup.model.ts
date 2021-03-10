@@ -6,7 +6,7 @@ import {User} from "./user.model";
  * Table for storing the many-to-many relation between groups and their members.
  */
 @Table({timestamps: false})
-export class UserGroup extends Model<UserGroup> {
+export class UserGroup extends Model {
 
     @ForeignKey(() => User)
     @AllowNull(false)

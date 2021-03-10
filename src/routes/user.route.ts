@@ -99,7 +99,7 @@ router.route("/")
             res.status(201).send(createdUser);
         }).catch(function(): void {
             res.status(406).send("Account with identical email already exists");
-        }).done();
+        });
     });
 
 // Specific user route
@@ -221,7 +221,7 @@ router.route("/:id")
                 }, function(err: Error): void {
                     console.error(err);
                 });
-            }).done();
+            });
 
         });
     })
@@ -299,7 +299,7 @@ router.route("/changePassword/:id")
                         console.error(err);
                     });
                 }
-            }).done();
+            });
         });
     });
 

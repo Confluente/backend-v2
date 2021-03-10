@@ -2,7 +2,7 @@ import {AllowNull, Column, DataType, ForeignKey, Model, Table} from "sequelize-t
 import {User} from "./user.model";
 
 @Table({timestamps: false})
-export class Session extends Model<Session> {
+export class Session extends Model {
 
     /**
      * Token of the session.

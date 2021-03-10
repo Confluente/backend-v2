@@ -3,7 +3,7 @@ import {stringValidation} from "../../helpers/type.validation.helper";
 
 
 @Table({timestamps: false})
-export class CompanyOpportunity extends Model<CompanyOpportunity> {
+export class CompanyOpportunity extends Model {
 
     /**
      * Title of the opportunity.

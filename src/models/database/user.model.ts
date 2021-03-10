@@ -20,7 +20,7 @@ import {UserGroup} from "./usergroup.model";
 import {Session} from "./session.model";
 
 @Table({timestamps: false})
-export class User extends Model<User> {
+export class User extends Model {
 
     /**
      * Database id of the user.

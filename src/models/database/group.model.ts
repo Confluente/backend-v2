@@ -16,7 +16,7 @@ import {Activity} from "./activity.model";
 
 
 @Table({timestamps: false})
-export class Group extends Model<Group> {
+export class Group extends Model {
 
     @PrimaryKey
     @AllowNull(false)

@@ -1,5 +1,4 @@
 import {TestFactory} from "../testFactory";
-import {cleanDb} from "../test.helper";
 import {User} from "../../src/models/database/user.model";
 import {getAgent, nonActiveMember} from "../test.data";
 const factory: TestFactory = new TestFactory();
@@ -64,7 +63,7 @@ describe("auth.route.ts '/api/auth'", () => {
                         delete naMember.id;
 
                         // Create new member
-                        User.create(naMember).then(function(dbUser: User): void {
+                        User.create(naMember).then(function(_: User): void {
 
                             // Create new agent
                             const agent = getAgent(factory.app);

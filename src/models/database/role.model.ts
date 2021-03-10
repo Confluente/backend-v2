@@ -13,7 +13,7 @@ import {
 import {User} from "./user.model";
 
 @Table({timestamps: false})
-export class Role extends Model<Role> {
+export class Role extends Model {
 
     /**
      * ID of the role

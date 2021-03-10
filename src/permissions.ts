@@ -1,11 +1,7 @@
-import {all} from "bluebird";
-import {Request, Response} from "express";
-
 import {User} from "./models/database/user.model";
 import {Group} from "./models/database/group.model";
 import {Activity} from "./models/database/activity.model";
 import {Role} from "./models/database/role.model";
-import {UserGroup} from "./models/database/usergroup.model";
 
 /**
  * Checks whether user has required permissions for a given scope
