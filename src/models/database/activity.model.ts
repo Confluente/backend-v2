@@ -55,7 +55,10 @@ export class Activity extends Model {
      * Date of the activity.
      */
     @AllowNull(false)
-    @Column(DataType.DATE)
+    @Column({
+        type: DataType.DATE,
+        validate: {isDate: true}
+    })
     public date!: any;
 
     /**
@@ -164,7 +167,10 @@ export class Activity extends Model {
     /**
      * Subscription deadline of the activity.
      */
-    @Column(DataType.TIME)
+    @Column({
+        type: DataType.DATE,
+        validate: {isDate: true}
+    })
     public subscriptionDeadline: any | null;
 
     /**

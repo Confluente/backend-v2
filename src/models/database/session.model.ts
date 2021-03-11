@@ -37,6 +37,9 @@ export class Session extends Model {
      * Expiration date of the session.
      */
     @AllowNull(false)
-    @Column(DataType.DATE)
+    @Column({
+        type: DataType.DATE,
+        validate: {isDate: true}
+    })
     public expires!: any;
 }
