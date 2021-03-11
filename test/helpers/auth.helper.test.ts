@@ -10,7 +10,7 @@ import {User} from "../../src/models/database/user.model";
 import {roleSuperAdmin, superAdmin} from "../test.data";
 import {TestFactory} from "../testFactory";
 import {Role} from "../../src/models/database/role.model";
-import {cleanRoles, cleanSessions, cleanUsers} from "../test.helper";
+import {cleanSessions, cleanUsers} from "../test.helper";
 import {Session} from "../../src/models/database/session.model";
 
 const factory: TestFactory = new TestFactory();
