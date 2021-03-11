@@ -1,6 +1,6 @@
-import {log} from "./logger";
 import {app, setupServer} from './expressServer';
 import {db} from "./db";
+import {logger} from "./logger";
 
 const httpServer = require('http').createServer(app);
 const https = require('https');
@@ -23,7 +23,7 @@ const fs = require('fs');
 
     // Start server
     httpServer.listen(port, function(): any {
-        log.info('Listening on port ' + port);
+        logger.info('Listening on port ' + port);
     });
 
     // Only for live website version
@@ -35,7 +35,7 @@ const fs = require('fs');
         }, app);
 
         httpsServer.listen(443, function(): void {
-            log.info('Listening...');
+            logger.info('Listening...');
         });
     }
 })();

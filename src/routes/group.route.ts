@@ -5,6 +5,7 @@ import {User} from "../models/database/user.model";
 
 import {checkPermission} from "../permissions";
 import {GroupWeb} from "../models/web/group.web.model";
+import {logger} from "../logger";
 
 const router: Router = express.Router();
 
@@ -70,7 +71,7 @@ router.route("/")
                 // Send created group back to the client
                 res.status(201).send(result);
             }).catch(function(err: Error): void {
-                console.error(err);
+                logger.error(err);
             });
         });
     });
@@ -158,7 +159,7 @@ router.route("/:id")
                 // Send new group to the client
                 res.send(updatedGroup);
             }, function(err: Error): void {
-                console.error(err);
+                logger.error(err);
             });
         });
     })

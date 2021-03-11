@@ -4,6 +4,7 @@ import {Page} from "../models/database/page.model";
 import {PageWeb} from "../models/web/page.web.model";
 
 import {checkPermission} from "../permissions";
+import {logger} from "../logger";
 
 const router: Router = express.Router();
 
@@ -88,7 +89,7 @@ router.route("/:url([^\?]+)")
             });
 
         }).catch(function(err: Error): any {
-            console.error(err);
+            logger.error(err);
             res.status(400).send("Error in deleting the page.");
         });
     });

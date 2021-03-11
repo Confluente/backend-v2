@@ -18,6 +18,7 @@ const router: Router = express.Router();
 
 import {Op, where} from 'sequelize';
 import {ActivityWeb} from "../models/web/activity.web.model";
+import {logger} from "../logger";
 
 // path where the pictures of the activities are put in in frontend
 let pathToPictures: string = '';
@@ -171,7 +172,7 @@ router.route("/")
                 // Send new activity back to the client
                 res.status(201).send(createdActivity);
             }).catch(function(err: Error): void {
-                console.error(err);
+                logger.error(err);
             });
         });
     });
@@ -416,7 +417,7 @@ router.route("/:id")
                 return res.locals.activity.update(req.body).then(function(updatedActivity: Activity): void {
                     res.send(updatedActivity);
                 }, function(err: Error): void {
-                    console.error(err);
+                    logger.error(err);
                 });
             });
         });

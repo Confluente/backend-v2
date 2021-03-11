@@ -9,6 +9,7 @@ import {generateSalt, getPasswordHashSync} from "../helpers/auth.helper";
 import {createTestAccount, createTransport} from "nodemailer";
 import {UserWeb} from "../models/web/user.web.model";
 import {GroupWeb} from "../models/web/group.web.model";
+import {logger} from "../logger";
 
 const router: Router = express.Router();
 
@@ -219,7 +220,7 @@ router.route("/:id")
                     // Send edited user back to the client.
                     res.send(returnedUser);
                 }, function(err: Error): void {
-                    console.error(err);
+                    logger.error(err);
                 });
             });
 
@@ -296,7 +297,7 @@ router.route("/changePassword/:id")
                         // Send updated user to the client
                         return res.send(updatedUser);
                     }, function(err: Error): void {
-                        console.error(err);
+                        logger.error(err);
                     });
                 }
             });

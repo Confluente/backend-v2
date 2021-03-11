@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import {scheduleJob} from 'node-schedule';
 import {Op} from "sequelize";
 import {createTestAccount, createTransport} from 'nodemailer';
-import {log} from "./logger";
+import {logger} from "./logger";
 
 import {checkPermission} from "./permissions";
 
@@ -31,7 +31,7 @@ export async function setupServer(server: Express): Promise<void> {
         server.use(morgan("combined", {stream: require("fs").createWriteStream("./access.log", {flags: "a"})}));
 
         server.use(function(req: any, res: any, next: () => void): void {
-            log.info({req}, "express_request");
+            logger.info(req, "express_request");
             next();
         });
     }

@@ -3,6 +3,7 @@ import express, {Response, Request, Router, NextFunction} from "express";
 import {CompanyOpportunity} from "../models/database/company.opportunity.model";
 
 import {checkPermission} from "../permissions";
+import {logger} from "../logger";
 
 const router: Router = express.Router();
 
@@ -33,11 +34,11 @@ router.route("/companyOpportunities")
             }).then((results: CompanyOpportunity[]) => {
                 return res.status(200).send(results);
             }).catch((err: Error) => {
-                console.error(err);
+                logger.error(err);
                 return res.sendStatus(500);
             });
         }).catch((err: Error) => {
-            console.error(err);
+            logger.error(err);
             res.sendStatus(500);
         });
     })
@@ -67,14 +68,14 @@ router.route("/companyOpportunities")
                     // send back new instance
                     return res.status(201).send(createdCompanyOpportunity);
                 }).catch((err: Error) => {
-                    console.error(err);
+                    logger.error(err);
                     return res.status(400).send({
                         message: "Something went wrong in creating the company " +
                             "opportunity. Check the logs for a detailed message."
                     });
                 });
             }).catch((err: Error) => {
-            console.error(err);
+            logger.error(err);
             return res.sendStatus(500);
         });
     });
@@ -106,11 +107,11 @@ router.route("/companyOpportunities/:id")
                     next();
                 }
             }).catch(function(err: Error): any {
-                console.error(err);
+                logger.error(err);
                 return res.sendStatus(500);
             });
         }).catch(function(err: Error): any {
-            console.error(err);
+            logger.error(err);
             return res.sendStatus(500);
         });
     })
@@ -142,11 +143,11 @@ router.route("/companyOpportunities/:id")
             res.locals.companyOpportunity.update(req.body).then((putCompanyOpportunity: CompanyOpportunity) => {
                 return res.status(200).send(putCompanyOpportunity);
             }).catch((err: Error) => {
-                console.error(err);
+                logger.error(err);
                 return res.status(400).send({message: "Could not update company opportunity."});
             });
         }).catch(function(err: Error): any {
-            console.error(err);
+            logger.error(err);
             return res.sendStatus(500);
         });
     })
@@ -168,11 +169,11 @@ router.route("/companyOpportunities/:id")
                 res.locals.companyOpportunity.destroy().then(() => {
                     return res.sendStatus(204);
                 }).catch(function(err: Error): any {
-                    console.error(err);
+                    logger.error(err);
                     return res.sendStatus(500);
                 });
             }).catch(function(err: Error): any {
-                console.error(err);
+                logger.error(err);
                 return res.sendStatus(500);
             });
     });
@@ -198,11 +199,11 @@ router.route("/companyOpportunities/category/:category")
                     // Return status
                     return res.status(200).send(foundCompanyOpportunities);
                 }).catch(function(err: Error): any {
-                    console.error(err);
+                    logger.error(err);
                     return res.sendStatus(500);
                 });
             }).catch(function(err: Error): any {
-                console.error(err);
+                logger.error(err);
                 return res.sendStatus(500);
             });
     });
