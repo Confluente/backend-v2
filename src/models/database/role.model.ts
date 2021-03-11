@@ -11,7 +11,7 @@ import {
     Unique
 } from "sequelize-typescript";
 import {User} from "./user.model";
-import {booleanValidation, booleanValidationOrNull, stringValidation} from "../../helpers/type.validation.helper";
+import {booleanValidation, stringValidation} from "../../helpers/type.validation.helper";
 
 @Table({timestamps: false})
 export class Role extends Model {

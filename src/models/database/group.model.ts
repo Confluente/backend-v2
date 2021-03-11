@@ -8,12 +8,12 @@ import {
     Unique,
     BelongsToMany,
     AutoIncrement,
-    HasMany
+    HasMany, Default
 } from 'sequelize-typescript';
 import {User} from "./user.model";
 import {UserGroup} from "./usergroup.model";
 import {Activity} from "./activity.model";
-import {stringValidation} from "../../helpers/type.validation.helper";
+import {booleanValidation, stringValidation} from "../../helpers/type.validation.helper";
 
 
 @Table({timestamps: false})
@@ -61,7 +61,11 @@ export class Group extends Model {
      * Whether the group can organize activities.
      */
     @AllowNull(false)
-    @Column(DataType.BOOLEAN)
+    @Default(false)
+    @Column({
+        type: DataType.BOOLEAN,
+        validate: {booleanValidation}
+    })
     public canOrganize!: boolean;
 
     /**

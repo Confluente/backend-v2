@@ -18,7 +18,7 @@ import {Role} from "./role.model";
 import {Subscription} from "./subscription.model";
 import {UserGroup} from "./usergroup.model";
 import {Session} from "./session.model";
-import {stringValidation, stringValidationOrNull} from "../../helpers/type.validation.helper";
+import {booleanValidation, stringValidation, stringValidationOrNull} from "../../helpers/type.validation.helper";
 
 @Table({timestamps: false})
 export class User extends Model {
@@ -141,7 +141,11 @@ export class User extends Model {
      * Whether the user gave consent regarding portrait right.
      */
     @Default(false)
-    @Column(DataType.BOOLEAN)
+    @AllowNull(false)
+    @Column({
+        type: DataType.BOOLEAN,
+        validate: {booleanValidation}
+    })
     public consentWithPortraitRight: boolean;
 
     /**
@@ -162,7 +166,11 @@ export class User extends Model {
      * Whether the account of the user is approved
      */
     @Default(false)
-    @Column(DataType.BOOLEAN)
+    @AllowNull(false)
+    @Column({
+        type: DataType.BOOLEAN,
+        validate: {booleanValidation}
+    })
     public approved: boolean;
 
     /**

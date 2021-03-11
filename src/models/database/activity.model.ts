@@ -13,7 +13,6 @@ import {User} from "./user.model";
 import {Subscription} from "./subscription.model";
 import {
     booleanValidation,
-    booleanValidationOrNull,
     stringValidation,
     stringValidationOrNull
 } from "../../helpers/type.validation.helper";
@@ -81,6 +80,7 @@ export class Activity extends Model {
      * canSubscribes stores whether members can subscribe to the activity.
      */
     @Default(false)
+    @AllowNull(false)
     @Column({
         type: DataType.BOOLEAN,
         validate: {booleanValidation}
@@ -168,7 +168,7 @@ export class Activity extends Model {
     @AllowNull(false)
     @Column({
         type: DataType.BOOLEAN,
-        validate: {booleanValidationOrNull}
+        validate: {booleanValidation}
     })
     public published!: boolean;
 
@@ -179,7 +179,7 @@ export class Activity extends Model {
     @AllowNull(false)
     @Column({
         type: DataType.BOOLEAN,
-        validate: {booleanValidationOrNull}
+        validate: {booleanValidation}
     })
     public hasCoverImage: boolean;
 
