@@ -18,7 +18,12 @@ import {Role} from "./role.model";
 import {Subscription} from "./subscription.model";
 import {UserGroup} from "./usergroup.model";
 import {Session} from "./session.model";
-import {booleanValidation, stringValidation, stringValidationOrNull} from "../../helpers/type.validation.helper";
+import {
+    booleanValidation,
+    numberValidation, numberValidationOrNull,
+    stringValidation,
+    stringValidationOrNull
+} from "../../helpers/type.validation.helper";
 
 @Table({timestamps: false})
 export class User extends Model {
@@ -30,7 +35,10 @@ export class User extends Model {
     @AutoIncrement
     @Unique
     @AllowNull(false)
-    @Column(DataType.INTEGER)
+    @Column({
+        type: DataType.INTEGER,
+        validate: {numberValidation}
+    })
     public id!: number;
 
     /**
@@ -106,7 +114,10 @@ export class User extends Model {
     /**
      * Year that the user started with honors.
      */
-    @Column(DataType.INTEGER)
+    @Column({
+        type: DataType.INTEGER,
+        validate: {numberValidationOrNull}
+    })
     public honorsGeneration: number | null;
     
     /**
@@ -200,7 +211,10 @@ export class User extends Model {
      */
     @ForeignKey(() => Role)
     @AllowNull(false)
-    @Column
+    @Column({
+        type: DataType.INTEGER,
+        validate: {numberValidation}
+    })
     public roleId!: number;
 
     /**

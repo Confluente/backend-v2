@@ -13,7 +13,7 @@ import {
 import {User} from "./user.model";
 import {UserGroup} from "./usergroup.model";
 import {Activity} from "./activity.model";
-import {booleanValidation, stringValidation} from "../../helpers/type.validation.helper";
+import {booleanValidation, numberValidationOrNull, stringValidation} from "../../helpers/type.validation.helper";
 
 
 @Table({timestamps: false})
@@ -23,7 +23,10 @@ export class Group extends Model {
     @AllowNull(false)
     @AutoIncrement
     @Unique
-    @Column(DataType.INTEGER)
+    @Column({
+        type: DataType.INTEGER,
+        validate: {numberValidationOrNull}
+    })
     public id!: number;
 
     /**

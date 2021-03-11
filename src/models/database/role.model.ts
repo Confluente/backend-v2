@@ -11,7 +11,11 @@ import {
     Unique
 } from "sequelize-typescript";
 import {User} from "./user.model";
-import {booleanValidation, stringValidation} from "../../helpers/type.validation.helper";
+import {
+    booleanValidation,
+    numberValidation,
+    stringValidation
+} from "../../helpers/type.validation.helper";
 
 @Table({timestamps: false})
 export class Role extends Model {
@@ -22,7 +26,10 @@ export class Role extends Model {
     @AutoIncrement
     @Unique
     @PrimaryKey
-    @Column(DataType.INTEGER)
+    @Column({
+        type: DataType.INTEGER,
+        validate: {numberValidation}
+    })
     public id: number;
 
     /**

@@ -12,7 +12,7 @@ import {Group} from './group.model';
 import {User} from "./user.model";
 import {Subscription} from "./subscription.model";
 import {
-    booleanValidation,
+    booleanValidation, numberValidation, numberValidationOrNull,
     stringValidation,
     stringValidationOrNull
 } from "../../helpers/type.validation.helper";
@@ -90,13 +90,19 @@ export class Activity extends Model {
     /**
      * Participation fee of the activity.
      */
-    @Column(DataType.DECIMAL)
+    @Column({
+        type: DataType.DECIMAL,
+        validate: {numberValidationOrNull}
+    })
     public participationFee: number | null;
 
     /**
      * Number of questions in the subscription form.
      */
-    @Column(DataType.INTEGER)
+    @Column({
+        type: DataType.INTEGER,
+        validate: {numberValidationOrNull}
+    })
     public numberOfQuestions: number | null;
 
     /**
@@ -194,7 +200,10 @@ export class Activity extends Model {
      */
     @ForeignKey(() => Group)
     @AllowNull(false)
-    @Column
+    @Column({
+        type: DataType.INTEGER,
+        validate: {numberValidation}
+    })
     public organizerId!: number;
 
     /**
