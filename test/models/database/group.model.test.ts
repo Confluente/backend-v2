@@ -46,7 +46,7 @@ describe("group.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["displayName", "fullName", "description", "canOrganize", "email", "type"];
+        const needed_props = ["displayName", "fullName", "description", "email", "type"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {
