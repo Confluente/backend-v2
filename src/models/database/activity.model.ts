@@ -11,6 +11,7 @@ import {
 import {Group} from './group.model';
 import {User} from "./user.model";
 import {Subscription} from "./subscription.model";
+import {stringValidation, stringValidationOrNull} from "../../helpers/type.validation.helper";
 
 @Table({
     timestamps: false
@@ -21,20 +22,29 @@ export class Activity extends Model {
      * Name of the activity.
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public name!: string;
 
     /**
      * Description of the activity.
      */
     @AllowNull(false)
-    @Column(DataType.STRING(8192))
+    @Column({
+        type: DataType.STRING(8192),
+        validate: {stringValidationOrNull},
+    })
     public description!: string;
 
     /**
      * Location of the activity.
      */
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidationOrNull},
+    })
     public location: string | null;
 
     /**
@@ -47,13 +57,19 @@ export class Activity extends Model {
     /**
      * Start time of the activity.
      */
-    @Column(DataType.STRING)
+    @Column({
+        type: DataType.STRING,
+        validate: {stringValidationOrNull},
+    })
     public startTime: string | null;
 
     /**
      * End time of the activity.
      */
-    @Column(DataType.STRING)
+    @Column({
+        type: DataType.STRING,
+        validate: {stringValidationOrNull},
+    })
     public endTime: string | null;
 
     /**
@@ -80,7 +96,10 @@ export class Activity extends Model {
      * For every question the string stores whether the question is text, multiple choice or checkboxes.
      * Types are separated by #,# delimiter.
      */
-    @Column(DataType.STRING(1024))
+    @Column({
+        type: DataType.STRING(1024),
+        validate: {stringValidationOrNull},
+    })
     public typeOfQuestion: string | null;
 
     /**
@@ -88,7 +107,10 @@ export class Activity extends Model {
      * For every question the string stores the description (actual question).
      * Descriptions are separated by #,# delimiter.
      */
-    @Column(DataType.STRING(8192))
+    @Column({
+        type: DataType.STRING(8192),
+        validate: {stringValidationOrNull},
+    })
     public questionDescriptions: string | null;
 
     /**
@@ -97,7 +119,10 @@ export class Activity extends Model {
      * Options of different questions are separated by #,#.
      * Options for the same question are separated by #;#.
      */
-    @Column(DataType.STRING(8192))
+    @Column({
+        type: DataType.STRING(8192),
+        validate: {stringValidationOrNull},
+    })
     public formOptions: string | null;
 
     /**
@@ -105,7 +130,10 @@ export class Activity extends Model {
      * For every question the string stores true or false.
      * Separated by #,#.
      */
-    @Column(DataType.STRING(8192))
+    @Column({
+        type: DataType.STRING(8192),
+        validate: {stringValidationOrNull},
+    })
     public required: string | null;
 
     /**
@@ -113,7 +141,10 @@ export class Activity extends Model {
      * For every question the string stores true or false.
      * Separated by #,#.
      */
-    @Column(DataType.STRING(8192))
+    @Column({
+        type: DataType.STRING(8192),
+        validate: {stringValidationOrNull},
+    })
     public privacyOfQuestions: string | null;
 
     /**

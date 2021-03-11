@@ -11,6 +11,7 @@ import {
     Unique
 } from "sequelize-typescript";
 import {User} from "./user.model";
+import {stringValidation} from "../../helpers/type.validation.helper";
 
 @Table({timestamps: false})
 export class Role extends Model {
@@ -29,7 +30,10 @@ export class Role extends Model {
      */
     @Unique
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public name!: string;
 
     /**

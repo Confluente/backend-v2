@@ -1,5 +1,6 @@
 import {AllowNull, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
 import {User} from "./user.model";
+import {stringValidation} from "../../helpers/type.validation.helper";
 
 @Table({timestamps: false})
 export class Session extends Model {
@@ -23,7 +24,10 @@ export class Session extends Model {
      * IP address of the user.
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public ip!: string;
 
     /**

@@ -18,6 +18,7 @@ import {Role} from "./role.model";
 import {Subscription} from "./subscription.model";
 import {UserGroup} from "./usergroup.model";
 import {Session} from "./session.model";
+import {stringValidation, stringValidationOrNull} from "../../helpers/type.validation.helper";
 
 @Table({timestamps: false})
 export class User extends Model {
@@ -37,21 +38,30 @@ export class User extends Model {
      */
     @Unique
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public email!: string;
 
     /**
      * First name of the user.
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public firstName!: string;
 
     /**
      * Last name of the user.
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public lastName!: string;
 
     /**
@@ -60,25 +70,37 @@ export class User extends Model {
      */
     // TODO delete this, and just make a function for get Display Name or smth
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public displayName!: string;
 
     /**
      * Major of the user
      */
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public major: string | null;
 
     /**
      * Stores the address of the user.
      */
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidationOrNull},
+    })
     public address: string | null;
 
     /**
      * Honors track of the user.
      */
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidationOrNull},
+    })
     public track: string | null;
 
     /**
@@ -91,19 +113,28 @@ export class User extends Model {
      * Stores what kind of membership the user has
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidationOrNull},
+    })
     public honorsMembership!: string;
 
     /**
      * Campus card number of the user.
      */
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidationOrNull},
+    })
     public campusCardNumber: string | null;
 
     /**
      * Mobile phone number of the user.
      */
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidationOrNull},
+    })
     public mobilePhoneNumber: string | null;
 
     /**
@@ -138,7 +169,10 @@ export class User extends Model {
      * The hash link via which the account can be approved
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public approvingHash!: string;
 
     /**

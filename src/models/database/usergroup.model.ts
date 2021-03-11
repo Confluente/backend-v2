@@ -1,6 +1,7 @@
 import {AllowNull, Column, DataType, Default, ForeignKey, Model, Table} from "sequelize-typescript";
 import {Group} from "./group.model";
 import {User} from "./user.model";
+import {stringValidationOrNull} from "../../helpers/type.validation.helper";
 
 /**
  * Table for storing the many-to-many relation between groups and their members.
@@ -20,6 +21,9 @@ export class UserGroup extends Model {
 
     @AllowNull(false)
     @Default("member")
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidationOrNull},
+    })
     func: string;
 }

@@ -12,3 +12,8 @@ export const booleanValidation = (data: any) => {
     }
 };
 
+export const stringValidationOrNull = (data: any) => {
+    if (typeof data !== "string" && data !== null) {
+        throw new ValidationError("Table column expected string (or null) but received " + (typeof data).toString());
+    }
+};

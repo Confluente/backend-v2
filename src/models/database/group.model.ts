@@ -13,6 +13,7 @@ import {
 import {User} from "./user.model";
 import {UserGroup} from "./usergroup.model";
 import {Activity} from "./activity.model";
+import {stringValidation} from "../../helpers/type.validation.helper";
 
 
 @Table({timestamps: false})
@@ -29,7 +30,10 @@ export class Group extends Model {
      * Display name of the group (shorter than fullName but identifiable).
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public displayName!: string;
 
     /**
@@ -37,14 +41,20 @@ export class Group extends Model {
      */
     @AllowNull(false)
     @Unique
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public fullName!: string;
 
     /**
      * Description of the group.
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public description!: string;
 
     /**
@@ -58,14 +68,20 @@ export class Group extends Model {
      * The email address of the group.
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public email!: string;
 
     /**
      * The type of the group.
      */
     @AllowNull(false)
-    @Column(DataType.STRING(128))
+    @Column({
+        type: DataType.STRING(128),
+        validate: {stringValidation},
+    })
     public type!: string;
 
     /**

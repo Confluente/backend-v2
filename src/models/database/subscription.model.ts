@@ -1,6 +1,7 @@
 import {AllowNull, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
 import {Activity} from "./activity.model";
 import {User} from "./user.model";
+import {stringValidationOrNull} from "../../helpers/type.validation.helper";
 
 /**
  * Table for storing the many-to-many relation between activities and users that have subscribed to an activity.
@@ -18,6 +19,9 @@ export  class Subscription extends Model {
     @Column(DataType.INTEGER)
     activityId: number;
 
-    @Column(DataType.STRING(8192))
+    @Column({
+        type: DataType.STRING(8192),
+        validate: {stringValidationOrNull},
+    })
     answers: string;
 }
