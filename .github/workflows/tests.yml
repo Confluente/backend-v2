@@ -27,4 +27,4 @@ jobs:
         env:
           NODE_ENV: test
         run: |
-          mocha -r ts-node/register test/**/*.test.ts -t 10000 --require test/testFactory.ts
+          npm run tests
