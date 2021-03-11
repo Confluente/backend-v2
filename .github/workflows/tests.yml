@@ -22,3 +22,11 @@ jobs:
         run: |
           npm install
           npm install --only=dev
+
+      - name: Prebuild
+        run:
+          npm run prebuild
+
+      - name: Run tests
+        run: |
+          npm run tests

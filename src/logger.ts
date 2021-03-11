@@ -1,24 +1,20 @@
-import bunyan from 'bunyan';
+import winston from "winston";
 
-function reqSerializer(req: { connection: any; method: any; url: any; headers: any; }): any {
-    if (!req || !req.connection) {
-        return req;
-    }
-
-    return {
-        method: req.method,
-        url: req.url,
-        headers: req.headers
-        // remoteAddress: req.connection.remoteAddress,
-        // remotePort: req.connection.remotePort
-    };
-}
-
-export let log = bunyan.createLogger({
-    name: 'gb24Backend',
-    serializers: {
-        err: bunyan.stdSerializers.err,
-        req: reqSerializer
-    },
-    env: process.env.NODE_ENV
+export const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'logs/combined.log' })
+    ],
 });
+
+//
+// If we're not in production then log to the `console` with the format:
+// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+//
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.simple(),
+    }));
+}

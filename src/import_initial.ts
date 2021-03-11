@@ -1,21 +1,27 @@
 import {all} from 'q';
 
-import {Activity} from "./models/activity";
-import {User} from "./models/user";
-import {Group} from "./models/group";
-import {Role} from "./models/role";
+import {Activity} from "./models/database/activity.model";
+import {User} from "./models/database/user.model";
+import {Group} from "./models/database/group.model";
+import {Role} from "./models/database/role.model";
 
 import fs from 'fs';
 
-if (!fs.existsSync("./data.sqlite")) {
-    // database does not yet exist! great :)
-} else {
-    fs.unlinkSync("./data.sqlite");
-    // throw new Error("Delete the database (data.sqlite) before generating a new one");
+import {db} from "./db";
+
+if (process.env.NODE_ENV !== "test") {
+    if (!fs.existsSync("./data.sqlite")) {
+        console.log("Not deleting current instance");
+        // database does not yet exist! great :)
+    } else {
+        console.log("Deleting current instance of database!");
+        fs.unlinkSync("./data.sqlite");
+        // throw new Error("Delete the database (data.sqlite) before generating a new one");
+    }
 }
 
 // Standard roles
-const roles = [
+export const roles = [
     {
         id: 1,
         name: "Super admin",
@@ -37,7 +43,10 @@ const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: true,
-        ACTIVITY_MANAGE: true
+        ACTIVITY_MANAGE: true,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: true
     },
     {
         id: 2,
@@ -60,7 +69,10 @@ const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: false,
-        ACTIVITY_MANAGE: false
+        ACTIVITY_MANAGE: false,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: false
     },
     {
         id: 3,
@@ -83,7 +95,10 @@ const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: false,
-        ACTIVITY_MANAGE: false
+        ACTIVITY_MANAGE: false,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: false
     },
     {
         id: 4,
@@ -106,7 +121,10 @@ const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: true,
-        ACTIVITY_MANAGE: true
+        ACTIVITY_MANAGE: true,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: true
     },
     {
         id: 5,
@@ -129,7 +147,10 @@ const roles = [
         // Activities
         ACTIVITY_VIEW_PUBLISHED: true,
         ACTIVITY_VIEW_ALL_UNPUBLISHED: false,
-        ACTIVITY_MANAGE: false
+        ACTIVITY_MANAGE: false,
+        // Partner content
+        PARTNER_VIEW: true,
+        PARTNER_MANAGE: false
     }
 ];
 
@@ -147,7 +168,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 1,
+        roleId: 1,
         groups: [10],
         functions: ["Chair"]
     },
@@ -163,13 +184,13 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 2,
+        roleId: 2,
         groups: [10],
         functions: ["Member"]
     },
     {
         id: 3,
-        email: "boardmember",
+        email: "boardmember@student.tue.nl",
         displayName: "Board Member",
         firstName: "Board",
         lastName: "Member",
@@ -179,7 +200,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 4,
+        roleId: 4,
         groups: [1],
         functions: ["Member"]
     },
@@ -195,7 +216,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 3,
+        roleId: 3,
         groups: [3, 4],
         functions: ["Chair", "Secretary"],
         activities: [2],
@@ -203,9 +224,9 @@ const users = [
     },
     {
         id: 5,
-        email: "activemember2@student.tue.nl",
-        displayName: "Active2 Member",
-        firstName: "Active2",
+        email: "nonactivemember@student.tue.nl",
+        displayName: "NonActive Member",
+        firstName: "NonActive",
         lastName: "Member",
         honorsMembership: "member",
         mobilePhoneNumber: "somenumber",
@@ -213,9 +234,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 3,
-        groups: [3],
-        functions: ["Member"]
+        roleId: 3,
     },
     {
         id: 6,
@@ -229,7 +248,7 @@ const users = [
         passwordHash: Buffer.from("tfExQFTNNT/gMWGfe5Z8CGz2bvBjoAoE7Mz7pmWd6/g=", "base64"),
         passwordSalt: Buffer.from("LAFU0L7mQ0FhEmPybJfHDiF11OAyBFjEIj8/oBzVZrM=", "base64"),
         approved: true,
-        RoleId: 3,
+        roleId: 3,
         groups: [4],
         functions: ["Treasurer"],
         activities: [2],
@@ -342,7 +361,8 @@ const activities: any[] = [
         startTime: "18:00",
         endTime: "20:00",
         participationFee: 8.5,
-        OrganizerId: 2
+        organizerId: 2,
+        published: false
     },
     {
         id: 2,
@@ -361,51 +381,62 @@ const activities: any[] = [
         required: "true#,#true#,#true#,#false",
         subscriptionDeadline: (new Date()).setDate((new Date()).getDate() + 1),
         published: true,
-        OrganizerId: 3
+        organizerId: 3
     }
 ];
 
-// Import initial administrator and initial group to database
-all([
-    Role.bulkCreate(roles).then(function(result: any): void {
-        console.log("Created roles");
-    }),
-    User.bulkCreate(users).then(function(result: any): void {
-        console.log("Created users");
-    }),
-    Group.bulkCreate(groups).then(function(result: any): void {
-        console.log("Created groups");
-    }),
-    Activity.bulkCreate(activities).then(function(result: any): void {
-        console.log("Created activities");
-    })
-]).then(function(): any {
-    const promises: any[] = [];
 
-    users.forEach(function(userData: any): void {
-        const promise = User.findByPk(userData.email).then(function(user: User): void {
-            if (!userData.functions || !userData.groups) {
-            } else if (userData.functions.length !== userData.groups.length) {
-            } else {
-                for (let i = 0; i < userData.functions.length; i++) {
-                    user.addGroup(userData.groups[i], {through: {func: userData.functions[i]}});
-                }
-            }
+if (process.env.NODE_ENV !== "test") {
+    (async () => {
 
-            if (!userData.activities) {
+        await db.sync({force: true});
 
-            } else if (userData.activities && userData.activities.length === userData.answers.length) {
-                for (let i = 0; i < userData.activities.length; i++) {
-                    Activity.findByPk(userData.activities[i]).then(function(activity: Activity): void {
-                        user.addActivity(activity, {through: {answers: userData.answers[i]}});
-                    });
-                }
-            }
+        all([
+            await Role.bulkCreate(roles).then(function(result: any): void {
+                console.log("==========Created roles==========");
+            }).catch(function(err: any): void {
+                console.error("Roles error!!!");
+                console.log(err);
+            }),
+
+            await User.bulkCreate(users).then(function(result: any): void {
+                console.log("==========Created users==========");
+            }).catch(function(err: any): void {
+                console.error("Users error!!!");
+                console.log(err);
+            }),
+
+            await Group.bulkCreate(groups).then(function(result: any): void {
+                console.log("==========Created groups==========");
+            }).catch(function(err: any): void {
+                console.error("Groups error!!!");
+                console.log(err);
+            }),
+
+            await Activity.bulkCreate(activities).then(function(result: any): void {
+                console.log("==========Created activities==========");
+            }).catch(function(err: any): void {
+                console.error("Activities error!!!");
+                console.log(err);
+            }),
+        ]).then(function(): void {
+            users.forEach(function(userData: any): void {
+                User.findByPk(userData.id).then(function(user: User): void {
+                    if (!userData.functions || !userData.groups) {
+                    } else if (userData.functions.length !== userData.groups.length) {
+                    } else {
+                        for (let i = 0; i < userData.groups.length; i++) {
+                            Group.findByPk(userData.groups[i]).then(function(group: Group): void {
+                                user.$add('groups', group, {through: {func: userData.functions[i]}})
+                                    .catch(function(err: Error): void {
+                                        console.log("Usergroup add error!");
+                                        console.log(err);
+                                    });
+                            });
+                        }
+                    }
+                });
+            });
         });
-        promises.push(promise);
-    });
-
-    return all(promises);
-}).then(function(): void {
-    console.log("Done!");
-}).done();
+    })();
+}
