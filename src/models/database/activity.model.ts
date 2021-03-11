@@ -11,7 +11,12 @@ import {
 import {Group} from './group.model';
 import {User} from "./user.model";
 import {Subscription} from "./subscription.model";
-import {stringValidation, stringValidationOrNull} from "../../helpers/type.validation.helper";
+import {
+    booleanValidation,
+    booleanValidationOrNull,
+    stringValidation,
+    stringValidationOrNull
+} from "../../helpers/type.validation.helper";
 
 @Table({
     timestamps: false
@@ -76,7 +81,10 @@ export class Activity extends Model {
      * canSubscribes stores whether members can subscribe to the activity.
      */
     @Default(false)
-    @Column(DataType.BOOLEAN)
+    @Column({
+        type: DataType.BOOLEAN,
+        validate: {booleanValidation}
+    })
     public canSubscribe: boolean;
 
     /**
@@ -157,14 +165,22 @@ export class Activity extends Model {
      * Stores whether the activity is published.
      */
     @Default(false)
-    @Column(DataType.BOOLEAN)
-    public published: boolean;
+    @AllowNull(false)
+    @Column({
+        type: DataType.BOOLEAN,
+        validate: {booleanValidationOrNull}
+    })
+    public published!: boolean;
 
     /**
      * Stores whether the activity has a cover image
      */
     @Default(false)
-    @Column(DataType.BOOLEAN)
+    @AllowNull(false)
+    @Column({
+        type: DataType.BOOLEAN,
+        validate: {booleanValidationOrNull}
+    })
     public hasCoverImage: boolean;
 
     /**
