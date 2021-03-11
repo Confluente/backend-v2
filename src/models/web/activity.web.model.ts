@@ -5,11 +5,10 @@ import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
 import {AbstractWebModel} from "./abstract.web.model";
 import {Model, Sequelize} from "sequelize-typescript";
 import {Activity} from "../database/activity.model";
-import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../../helpers/array.helper";
+import {destringifyStringifiedArrayOfStrings} from "../../helpers/array.helper";
 import * as fs from "fs";
 import {pathToActPictures} from "../../constants";
 import {UserWeb} from "./user.web.model";
-import {Group} from "../database/group.model";
 
 enum questionType {"☰ text", "◉ multiple choice", "☑ checkboxes"}
 

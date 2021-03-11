@@ -1,5 +1,4 @@
 import {AbstractWebModel} from "../models/web/abstract.web.model";
-import {GroupWeb} from "../models/web/group.web.model";
 
 export function copyMatchingSourceKeyValues(target: any, source: any): any {
     if (target.constructor.prototype instanceof AbstractWebModel) {
