@@ -240,7 +240,7 @@ router.route("/:id")
             logger.error(err);
             return res.sendStatus(500);
         });
-    })
+    });
 
 router.route("/changePassword/:id")
     /**
