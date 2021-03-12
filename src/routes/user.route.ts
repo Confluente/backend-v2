@@ -59,7 +59,12 @@ router.route("/")
     .post((req: Request, res: Response) => {
         // Check if request has password
         if (!req.body.password || typeof req.body.password !== "string") {
-            return res.sendStatus(400);
+            return res.status(400).send("No password was included in the request.");
+        }
+
+        // Check if request has all necessary attributes
+        if (!req.body.email || !req.body.firstName || !req.body.lastName) {
+            return res.status(400).send("Not all required attributes were send in the request.");
         }
 
         // generate approvingHash, passwordSalt and passwordHash
@@ -70,43 +75,47 @@ router.route("/")
         // Delete password permanently
         delete req.body.password;
 
-        // Set role to be the default member role
-        req.body.role = Role.findOne({
-            where: {
-                name: 'Member'
-            }
-        });
+        // Set role of default member
+        Role.findOne({where: {name: 'Member'}}).then((role: Role) => {
 
-        // Create new user in database
-        return User.create(req.body).then(function(createdUser: User): void {
-            // Send approval email to email
-            createTestAccount().then(function(): void {
+            req.body.roleId = role.id;
 
-                // TODO test if this works?? Same as in expressServer
-                const transporter: any = createTransport({
-                    service: 'gmail',
-                    secure: true,
-                    // Never fill this password in and add it to git! Only filled in locally or on the server!
-                    auth: {
-                        user: 'web@hsaconfluente.nl',
-                        pass: ''
-                    }
+            // Create new user in database
+            return User.create(req.body).then(function(createdUser: User): void {
+
+                // Send approval email to email
+                createTestAccount().then(function(): void {
+
+                    // TODO test if this works?? Same as in expressServer
+                    const transporter: any = createTransport({
+                        service: 'gmail',
+                        secure: true,
+                        // Never fill this password in and add it to git! Only filled in locally or on the server!
+                        auth: {
+                            user: 'web@hsaconfluente.nl',
+                            pass: ''
+                        }
+                    });
+
+                    const link: string = "https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash;
+
+                    transporter.sendMail({
+                        from: '"website" <web@hsaconfluente.nl>',
+                        to: req.body.email,
+                        subject: "Registration H.S.A. Confluente",
+                        text: "Thank you for making an account on our website hsaconfluente.nl! \n To fully activate your account, please visit this link: https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash,
+                        html: "<h3>&nbsp;</h3><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"padding: 10px 0 30px 0;\"><table style=\"border: 1px solid #cccccc; border-collapse: collapse;\" border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\"><tbody><tr><td style=\"padding: 40px 30px 40px 30px;\" bgcolor=\"#ffffff\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #153643; font-family: Arial, sans-serif; font-size: 24px;\"><h3><strong>Hooray! Welcome to H.S.A. Confluente</strong></h3></td></tr><tr><td style=\"padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;\">Thank you for signing up to the website of H.S.A. Confluente at <a href=\"http://www.hsaconfluente.nl\">www.hsaconfluente.nl</a>. To activate your account on our website, please click the  <a href='" + link + "'>here!</a></td></tr><tr><td><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Events</h4><p>Now that you have an account on the H.S.A. Confluente website, you can subscribe to all the wonderful events that H.S.A. Confluente is organizing. Want to see what activities are coming up? <a href=\"https://hsaconfluente.nl/activities\">Click here!</a></p></td></tr></tbody></table></td><td style=\"font-size: 0; line-height: 0;\" width=\"20\">&nbsp;</td><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Want to learn more?</h4><p>Are you interested in what H.S.A. Confluente is or can offer you? Then go and take an extensive look at our <a href=\"https://hsaconfluente.nl/\">website</a>! You can find pictures of all previous boards as well as information about what committees we have at H.S.A. Confluente!.</p></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr><tr><td style=\"padding: 30px 30px 30px 30px;\" bgcolor=\"#1689ad\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;\" width=\"75%\">Web Commttee H.S.A. Confluente, TU/e 2020</td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table>"
+                    }).then(function(info: any): void {
+                    });
                 });
-
-                const link: string = "https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash;
-
-                transporter.sendMail({
-                    from: '"website" <web@hsaconfluente.nl>',
-                    to: req.body.email,
-                    subject: "Registration H.S.A. Confluente",
-                    text: "Thank you for making an account on our website hsaconfluente.nl! \n To fully activate your account, please visit this link: https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash,
-                    html: "<h3>&nbsp;</h3><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"padding: 10px 0 30px 0;\"><table style=\"border: 1px solid #cccccc; border-collapse: collapse;\" border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\"><tbody><tr><td style=\"padding: 40px 30px 40px 30px;\" bgcolor=\"#ffffff\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #153643; font-family: Arial, sans-serif; font-size: 24px;\"><h3><strong>Hooray! Welcome to H.S.A. Confluente</strong></h3></td></tr><tr><td style=\"padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;\">Thank you for signing up to the website of H.S.A. Confluente at <a href=\"http://www.hsaconfluente.nl\">www.hsaconfluente.nl</a>. To activate your account on our website, please click the  <a href='" + link + "'>here!</a></td></tr><tr><td><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Events</h4><p>Now that you have an account on the H.S.A. Confluente website, you can subscribe to all the wonderful events that H.S.A. Confluente is organizing. Want to see what activities are coming up? <a href=\"https://hsaconfluente.nl/activities\">Click here!</a></p></td></tr></tbody></table></td><td style=\"font-size: 0; line-height: 0;\" width=\"20\">&nbsp;</td><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Want to learn more?</h4><p>Are you interested in what H.S.A. Confluente is or can offer you? Then go and take an extensive look at our <a href=\"https://hsaconfluente.nl/\">website</a>! You can find pictures of all previous boards as well as information about what committees we have at H.S.A. Confluente!.</p></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr><tr><td style=\"padding: 30px 30px 30px 30px;\" bgcolor=\"#1689ad\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;\" width=\"75%\">Web Commttee H.S.A. Confluente, TU/e 2020</td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table>"
-                }).then(function(info: any): void {
-                });
+                res.status(201).send(createdUser);
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.status(406).send("Account could not be created. " + err.message);
             });
-            res.status(201).send(createdUser);
-        }).catch(function(): void {
-            res.status(406).send("Account with identical email already exists");
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.status(500);
         });
     });
 
@@ -117,10 +126,10 @@ router.route("/:id")
      */
     .all((req: Request, res: Response, next: NextFunction) => {
         // Check if client has a session
-        const user: number = res.locals.session ? res.locals.session.userId : null;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check whether user has permission to see the information of the user requested
-        checkPermission(user, {type: "USER_VIEW", value: +req.params.id}).then(function(result: boolean): any {
+        checkPermission(userId, {type: "USER_VIEW", value: +req.params.id}).then(function(result: boolean): any {
             // If no permission, return 403
             if (!result) {
                 return res.status(403);
@@ -129,14 +138,14 @@ router.route("/:id")
             // Get user from database
             User.findByPk(req.params.id, {
                 attributes: ["id", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "consentWithPortraitRight"],
-                include: [User.associations.role],
+                include: [Role, Group],
             }).then(function(foundUser: User): void {
                 // Return if user not found
                 if (foundUser === null) {
                     res.status(404).send({status: "Not Found"});
                 } else {
                     // Store user and go to next function
-                    res.locals.user = user;
+                    res.locals.user = foundUser;
 
                     next();
                 }
@@ -148,33 +157,12 @@ router.route("/:id")
      * Get a specific user from the database and return to the client
      */
     .get((req: Request, res: Response) => {
-        // store user in variable
-        const user: number = res.locals.session.user;
-
-        // Check whether user has permission to see the information of the user requested
-        checkPermission(user, {type: "USER_VIEW", value: +req.params.id}).then(function(result: boolean): any {
-            // If no permission, return 403
-            if (!result) { return res.sendStatus(403); }
-
-            // If permission, find all groups in the database, that the requested user is a member of.
-            Group.findAll({
-                attributes: ["id", "fullName", "canOrganize"],
-                include: [
-                    {
-                        model: User,
-                        attributes: ["id"],
-                        where: {
-                            id: req.params.id
-                        }
-                    }
-                ]
-            }).then(function(foundGroups: Group[]): void {
-                const webUser = UserWeb.getWebModelFromDbModel(res.locals.user);
-                const webGroups = GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
-
-                // Send user together with group back to client
-                res.send([webUser, webGroups]);
-            });
+        // Transform user to web user and return
+        UserWeb.getWebModelFromDbModel(res.locals.user).then((webUser: UserWeb) => {
+            return res.status(200).send(webUser);
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     })
 
@@ -183,59 +171,47 @@ router.route("/:id")
      */
     .put((req: Request, res: Response) => {
         // Store user in variable
-        const user: number = res.locals.session.user;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check whether the client has permission to manage (edit) users
-        checkPermission(user, {
-            type: "USER_MANAGE",
-            value: res.locals.user.id
-        }).then(function(result: boolean): any {
+        checkPermission(userId, {type: "USER_MANAGE"}).then(function(result: boolean): any {
             // If no permission, send 403
             if (!result) {
-                return res.sendStatus(403);
+                return res.status(403).send("You are unauthorized to edit users.");
             }
 
-            // Find all groups that the user edited is currently a member of
-            Group.findAll({
-                attributes: ["id", "fullName"],
-                include: [
-                    {
-                        model: User,
-                        attributes: ["id"],
-                        where: {
-                            id: req.params.id
-                        }
-                    }
-                ]
-            }).then(function(foundGroups: Group[]): any {
-                // Remove all existing group relations from the database
-                for (const foundGroup of foundGroups) {
-                    // Check if this does what it should do
-                    // OLD CODE
-                    // foundGroup.members[0].user_group.destroy();
-                    foundGroup.members[0].$remove('groups', foundGroup);
+            const dbGroups = res.locals.user.groups;
 
+            // Remove all groups currently assigned to user
+            for (const group of dbGroups) {
+                (res.locals.user as User).$remove('groups', group);
+            }
+
+            // Add all groups as stated in the request
+            req.body[1].forEach(function(groupData: any): void {
+                if (groupData.selected) {
+                    Group.findByPk(groupData.id).then(function(specificGroup: Group): void {
+                        (res.locals.user as User)
+                            .$add('groups', specificGroup, {through: {func: groupData.role}})
+                            .catch((err: Error) => {
+                                logger.error("user.route./:id.put: " + err);
+                            });
+                    });
                 }
-
-                // Add all groups as stated in the request
-                req.body[1].forEach(function(groupData: any): void {
-                    if (groupData.selected) {
-                        Group.findByPk(groupData.id).then(function(specificGroup: Group): void {
-                            res.locals.user.addGroups(specificGroup, {through: {func: groupData.role}})
-                                .then(console.log);
-                        });
-                    }
-                });
-
-                // Update the user in the database
-                return res.locals.user.update(req.body[0]).then(function(returnedUser: User): void {
-                    // Send edited user back to the client.
-                    res.send(returnedUser);
-                }, function(err: Error): void {
-                    logger.error(err);
-                });
             });
 
+            // Update the user in the database
+            res.locals.user.update(req.body[0]).then((updatedUser: User) => {
+
+                // Transform updated user to web model
+                const webUser = UserWeb.getWebModelFromDbModel(updatedUser);
+
+                // Send edited user back to the client.
+                return res.status(200).send(webUser);
+            }, (err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
+            });
         });
     })
 
@@ -244,22 +220,27 @@ router.route("/:id")
      */
     .delete((req: Request, res: Response) => {
         // Store user in variable
-        const user: number = res.locals.session.user;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has the permission to manage (delete) users
-        checkPermission(user, {
-            type: "USER_MANAGE",
-            value: res.locals.user.id
-        }).then(function(result: boolean): any {
+        checkPermission(userId, {type: "USER_MANAGE"}).then((result: boolean) => {
             // If no permission, send 403
-            if (!result) { return res.sendStatus(403); }
+            if (!result) {
+                return res.status(403).send("You are unauthorized to delete users.");
+            }
 
             // Destroy user in database
-            return res.locals.user.destroy();
-        }).then(function(): void {
-            res.status(204).send({status: "Successful"});
+            res.locals.user.destroy().then(() => {
+                return res.sendStatus(201);
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
+            });
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
-    });
+    })
 
 router.route("/changePassword/:id")
     /**
@@ -272,7 +253,9 @@ router.route("/changePassword/:id")
         // Check if client has permission to change password of user
         checkPermission(user, {type: "CHANGE_PASSWORD", value: +req.params.id}).then(function(result: boolean): any {
             // If no permission, send 403
-            if (!result) { return res.sendStatus(403); }
+            if (!result) {
+                return res.sendStatus(403);
+            }
 
             // Get user from database
             User.findByPk(req.params.id, {
@@ -341,11 +324,11 @@ router.route("/approve/:approvalString")
 
             foundUser.update({approved: true, approvingHash: generateSalt(23)})
                 .then(function(result: any): void {
-                res.writeHead(301, {
-                    location: '/completed_registration'
+                    res.writeHead(301, {
+                        location: '/completed_registration'
+                    });
+                    res.send();
                 });
-                res.send();
-            });
         });
     });
 
