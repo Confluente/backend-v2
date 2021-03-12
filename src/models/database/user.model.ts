@@ -73,18 +73,6 @@ export class User extends Model {
     public lastName!: string;
 
     /**
-     * Display name of the user.
-     * Usually concatenation of first name and last name
-     */
-    // TODO delete this, and just make a function for get Display Name or smth
-    @AllowNull(false)
-    @Column({
-        type: DataType.STRING(128),
-        validate: {stringValidation},
-    })
-    public displayName!: string;
-
-    /**
      * Major of the user
      */
     @Column({

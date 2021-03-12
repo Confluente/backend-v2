@@ -146,7 +146,7 @@ export async function setupServer(server: Express): Promise<void> {
         const lastWeek: Date = new Date();
         lastWeek.setDate(lastWeek.getDate() - 7);
         User.findAll({
-            attributes: ["displayName", "email", "track", "createdAt"],
+            attributes: ["firstName", "lastName", "email", "track", "createdAt"],
             where: {
                 createdAt: {
                     [Op.gte]: lastWeek
@@ -158,6 +158,7 @@ export async function setupServer(server: Express): Promise<void> {
                 const number_of_new_users: number = newUsers.length;
                 let data_of_new_users: string = "";
                 for (let i: number = 0; i < number_of_new_users; i++) {
+                    // TODO CHANGE DISPLAY NAME!
                     data_of_new_users += "Name: " + newUsers[i].displayName;
                     data_of_new_users += ", Email: " + newUsers[i].email;
                     data_of_new_users += ", track: " + newUsers[i].track + "\n";

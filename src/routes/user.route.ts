@@ -22,27 +22,34 @@ router.route("/")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if the client has permission to manage users
-        checkPermission(userId, {
-            type: "USER_MANAGE",
-            value: userId
-        }).then(function(result: boolean): void {
-            // If no result, then the client has no permission
-            if (!result) { res.sendStatus(403); }
+        checkPermission(userId, {type: "USER_MANAGE"}).then((result: boolean) => {
 
-            // If client has permission, find all users in database
+            // If no permission, return 403
+            if (!result) {
+                return res.status(403).send("You are not authorized to manage users.");
+            }
+
+            // If client has permission, find all users in database, including role
             User.findAll({
-                attributes: ["id", "displayName", "email"],
+                attributes: ["id", "firstName", "lastName", "email"],
                 include: [Role],
                 order: [
                     ["id", "ASC"]
                 ]
-            }).then(function(foundUsers: User[]): void {
+            }).then((foundUsers: User[]) => {
+
                 // Transform dbUsers to webUsers
                 const users = UserWeb.getArrayOfWebModelsFromArrayOfDbModels(foundUsers);
 
                 // Send the users back to the client
-                res.send(users);
+                return res.status(200).send(users);
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
             });
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     })
 
@@ -50,8 +57,8 @@ router.route("/")
      * Creates a new user in the database
      */
     .post((req: Request, res: Response) => {
-        // Check if required fields are filled in
-        if (!req.body.displayName || !req.body.email || !req.body.password) {
+        // Check if request has password
+        if (!req.body.password || typeof req.body.password !== "string") {
             return res.sendStatus(400);
         }
 
@@ -112,23 +119,28 @@ router.route("/:id")
         // Check if client has a session
         const user: number = res.locals.session ? res.locals.session.userId : null;
 
-        // If client does not have a session, he does not have permission
-        if (user === null) { return res.send(403); }
-
-        // Get user from database
-        User.findByPk(req.params.id, {
-            attributes: ["id", "firstName", "lastName", "displayName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "consentWithPortraitRight"],
-            include: [User.associations.role],
-        }).then(function(foundUser: User): void {
-            // Return if user not found
-            if (foundUser === null) {
-                res.status(404).send({status: "Not Found"});
-            } else {
-                // Store user and go to next function
-                res.locals.user = user;
-
-                next();
+        // Check whether user has permission to see the information of the user requested
+        checkPermission(user, {type: "USER_VIEW", value: +req.params.id}).then(function(result: boolean): any {
+            // If no permission, return 403
+            if (!result) {
+                return res.status(403);
             }
+
+            // Get user from database
+            User.findByPk(req.params.id, {
+                attributes: ["id", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "consentWithPortraitRight"],
+                include: [User.associations.role],
+            }).then(function(foundUser: User): void {
+                // Return if user not found
+                if (foundUser === null) {
+                    res.status(404).send({status: "Not Found"});
+                } else {
+                    // Store user and go to next function
+                    res.locals.user = user;
+
+                    next();
+                }
+            });
         });
     })
 
@@ -264,7 +276,7 @@ router.route("/changePassword/:id")
 
             // Get user from database
             User.findByPk(req.params.id, {
-                attributes: ["id", "displayName", "email", "passwordHash", "passwordSalt"],
+                attributes: ["id", "firstName", "lastName", "email", "passwordHash", "passwordSalt"],
                 include: [User.associations.role]
             }).then(function(foundUser: User): any {
                 // If user does not exist, send 404
