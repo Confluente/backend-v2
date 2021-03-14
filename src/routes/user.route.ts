@@ -28,7 +28,7 @@ router.route("/")
 
             // If no permission, return 403
             if (!result) {
-                return res.status(403).send("You are not authorized to manage users.");
+                return res.status(403).send({message: "You are not authorized to manage users."});
             }
 
             // If client has permission, find all users in database, including role
@@ -41,10 +41,13 @@ router.route("/")
             }).then((foundUsers: User[]) => {
 
                 // Transform dbUsers to webUsers
-                const users = UserWeb.getArrayOfWebModelsFromArrayOfDbModels(foundUsers);
-
-                // Send the users back to the client
-                return res.status(200).send(users);
+                UserWeb.getArrayOfWebModelsFromArrayOfDbModels(foundUsers).then((users: UserWeb[]) => {
+                    // Send the users back to the client
+                    return res.status(200).send(users);
+                }).catch((err: Error) => {
+                    logger.error(err);
+                    return res.sendStatus(500);
+                });
             }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
@@ -134,17 +137,17 @@ router.route("/:id")
         checkPermission(userId, {type: "USER_VIEW", value: +req.params.id}).then(function(result: boolean): any {
             // If no permission, return 403
             if (!result) {
-                return res.status(403);
+                return res.status(403).send({message: "You are not authorized to view the requested user"});
             }
 
             // Get user from database
             User.findByPk(req.params.id, {
                 attributes: ["id", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "consentWithPortraitRight"],
                 include: [Role, Group],
-            }).then(function(foundUser: User): void {
+            }).then((foundUser: User) => {
                 // Return if user not found
                 if (foundUser === null) {
-                    res.status(404).send({status: "Not Found"});
+                    return res.status(404).send({status: "Not Found"});
                 } else {
                     // Store user and go to next function
                     res.locals.user = foundUser;
@@ -152,6 +155,14 @@ router.route("/:id")
                     next();
                 }
             });
+        }).catch((err: Error) => {
+            logger.error(err);
+            if (err.message === "permissions.checkPermission: USER_VIEW permission was requested for non " +
+                "existing user.") {
+                return res.status(404).send({message: err.message});
+            } else {
+                return res.status(500);
+            }
         });
     })
 
