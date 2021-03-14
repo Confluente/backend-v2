@@ -186,7 +186,7 @@ router.route("/:id")
 
             // Remove all groups currently assigned to user
             for (const group of dbGroups) {
-                (res.locals.user as User).$remove('groups', group);
+                (res.locals.user as User).$remove('groups', group).then(_ => {});
             }
 
             // Add all groups as stated in the request
