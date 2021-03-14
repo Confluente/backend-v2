@@ -145,15 +145,13 @@ router.route("/:id")
                 attributes: ["id", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "consentWithPortraitRight"],
                 include: [Role, Group],
             }).then((foundUser: User) => {
-                // Return if user not found
-                if (foundUser === null) {
-                    return res.status(404).send({status: "Not Found"});
-                } else {
-                    // Store user and go to next function
-                    res.locals.user = foundUser;
+                // User must always be found. If user requested is not in the database, then the checkPermission will
+                // throw an error.
 
-                    next();
-                }
+                // Store user and go to next function
+                res.locals.user = foundUser;
+
+                next();
             });
         }).catch((err: Error) => {
             logger.error(err);
@@ -197,7 +195,8 @@ router.route("/:id")
 
             // Remove all groups currently assigned to user
             for (const group of dbGroups) {
-                (res.locals.user as User).$remove('groups', group).then(_ => {});
+                (res.locals.user as User).$remove('groups', group).then(_ => {
+                });
             }
 
             // Add all groups as stated in the request
@@ -267,8 +266,10 @@ router.route("/changePassword/:id")
         checkPermission(userId, {type: "CHANGE_PASSWORD", value: +req.params.id}).then(function(result: boolean): any {
             // If no permission, send 403
             if (!result) {
-                return res.status(403).send({message: "You do not have permission to change the password of the " +
-                    "requested user."});
+                return res.status(403).send({
+                    message: "You do not have permission to change the password of the " +
+                        "requested user."
+                });
             }
 
             // Get user from database
@@ -287,14 +288,18 @@ router.route("/changePassword/:id")
 
                     // Check if it is indeed the correct password
                     if (inputtedPasswordHash.equals(foundUser.passwordHash)) {
-                        return res.status(406).send({message: "The password submitted is not the current" +
-                                " password of this user."});
+                        return res.status(406).send({
+                            message: "The password submitted is not the current" +
+                                " password of this user."
+                        });
                     }
 
                     // Check if both newly inputted passwords are the same
                     if (req.body.passwordNew !== req.body.passwordNew2) {
-                        return res.status(406).send({message: "The pair of new passwords submitted was not " +
-                                "equal."});
+                        return res.status(406).send({
+                            message: "The pair of new passwords submitted was not " +
+                                "equal."
+                        });
                     }
 
                     // Generate new salt and hash
