@@ -1,4 +1,7 @@
 import {TestFactory} from "../testFactory";
+import {User} from "../../src/models/database/user.model";
+import {Group} from "../../src/models/database/group.model";
+import {Role} from "../../src/models/database/role.model";
 
 const factory: TestFactory = new TestFactory();
 
@@ -102,7 +105,65 @@ describe("user.route.ts '/api/users'", () => {
                         } else {
                             done(new Error());
                         }
-                    }).catch((err: Error) => {
+                    }).catch((_: Error) => {
+                        done(new Error());
+                    });
+            });
+
+        });
+
+        describe("put", () => {
+
+            it("Should return 400 on badly formulated request", (done) => {
+                factory.agents.superAdminAgent
+                    .put("/api/users/3")
+                    .send("hey")
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "Bad request") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return 403 if no permission", (done) => {
+                factory.agents.zeroPermissionsAgent
+                    .put("/api/users/6")
+                    .send([{}, []])
+                    .expect(403)
+                    .then((res: any) => {
+                        if (res.body.message === "You are unauthorized to edit users.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch((_) => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should edit the user correctly", (done) => {
+                factory.agents.superAdminAgent
+                    .put("/api/users/5")
+                    .send([
+                        {lastName: "Ember"},
+                        [{id: 1, role: "chair"}]
+                    ])
+                    .expect(200)
+                    .then((res: any) => {
+                        User.findByPk(5, {include: [Role, Group]}).then((us: User) => {
+                            if (us.id === 5 && us.lastName === "Ember" && us.groups.length === 1
+                                && us.groups[0].UserGroup.func === "chair") {
+                                done();
+                            } else {
+                                done(new Error());
+                            }
+                        });
+                    }).catch(err => {
                         done(new Error());
                     });
             });

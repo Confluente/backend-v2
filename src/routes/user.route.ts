@@ -9,6 +9,7 @@ import {generateSalt, getPasswordHashSync} from "../helpers/auth.helper";
 import {createTestAccount, createTransport} from "nodemailer";
 import {UserWeb} from "../models/web/user.web.model";
 import {logger} from "../logger";
+import {all} from "q";
 
 const router: Router = express.Router();
 
@@ -178,51 +179,64 @@ router.route("/:id")
     })
 
     /**
-     * Edit a user
+     * Edit a user.
+     * To edit a user, the request body needs to be a list with two entries: [user attributes, group data]
+     * The user attributes can include any attributes available in the user model.
+     * The group data is a list, where each entry represents data of a group. i.e. group data = [group1, group2, etc]
+     *      each group must have
+     *          {
+     *              id: number         // the id of the group
+     *              role: string       // the role this user fulfills in the group
+     *          }
      */
     .put((req: Request, res: Response) => {
+
+        if (!Array.isArray(req.body) || req.body.length !== 2) {
+            return res.status(400).send({message: "Bad request"});
+        }
+
         // Store user in variable
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check whether the client has permission to manage (edit) users
-        checkPermission(userId, {type: "USER_MANAGE"}).then(function(result: boolean): any {
+        checkPermission(userId, {type: "USER_MANAGE"}).then(async (result: boolean) => {
             // If no permission, send 403
             if (!result) {
-                return res.status(403).send("You are unauthorized to edit users.");
+                return res.status(403).send({message: "You are unauthorized to edit users."});
             }
 
             const dbGroups = res.locals.user.groups;
 
             // Remove all groups currently assigned to user
             for (const group of dbGroups) {
-                (res.locals.user as User).$remove('groups', group).then(_ => {
-                });
+                await (res.locals.user as User).$remove('groups', group).then(_ => {});
             }
 
             // Add all groups as stated in the request
-            req.body[1].forEach(function(groupData: any): void {
-                if (groupData.selected) {
-                    Group.findByPk(groupData.id).then(function(specificGroup: Group): void {
-                        (res.locals.user as User)
-                            .$add('groups', specificGroup, {through: {func: groupData.role}})
-                            .catch((err: Error) => {
-                                logger.error("user.route./:id.put: " + err);
-                            });
-                    });
-                }
-            });
+            for (const groupData of req.body[1]) {
+                await Group.findByPk(groupData.id).then(async (specificGroup: Group) => {
+                    await (res.locals.user as User).$add('groups', specificGroup, {through: {func: groupData.role}})
+                        .then(() => {})
+                        .catch((err: Error) => {
+                            logger.error("user.route./:id.put: " + err);
+                        });
+                });
+            }
 
             // Update the user in the database
             res.locals.user.update(req.body[0]).then((updatedUser: User) => {
 
                 // Transform updated user to web model
-                const webUser = UserWeb.getWebModelFromDbModel(updatedUser);
-
-                // Send edited user back to the client.
-                return res.status(200).send(webUser);
-            }, (err: Error) => {
+                UserWeb.getWebModelFromDbModel(updatedUser).then((webUser: UserWeb) => {
+                    // Send edited user back to the client.
+                    return res.status(200).send(webUser);
+                }).catch((err: Error) => {
+                    logger.error(err);
+                    return res.sendStatus(500);
+                });
+            }).catch((err: Error) => {
                 logger.error(err);
-                return res.sendStatus(500);
+                return res.sendStatus(400);
             });
         });
     })
