@@ -64,7 +64,7 @@ export class GroupWeb extends AbstractWebModel {
                 const func = member.UserGroup.func;
                 delete member.UserGroup;
                 await UserWeb.getWebModelFromDbModel(member).then(function(user: UserWeb): void {
-                    webGroup.members.push(new UserGroupWeb(user, webGroup, func));
+                    webGroup.members.push(new UserGroupWeb(user, null, func));
                 });
             }
         }

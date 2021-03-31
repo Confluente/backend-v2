@@ -307,6 +307,15 @@ export const newPartialRole = {
     PAGE_MANAGE: true,
 };
 
+export const newGroup = {
+    displayName: "Newly added group",
+    fullName: "The awesome newly added group",
+    description: "Once a new group was formed. This new group, only later added, was forged by the original founders " +
+        "of H.S.A. Confluente to rule all other groups.",
+    email: "newgroupshere@hsaconfluente.nl",
+    type: "family",
+};
+
 export const session = {
     token: Buffer.from("something"),
     userId: 1,

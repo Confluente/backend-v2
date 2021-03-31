@@ -14,7 +14,7 @@ router.route("/")
         // Check if client is logged in
         const userId = res.locals.session ? res.locals.session.userId : null;
 
-        checkPermission(userId, { type: "GROUP_MANAGE" }).then(function(result: boolean): any {
+        checkPermission(userId, { type: "GROUP_MANAGE" }).then((result: boolean) => {
             // If false then return 403
             if (!result) { return res.sendStatus(403); }
 
@@ -30,14 +30,14 @@ router.route("/")
      */
     .get((req: Request, res: Response) => {
         Group.findAll({
-            attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type", "createdAt"],
+            attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type"],
             order: [
                 ["id", "ASC"]
             ]
-        }).then(function(foundGroups: Group[]): void {
+        }).then(async function(foundGroups: Group[]): Promise<void> {
 
             // Transform dbGroups to webGroups
-            const groups = GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
+            const groups = await GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
 
             // Sends the groups back to the client
             res.send(groups);
@@ -49,31 +49,17 @@ router.route("/")
      */
     .post((req: Request, res: Response) => {
 
-        // Checks if the client is logged in
-        if (!res.locals.session) { return res.sendStatus(401); }
-
         // Checks if all required fields are filled in
-        if (!req.body.displayName || !req.body.fullName || !req.body.description || !req.body.email) {
+        if (!req.body.displayName || !req.body.fullName || !req.body.description || !req.body.email || !req.body.type) {
             return res.sendStatus(400);
         }
-
-        // Checks if the client has permission to create a group
-        checkPermission(res.locals.session.userId, {
-            type: "GROUP_CREATE",
-            value: req.body.organizer
-        }).then(function(result: boolean): any {
-
-            // If no permission, send 403
-            if (!result) { return res.sendStatus(403); }
-
-            // Create group in the database
-            return Group.create(req.body).then(function(_: Group): void {
-                // Send created group back to the client
+        // Create group in the database
+        Group.create(req.body).then(function(result: Group): void {
+            // Send created group back to the client
                 res.status(201).send(result);
             }).catch(function(err: Error): void {
                 logger.error(err);
             });
-        });
     });
 
 router.route("/:id")
@@ -82,7 +68,7 @@ router.route("/:id")
      */
     .all((req: Request, res: Response, next: any) => {
         Group.findByPk(req.params.id, {
-            attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type", "createdAt"],
+            attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type"],
             include: [
                 {
                     model: User,
@@ -90,10 +76,10 @@ router.route("/:id")
                     attributes: ["displayName"]
                 }
             ]
-        }).then(function(foundGroup: Group): void {
+        }).then((foundGroup: Group) => {
             // If group does not exists, send 404
             if (foundGroup === null) {
-                res.status(404).send({status: "Not Found"});
+                return res.status(404).send({status: "Not Found"});
             } else {
                 // Store group
                 res.locals.group = foundGroup;
@@ -110,16 +96,17 @@ router.route("/:id")
         const user: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to view the group
-        checkPermission(user, {type: "GROUP_VIEW", value: +req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "GROUP_VIEW", value: +req.params.id})
+            .then((result: boolean) => {
 
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
 
             // Transform dbGroup to webGroup
-            const group = GroupWeb.getWebModelFromDbModel(res.locals.group);
-
-            // Send group to client
-            res.send(group);
+            GroupWeb.getWebModelFromDbModel(res.locals.group).then((webGroup: GroupWeb) => {
+                // Send group to client
+                return res.status(200).send(webGroup);
+            });
         });
     })
 
