@@ -315,7 +315,7 @@ export const session = {
 };
 
 export const newUser = {
-    email: "newmember@student.tue.nl",
+    email: "r.d.v.hoorn@student.tue.nl",
     displayName: "New Member",
     firstName: "New",
     lastName: "Member",

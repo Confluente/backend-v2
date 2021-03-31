@@ -3,7 +3,6 @@ import {User} from "../../src/models/database/user.model";
 import {Group} from "../../src/models/database/group.model";
 import {Role} from "../../src/models/database/role.model";
 import {newUser, password} from "../test.data";
-import {use} from "marked";
 
 const factory: TestFactory = new TestFactory();
 
@@ -59,8 +58,127 @@ describe("user.route.ts '/api/users'", () => {
 
         describe("post", () => {
 
+            it("Should return 400 for not including password in request", (done) => {
+                const us = {...newUser};
+                delete us.password;
 
+                factory.agents.nobodyUserAgent
+                    .post("/api/users/")
+                    .send(us)
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "No correct password was included in the request.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
 
+            it("Should return 400 for including password of wrong type", (done) => {
+                const us = {
+                    email: "newmember@student.tue.nl",
+                    displayName: "New Member",
+                    firstName: "New",
+                    lastName: "Member",
+                    honorsMembership: "member",
+                    approvingHash: "daerqecxvionsd",
+                    password: true,
+                    approved: false,
+                    roleId: 3,
+                    consentWithPortraitRight: false,
+                };
+
+                factory.agents.nobodyUserAgent
+                    .post("/api/users")
+                    .send(us)
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "No correct password was included in the request.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+
+            });
+
+            it("Should return 400 if no email is included", (done) => {
+                const us = {...newUser};
+                delete us.email;
+
+                factory.agents.nobodyUserAgent
+                    .post("/api/users/")
+                    .send(us)
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "Not all required attributes were send in the request.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return 400 if no firstname is included", (done) => {
+                const us = {...newUser};
+                delete us.firstName;
+
+                factory.agents.nobodyUserAgent
+                    .post("/api/users/")
+                    .send(us)
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "Not all required attributes were send in the request.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                    done(new Error());
+                });
+            });
+
+            it("Should return 400 if no lastName is included", (done) => {
+                const us = {...newUser};
+                delete us.lastName;
+
+                factory.agents.nobodyUserAgent
+                    .post("/api/users/")
+                    .send(us)
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "Not all required attributes were send in the request.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                    done(new Error());
+                });
+            });
+            
+            // it("Should create user properly", (done) => {
+            //     factory.agents.nobodyUserAgent
+            //         .post("/api/users/")
+            //         .send(newUser)
+            //         .expect(201)
+            //         .then((res: any) => {
+            //             User.findOne(res.body.id).then((user: User) => {
+            //                 user.destroy().then(_ => {
+            //                     done();
+            //                 });
+            //             });
+            //         }).catch(_ => {
+            //             done(new Error());
+            //         });
+            // });
         });
 
     });
