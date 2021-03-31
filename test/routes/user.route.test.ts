@@ -2,6 +2,8 @@ import {TestFactory} from "../testFactory";
 import {User} from "../../src/models/database/user.model";
 import {Group} from "../../src/models/database/group.model";
 import {Role} from "../../src/models/database/role.model";
+import {newUser, password} from "../test.data";
+import {use} from "marked";
 
 const factory: TestFactory = new TestFactory();
 
@@ -56,6 +58,8 @@ describe("user.route.ts '/api/users'", () => {
         });
 
         describe("post", () => {
+
+
 
         });
 
@@ -166,6 +170,196 @@ describe("user.route.ts '/api/users'", () => {
                     }).catch(err => {
                         done(new Error());
                     });
+            });
+
+        });
+
+        describe("delete", () => {
+
+            it("Should return 403 if no permission", (done) => {
+                factory.agents.zeroPermissionsAgent
+                    .delete("/api/users/6")
+                    .expect(403)
+                    .then((res: any) => {
+                        if (res.body.message === "You are unauthorized to delete users.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return 201 for correct behavior", (done) => {
+                User.create(newUser).then((user: User) => {
+                    factory.agents.superAdminAgent
+                        .delete("/api/users/" + user.id)
+                        .expect(201)
+                        .then(_ => {
+                            done();
+                        }).catch(_ => {
+                            done(new Error());
+                        });
+                });
+            });
+
+        });
+
+    });
+
+    describe("/changePassword/:id", () => {
+
+        describe("put", () => {
+
+            const payload = {password: password, passwordNew: "newpass", passwordNew2: "newpass"};
+
+            it("Should return 400 for non-existing user", (done) => {
+                factory.agents.superAdminAgent
+                    .put("/api/users/changePassword/100")
+                    .send({})
+                    .expect(400)
+                    .then(_ => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return 403 for unauthorized user", (done) => {
+                factory.agents.zeroPermissionsAgent
+                    .put("/api/users/changePassword/4")
+                    .send({})
+                    .expect(403)
+                    .then((res: any) => {
+                        if (res.body.message === "You do not have permission to change the password of the " +
+                            "requested user.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+                });
+
+            it("Should return 406 for wrong current password", (done) => {
+                const load = {...payload};
+                load.password = "bad";
+
+                factory.agents.zeroPermissionsAgent
+                    .put("/api/users/changePassword/6")
+                    .send(load)
+                    .expect(406)
+                    .then((res: any) => {
+                        if (res.body.message === "The password submitted is not the current" +
+                            " password of this user.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+
+            });
+
+            it("Should return 400 for request with wrong types", (done) => {
+                const load = {password: password, passwordNew: true, passwordNew2: "newpass"};
+
+                factory.agents.zeroPermissionsAgent
+                    .put("/api/users/changePassword/6")
+                    .send(load)
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "The passwords submitted were not of type " +
+                            "'string'") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return 406 for request with unequal new passwords", (done) => {
+                const load = {...payload};
+                load.passwordNew2 = "doggos";
+
+                factory.agents.superAdminAgent
+                    .put("/api/users/changePassword/1")
+                    .send(load)
+                    .expect(406)
+                    .then((res: any) => {
+                        if (res.body.message === "The pair of new passwords submitted was not " +
+                            "equal.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+
+            });
+
+            it("Should change password correctly", (done) => {
+
+                factory.agents.superAdminAgent
+                    .put("/api/users/changePassword/6")
+                    .send(payload)
+                    .expect(200)
+                    .then(_ => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+
+            });
+
+        });
+
+    });
+
+    describe("/approve/:approvalString", () => {
+
+        describe("all", () => {
+
+            it("Should return 200 for unknown link", (done) => {
+                factory.agents.nobodyUserAgent
+                    .get("/api/users/approve/aiewgdshoi")
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.headers.location === "/login") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return 200 for correct execution", (done) => {
+
+                User.create(newUser).then((user: User) => {
+                    factory.agents.nobodyUserAgent
+                        .get("/api/users/approve/" + user.approvingHash)
+                        .expect(200)
+                        .then((res: any) => {
+                            user.destroy().then(_ => {
+                                if (res.headers.location === "/completed_registration") {
+                                    done();
+                                } else {
+                                    done(new Error());
+                                }
+                            });
+                        }).catch(_ => {
+                            done(new Error());
+                        });
+                });
+
             });
 
         });

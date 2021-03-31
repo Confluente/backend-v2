@@ -10,6 +10,7 @@ import {createTestAccount, createTransport} from "nodemailer";
 import {UserWeb} from "../models/web/user.web.model";
 import {logger} from "../logger";
 import {all} from "q";
+import * as buffer from "buffer";
 
 const router: Router = express.Router();
 
@@ -209,14 +210,16 @@ router.route("/:id")
 
             // Remove all groups currently assigned to user
             for (const group of dbGroups) {
-                await (res.locals.user as User).$remove('groups', group).then(_ => {});
+                await (res.locals.user as User).$remove('groups', group).then(_ => {
+                });
             }
 
             // Add all groups as stated in the request
             for (const groupData of req.body[1]) {
                 await Group.findByPk(groupData.id).then(async (specificGroup: Group) => {
                     await (res.locals.user as User).$add('groups', specificGroup, {through: {func: groupData.role}})
-                        .then(() => {})
+                        .then(() => {
+                        })
                         .catch((err: Error) => {
                             logger.error("user.route./:id.put: " + err);
                         });
@@ -250,9 +253,10 @@ router.route("/:id")
 
         // Check if client has the permission to manage (delete) users
         checkPermission(userId, {type: "USER_MANAGE"}).then((result: boolean) => {
+
             // If no permission, send 403
             if (!result) {
-                return res.status(403).send("You are unauthorized to delete users.");
+                return res.status(403).send({message: "You are unauthorized to delete users."});
             }
 
             // Destroy user in database
@@ -278,6 +282,7 @@ router.route("/changePassword/:id")
 
         // Check if client has permission to change password of user
         checkPermission(userId, {type: "CHANGE_PASSWORD", value: +req.params.id}).then(function(result: boolean): any {
+
             // If no permission, send 403
             if (!result) {
                 return res.status(403).send({
@@ -291,54 +296,54 @@ router.route("/changePassword/:id")
                 attributes: ["id", "firstName", "lastName", "email", "passwordHash", "passwordSalt"],
                 include: [Role]
             }).then(function(foundUser: User): any {
+                // User definitely exists. If not, it would have been filtered out in the checkPermission call.
 
-                // If user does not exist, send 404
-                if (foundUser === null) {
-                    return res.status(404).send({message: "Requested user was not found in the database."});
-                } else {
-                    // Get the hash of the (original) password the user put
-                    const inputtedPasswordHash =
-                        getPasswordHashSync(req.body.password, foundUser.passwordSalt);
+                // Get the hash of the (original) password the user put
+                const inputtedPasswordHash =
+                    getPasswordHashSync(req.body.password, foundUser.passwordSalt);
 
-                    // Check if it is indeed the correct password
-                    if (inputtedPasswordHash.equals(foundUser.passwordHash)) {
-                        return res.status(406).send({
-                            message: "The password submitted is not the current" +
-                                " password of this user."
-                        });
-                    }
-
-                    // Check if both newly inputted passwords are the same
-                    if (req.body.passwordNew !== req.body.passwordNew2) {
-                        return res.status(406).send({
-                            message: "The pair of new passwords submitted was not " +
-                                "equal."
-                        });
-                    }
-
-                    // Generate new salt and hash
-                    const passwordSalt: string = generateSalt(passwordSaltLength); // Create salt of 16 characters
-                    const passwordHash = getPasswordHashSync(req.body.passwordNew, passwordSalt);
-
-                    // Update user in database with new password and hash
-                    return foundUser.update({
-                        passwordHash,
-                        passwordSalt
-                    }).then((updatedUser: User) => {
-                        // Send updated user to the client
-                        return res.status(200).send(updatedUser);
-                    }).catch((err: Error) => {
-                        logger.error(err);
-                        return res.status(400).send("Was not able to update password.");
+                // Check if it is indeed the correct password
+                if (Buffer.compare(inputtedPasswordHash, Buffer.from(foundUser.passwordHash)) !== 0) {
+                    return res.status(406).send({
+                        message: "The password submitted is not the current" +
+                            " password of this user."
                     });
                 }
+
+                if (typeof req.body.passwordNew !== "string" || typeof req.body.passwordNew2 !== "string") {
+                    return res.status(400).send({message: "The passwords submitted were not of type " +
+                            "'string'"});
+                }
+
+                // Check if both newly inputted passwords are the same
+                if (req.body.passwordNew !== req.body.passwordNew2) {
+                    return res.status(406).send({
+                        message: "The pair of new passwords submitted was not " +
+                            "equal."
+                    });
+                }
+
+                // Generate new salt and hash
+                const passwordSalt: string = generateSalt(passwordSaltLength); // Create salt of 16 characters
+                const passwordHash = getPasswordHashSync(req.body.passwordNew, passwordSalt);
+
+                // Update user in database with new password and hash
+                return foundUser.update({
+                    passwordHash,
+                    passwordSalt
+                }).then((updatedUser: User) => {
+                    // Send updated user to the client
+                    return res.status(200).send(updatedUser);
+                }).catch((err: Error) => {
+                    logger.error(err);
+                    return res.status(400).send("Was not able to update password.");
+                });
             }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
             });
         }).catch((err: Error) => {
-            logger.error(err);
-            return res.sendStatus(500);
+            return res.sendStatus(400);
         });
     });
 
@@ -350,17 +355,12 @@ router.route("/approve/:approvalString")
         // Get the approval string
         const approvalString = req.params.approvalString;
 
-        // Check if it has the correct length
-        if (approvalString.length !== approvalStringLength || typeof approvalString !== "string") {
-            return res.send(400);
-        }
-
         // Find the user whose approval string matches the url
         User.findOne({where: {approvingHash: approvalString}}).then((foundUser: User) => {
 
             if (!foundUser) {
                 // If the same link is clicked again in the email
-                res.writeHead(301, {
+                res.writeHead(200, {
                     location: '/login'
                 });
                 return res.send();
@@ -369,7 +369,7 @@ router.route("/approve/:approvalString")
             // If user is found, approve user, and redirect.
             foundUser.update({approved: true, approvingHash: generateSalt(approvalStringLength - 1)})
                 .then((_: User) => {
-                    res.writeHead(301, {
+                    res.writeHead(200, {
                         location: '/completed_registration'
                     });
                     return res.send();
