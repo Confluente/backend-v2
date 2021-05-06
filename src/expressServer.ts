@@ -1,6 +1,5 @@
-import express, {Express, Request, Response} from "express";
+import express, {Express, NextFunction, Request, Response} from "express";
 import path from 'path';
-import morgan from 'morgan';
 import bodyParser, {json, urlencoded} from "body-parser";
 import cookieParser from 'cookie-parser';
 import {scheduleJob} from 'node-schedule';
@@ -28,7 +27,6 @@ export async function setupServer(server: Express): Promise<void> {
     } else { // Running in production
         console.log("Running in PRODUCTION mode!");
         webroot = path.resolve(__dirname, "../frontend/build");
-        server.use(morgan("combined", {stream: require("fs").createWriteStream("./access.log", {flags: "a"})}));
 
         server.use(function(req: any, res: any, next: () => void): void {
             logger.info(req, "express_request");
@@ -41,7 +39,7 @@ export async function setupServer(server: Express): Promise<void> {
     server.use(function(req: any, res: any, next: any): void {
         // update to match the domain you will make the request from
         res.header("Access-Control-Allow-Origin", "http://localhost");
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, serverend,delete,entries,foreach,get,has,keys,set,values,Authorization");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, serverend, delete, entries, foreach, get, has, keys, set, values, Authorization");
         res.header("Access-Control-Allow-Credentials", "true");
         res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
         next();
@@ -54,7 +52,6 @@ export async function setupServer(server: Express): Promise<void> {
         res.end();
     });
 
-    // TODO check if the json thingy works
     server.use(json({limit: '10mb'}));
     server.use(urlencoded({limit: '10mb', extended: false}));
     server.use(cookieParser());
@@ -76,7 +73,7 @@ export async function setupServer(server: Express): Promise<void> {
 
     // HTTPS Rerouting (only for production website version)
     if (process.env.NODE_ENV === "production") {
-        server.use(function(req: Request, res: Response, next: any): any {
+        server.use((req: Request, res: Response, next: NextFunction) => {
             if (req.secure) {
                 // request was via https, so do no special handling
                 next();
@@ -104,19 +101,19 @@ export async function setupServer(server: Express): Promise<void> {
     server.use("/api/roles", require("./routes/role.route"));
     server.use("/api/notifications", require("./routes/notification.route"));
     server.use("/api/partners", require("./routes/partner.route"));
-    server.use("/api/*", function(req: any, res: any): void {
+    server.use("/api/*", (req: any, res: any) => {
         res.sendStatus(404);
     });
 
-    server.use(function(req: any, res: any, next: any): any {
+    server.use((req: Request, res: Response, next: NextFunction) => {
         const user: any = res.locals.session ? res.locals.session.userId : null;
-        checkPermission(user, {type: "PAGE_VIEW", value: req.path})
+        checkPermission(user, {type: "PAGE_VIEW", value: +req.path})
             .then(function(hasPermission: any): any {
                 if (!hasPermission) {
                     if (user) {
                         return res.status(403).send("User does not have the permission to view this page!");
                     } else {
-                        return res.status(401).send("Page error?");
+                        return res.status(401).send("Page error");
                     }
                 }
                 return next();
@@ -127,7 +124,7 @@ export async function setupServer(server: Express): Promise<void> {
         server.use(express.static(webroot));
     }
 
-    server.get("*", function(req: any, res: any, next: any): any {
+    server.get("*", (req: Request, res: Response) => {
 
         if (req.originalUrl.includes(".")) {
             return res.sendStatus(404);
@@ -136,7 +133,7 @@ export async function setupServer(server: Express): Promise<void> {
         res.sendFile("/index.html", {root: webroot});
     });
 
-    server.use(function(err: Error, req: any, res: any, next: any): void {
+    server.use((err: Error) => {
         console.error(err);
     });
 
@@ -146,7 +143,7 @@ export async function setupServer(server: Express): Promise<void> {
         const lastWeek: Date = new Date();
         lastWeek.setDate(lastWeek.getDate() - 7);
         User.findAll({
-            attributes: ["firstName", "lastName", "email", "track", "createdAt"],
+            attributes: ["firstName", "lastName", "email", "track"],
             where: {
                 createdAt: {
                     [Op.gte]: lastWeek
@@ -158,14 +155,12 @@ export async function setupServer(server: Express): Promise<void> {
                 const number_of_new_users: number = newUsers.length;
                 let data_of_new_users: string = "";
                 for (let i: number = 0; i < number_of_new_users; i++) {
-                    // TODO CHANGE DISPLAY NAME!
-                    data_of_new_users += "Name: " + newUsers[i].displayName;
+                    data_of_new_users += "Name: " + newUsers[i].firstName + " " + newUsers[i].lastName;
                     data_of_new_users += ", Email: " + newUsers[i].email;
                     data_of_new_users += ", track: " + newUsers[i].track + "\n";
                 }
 
                 createTestAccount().then(function(): void {
-                    // TODO check if this works
                     const transporter: any = createTransport({
                         service: 'gmail',
                         secure: true,
@@ -177,12 +172,15 @@ export async function setupServer(server: Express): Promise<void> {
                     });
                     transporter.sendMail({
                         from: '"website" <web@hsaconfluente.nl>',
-                        to: '"secretary of H.S.A. Confluente" <treasurer@hsaconfluente.nl>',
+                        to: '"secretary of H.S.A. Confluente" <secretary@hsaconfluente.nl>',
                         subject: "New members that registered on the website",
-                        // tslint:disable-next-line:max-line-length
-                        text: "Heyhoi dear secretary \n \nIn the past week there have been " + number_of_new_users.toString() + " new registrations on the website. \n\nThe names and emails of the new registrations are \n" + data_of_new_users + " \nSincerely, \nThe website \nOn behalf of the Web Committee"
-                    }).then(function(info: object): void {
-                        console.log(info);
+                        text: "Heyhoi dear secretary \n \nIn the past week there have been "
+                            + number_of_new_users.toString() + " new registrations on the website. "
+                            + "\n\nThe names and emails of the new registrations are \n"
+                            + data_of_new_users
+                            + " \nSincerely, \nThe website \nOn behalf of the Web Committee"
+                    }).then((info: object) => {
+                        logger.info(info.toString());
                     });
                 });
             }
