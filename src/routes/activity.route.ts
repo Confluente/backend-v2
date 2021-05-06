@@ -90,7 +90,8 @@ function deletePicture(id: number): void {
  */
 router.route("/")
     /**
-     * Gets every activity in the database happening from today onwards
+     * Gets every activity in the database happening from today onwards.
+     * Manage page activities getter has its own function.
      */
     .get((req: Request, res: Response) => {
         // Get all activities from the database
@@ -100,26 +101,30 @@ router.route("/")
                 ["date", "ASC"]
             ],
             where: {
-                date: {[
-                        Op.between]: [new Date().setDate(new Date().getDate() - 1),
-                        new Date().setFullYear(new Date().getFullYear() + 10)
-                    ]}
+                date: {
+                    [Op.between]: [new Date().setDate(new Date().getDate() - 1),
+                        new Date().setFullYear(new Date().getFullYear() + 10)]
+                }
             },
             include: [
                 {model: Group, attributes: ["id", "displayName", "fullName", "email"]},
-                {model: User, attributes: ["id", "displayName", "firstName", "lastName", "email"]}
+                {model: User, attributes: ["id", "firstName", "lastName", "email"]}
             ]
-        }).then(async function(foundActivities: Activity[]): Promise<any> {
+    }).then(async function(foundActivities: Activity[]): Promise<any> {
             const activities = await ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
 
             // Check for every activity if the client can view them
-            const promises = activities.map(function(singleActivity: ActivityWeb): any {
+            const promises = activities.map((singleActivity: ActivityWeb) => {
                 // If the activity is published, everyone (also not logged in) is allowed to see them
                 // These lines are needed not to crash the management table in some cases
-                if (singleActivity.published) { return Q(singleActivity); }
+                if (singleActivity.published) {
+                    return Q(singleActivity);
+                }
 
                 // If not logged in (and unpublished), client has no permission
-                if (!res.locals.session) { return Q(null); }
+                if (!res.locals.session) {
+                    return Q(null);
+                }
 
                 // If logged in (and unpublished), check whether client has permission to view activity
                 return checkPermission(res.locals.session.user, {
@@ -166,7 +171,9 @@ router.route("/")
             value: activity.organizer
         }).then(function(result: boolean): any {
             // If no permission, send 403
-            if (!result) { return res.sendStatus(403); }
+            if (!result) {
+                return res.sendStatus(403);
+            }
 
             // Format form correctly
             // Change all lists database strings
@@ -303,7 +310,9 @@ router.route("/subscriptions/:id")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // If client is not logged in, send 403
-        if (userId == null) { return res.status(403).send({status: "Not logged in"}); }
+        if (userId == null) {
+            return res.status(403).send({status: "Not logged in"});
+        }
 
         // Get activity from database
         Activity.findByPk(req.params.id, {
@@ -321,9 +330,9 @@ router.route("/subscriptions/:id")
                 foundUser.$add('activity', foundActivity, {through: {answers: answerString}})
                     .then(function(result: Activity): any {
 
-                    // Send relation back to the client
-                    res.send(result);
-                });
+                        // Send relation back to the client
+                        res.send(result);
+                    });
             });
         });
     })
@@ -336,7 +345,9 @@ router.route("/subscriptions/:id")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // If client is not logged in, send 403
-        if (userId == null) { return res.status(403).send({status: "Not logged in"}); }
+        if (userId == null) {
+            return res.status(403).send({status: "Not logged in"});
+        }
 
         // Get activity from database
         Activity.findByPk(req.params.id, {
@@ -402,7 +413,9 @@ router.route("/:id")
         // Check if client has permission to view the activity
         checkPermission(user, {type: "ACTIVITY_VIEW", value: +req.params.id}).then(function(result: boolean): any {
             // If no permission, send 403
-            if (!result) { return res.sendStatus(403); }
+            if (!result) {
+                return res.sendStatus(403);
+            }
 
             // Store activity in variable
             const activity = ActivityWeb.getWebModelFromDbModel(res.locals.activity);
@@ -424,7 +437,9 @@ router.route("/:id")
             value: res.locals.activity.id
         }).then(function(result: boolean): any {
             // If no permission, send 403
-            if (!result) { return res.sendStatus(403); }
+            if (!result) {
+                return res.sendStatus(403);
+            }
 
             // Get the organizing group from the database
             Group.findOne({where: {fullName: req.body.organizer}}).then(function(foundGroup: Group): any {
