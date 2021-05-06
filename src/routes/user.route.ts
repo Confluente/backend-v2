@@ -8,10 +8,12 @@ import {checkPermission} from "../permissions";
 import {generateSalt, getPasswordHashSync} from "../helpers/auth.helper";
 import {createTestAccount, createTransport} from "nodemailer";
 import {UserWeb} from "../models/web/user.web.model";
-import {GroupWeb} from "../models/web/group.web.model";
 import {logger} from "../logger";
 
 const router: Router = express.Router();
+
+const passwordSaltLength: number = 16;
+const approvalStringLength: number = 24;
 
 router.route("/")
     /**
@@ -22,27 +24,37 @@ router.route("/")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if the client has permission to manage users
-        checkPermission(userId, {
-            type: "USER_MANAGE",
-            value: userId
-        }).then(function(result: boolean): void {
-            // If no result, then the client has no permission
-            if (!result) { res.sendStatus(403); }
+        checkPermission(userId, {type: "USER_MANAGE"}).then((result: boolean) => {
 
-            // If client has permission, find all users in database
+            // If no permission, return 403
+            if (!result) {
+                return res.status(403).send({message: "You are not authorized to manage users."});
+            }
+
+            // If client has permission, find all users in database, including role
             User.findAll({
-                attributes: ["id", "displayName", "email"],
+                attributes: ["id", "firstName", "lastName", "email"],
                 include: [Role],
                 order: [
                     ["id", "ASC"]
                 ]
-            }).then(function(foundUsers: User[]): void {
-                // Transform dbUsers to webUsers
-                const users = UserWeb.getArrayOfWebModelsFromArrayOfDbModels(foundUsers);
+            }).then((foundUsers: User[]) => {
 
-                // Send the users back to the client
-                res.send(users);
+                // Transform dbUsers to webUsers
+                UserWeb.getArrayOfWebModelsFromArrayOfDbModels(foundUsers).then((users: UserWeb[]) => {
+                    // Send the users back to the client
+                    return res.status(200).send(users);
+                }).catch((err: Error) => {
+                    logger.error(err);
+                    return res.sendStatus(500);
+                });
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
             });
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     })
 
@@ -50,56 +62,67 @@ router.route("/")
      * Creates a new user in the database
      */
     .post((req: Request, res: Response) => {
-        // Check if required fields are filled in
-        if (!req.body.displayName || !req.body.email || !req.body.password) {
-            return res.sendStatus(400);
+        // Check if request has password
+        if (!req.body.password || typeof req.body.password !== "string") {
+            return res.status(400).send({message: "No correct password was included in the request."});
+        }
+
+        // Check if request has all necessary attributes
+        if (!req.body.email || !req.body.firstName || !req.body.lastName) {
+            return res.status(400).send({message: "Not all required attributes were send in the request."});
         }
 
         // generate approvingHash, passwordSalt and passwordHash
-        req.body.approvingHash = generateSalt(24);
-        req.body.passwordSalt = generateSalt(16);
+        req.body.approvingHash = generateSalt(approvalStringLength);
+        req.body.passwordSalt = generateSalt(passwordSaltLength);
         req.body.passwordHash = getPasswordHashSync(req.body.password, req.body.passwordSalt);
 
         // Delete password permanently
         delete req.body.password;
 
-        // Set role to be the default member role
-        req.body.role = Role.findOne({
-            where: {
-                name: 'Member'
-            }
-        });
+        // Set role of default member
+        Role.findOne({where: {name: 'Regular member'}}).then((role: Role) => {
 
-        // Create new user in database
-        return User.create(req.body).then(function(createdUser: User): void {
-            // Send approval email to email
-            createTestAccount().then(function(): void {
+            const user = {
+                ...(req.body),
+                roleId: role.id
+            };
 
-                // TODO test if this works?? Same as in expressServer
-                const transporter: any = createTransport({
-                    service: 'gmail',
-                    secure: true,
-                    // Never fill this password in and add it to git! Only filled in locally or on the server!
-                    auth: {
-                        user: 'web@hsaconfluente.nl',
-                        pass: ''
-                    }
+            // Create new user in database
+            return User.create(user).then(function(createdUser: User): void {
+
+                // Send approval email to email
+                createTestAccount().then(() => {
+
+                    const transporter: any = createTransport({
+                        service: 'gmail',
+                        secure: true,
+                        // Never fill this password in and add it to git! Only filled in locally or on the server!
+                        auth: {
+                            user: 'web@hsaconfluente.nl',
+                            pass: ''
+                        }
+                    });
+
+                    const link: string = "https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash;
+
+                    transporter.sendMail({
+                        from: '"website" <web@hsaconfluente.nl>',
+                        to: req.body.email,
+                        subject: "Registration H.S.A. Confluente",
+                        text: "Thank you for making an account on our website hsaconfluente.nl! \n To fully activate your account, please visit this link: https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash,
+                        html: "<h3>&nbsp;</h3><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"padding: 10px 0 30px 0;\"><table style=\"border: 1px solid #cccccc; border-collapse: collapse;\" border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\"><tbody><tr><td style=\"padding: 40px 30px 40px 30px;\" bgcolor=\"#ffffff\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #153643; font-family: Arial, sans-serif; font-size: 24px;\"><h3><strong>Hooray! Welcome to H.S.A. Confluente</strong></h3></td></tr><tr><td style=\"padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;\">Thank you for signing up to the website of H.S.A. Confluente at <a href=\"http://www.hsaconfluente.nl\">www.hsaconfluente.nl</a>. To activate your account on our website, please click the  <a href='" + link + "'>here!</a></td></tr><tr><td><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Events</h4><p>Now that you have an account on the H.S.A. Confluente website, you can subscribe to all the wonderful events that H.S.A. Confluente is organizing. Want to see what activities are coming up? <a href=\"https://hsaconfluente.nl/activities\">Click here!</a></p></td></tr></tbody></table></td><td style=\"font-size: 0; line-height: 0;\" width=\"20\">&nbsp;</td><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Want to learn more?</h4><p>Are you interested in what H.S.A. Confluente is or can offer you? Then go and take an extensive look at our <a href=\"https://hsaconfluente.nl/\">website</a>! You can find pictures of all previous boards as well as information about what committees we have at H.S.A. Confluente!.</p></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr><tr><td style=\"padding: 30px 30px 30px 30px;\" bgcolor=\"#1689ad\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;\" width=\"75%\">Web Commttee H.S.A. Confluente, TU/e 2020</td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table>"
+                    }).then((_: any) => {
+                    });
                 });
-
-                const link: string = "https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash;
-
-                transporter.sendMail({
-                    from: '"website" <web@hsaconfluente.nl>',
-                    to: req.body.email,
-                    subject: "Registration H.S.A. Confluente",
-                    text: "Thank you for making an account on our website hsaconfluente.nl! \n To fully activate your account, please visit this link: https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash,
-                    html: "<h3>&nbsp;</h3><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"padding: 10px 0 30px 0;\"><table style=\"border: 1px solid #cccccc; border-collapse: collapse;\" border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\"><tbody><tr><td style=\"padding: 40px 30px 40px 30px;\" bgcolor=\"#ffffff\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #153643; font-family: Arial, sans-serif; font-size: 24px;\"><h3><strong>Hooray! Welcome to H.S.A. Confluente</strong></h3></td></tr><tr><td style=\"padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;\">Thank you for signing up to the website of H.S.A. Confluente at <a href=\"http://www.hsaconfluente.nl\">www.hsaconfluente.nl</a>. To activate your account on our website, please click the  <a href='" + link + "'>here!</a></td></tr><tr><td><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Events</h4><p>Now that you have an account on the H.S.A. Confluente website, you can subscribe to all the wonderful events that H.S.A. Confluente is organizing. Want to see what activities are coming up? <a href=\"https://hsaconfluente.nl/activities\">Click here!</a></p></td></tr></tbody></table></td><td style=\"font-size: 0; line-height: 0;\" width=\"20\">&nbsp;</td><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Want to learn more?</h4><p>Are you interested in what H.S.A. Confluente is or can offer you? Then go and take an extensive look at our <a href=\"https://hsaconfluente.nl/\">website</a>! You can find pictures of all previous boards as well as information about what committees we have at H.S.A. Confluente!.</p></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr><tr><td style=\"padding: 30px 30px 30px 30px;\" bgcolor=\"#1689ad\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;\" width=\"75%\">Web Commttee H.S.A. Confluente, TU/e 2020</td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table>"
-                }).then(function(info: any): void {
-                });
+                res.status(201).send(createdUser);
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.status(406).send("Account could not be created. " + err.message);
             });
-            res.status(201).send(createdUser);
-        }).catch(function(): void {
-            res.status(406).send("Account with identical email already exists");
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.status(500);
         });
     });
 
@@ -110,24 +133,35 @@ router.route("/:id")
      */
     .all((req: Request, res: Response, next: NextFunction) => {
         // Check if client has a session
-        const user: number = res.locals.session ? res.locals.session.userId : null;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
-        // If client does not have a session, he does not have permission
-        if (user === null) { return res.send(403); }
+        // Check whether user has permission to see the information of the user requested
+        checkPermission(userId, {type: "USER_VIEW", value: +req.params.id}).then(function(result: boolean): any {
+            // If no permission, return 403
+            if (!result) {
+                return res.status(403).send({message: "You are not authorized to view the requested user"});
+            }
 
-        // Get user from database
-        User.findByPk(req.params.id, {
-            attributes: ["id", "firstName", "lastName", "displayName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "consentWithPortraitRight"],
-            include: [User.associations.role],
-        }).then(function(foundUser: User): void {
-            // Return if user not found
-            if (foundUser === null) {
-                res.status(404).send({status: "Not Found"});
-            } else {
+            // Get user from database
+            User.findByPk(req.params.id, {
+                attributes: ["id", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "consentWithPortraitRight"],
+                include: [Role, Group],
+            }).then((foundUser: User) => {
+                // User must always be found. If user requested is not in the database, then the checkPermission will
+                // throw an error.
+
                 // Store user and go to next function
-                res.locals.user = user;
+                res.locals.user = foundUser;
 
                 next();
+            });
+        }).catch((err: Error) => {
+            logger.error(err);
+            if (err.message === "permissions.checkPermission: USER_VIEW permission was requested for non " +
+                "existing user.") {
+                return res.status(404).send({message: err.message});
+            } else {
+                return res.status(500);
             }
         });
     })
@@ -136,94 +170,77 @@ router.route("/:id")
      * Get a specific user from the database and return to the client
      */
     .get((req: Request, res: Response) => {
-        // store user in variable
-        const user: number = res.locals.session.user;
-
-        // Check whether user has permission to see the information of the user requested
-        checkPermission(user, {type: "USER_VIEW", value: +req.params.id}).then(function(result: boolean): any {
-            // If no permission, return 403
-            if (!result) { return res.sendStatus(403); }
-
-            // If permission, find all groups in the database, that the requested user is a member of.
-            Group.findAll({
-                attributes: ["id", "fullName", "canOrganize"],
-                include: [
-                    {
-                        model: User,
-                        attributes: ["id"],
-                        where: {
-                            id: req.params.id
-                        }
-                    }
-                ]
-            }).then(function(foundGroups: Group[]): void {
-                const webUser = UserWeb.getWebModelFromDbModel(res.locals.user);
-                const webGroups = GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
-
-                // Send user together with group back to client
-                res.send([webUser, webGroups]);
-            });
+        // Transform user to web user and return
+        UserWeb.getWebModelFromDbModel(res.locals.user).then((webUser: UserWeb) => {
+            return res.status(200).send(webUser);
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     })
 
     /**
-     * Edit a user
+     * Edit a user.
+     * To edit a user, the request body needs to be a list with two entries: [user attributes, group data]
+     * The user attributes can include any attributes available in the user model.
+     * The group data is a list, where each entry represents data of a group. i.e. group data = [group1, group2, etc]
+     *      each group must have
+     *          {
+     *              id: number         // the id of the group
+     *              role: string       // the role this user fulfills in the group
+     *          }
      */
     .put((req: Request, res: Response) => {
+
+        if (!Array.isArray(req.body) || req.body.length !== 2) {
+            return res.status(400).send({message: "Bad request"});
+        }
+
         // Store user in variable
-        const user: number = res.locals.session.user;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check whether the client has permission to manage (edit) users
-        checkPermission(user, {
-            type: "USER_MANAGE",
-            value: res.locals.user.id
-        }).then(function(result: boolean): any {
+        checkPermission(userId, {type: "USER_MANAGE"}).then(async (result: boolean) => {
             // If no permission, send 403
             if (!result) {
-                return res.sendStatus(403);
+                return res.status(403).send({message: "You are unauthorized to edit users."});
             }
 
-            // Find all groups that the user edited is currently a member of
-            Group.findAll({
-                attributes: ["id", "fullName"],
-                include: [
-                    {
-                        model: User,
-                        attributes: ["id"],
-                        where: {
-                            id: req.params.id
-                        }
-                    }
-                ]
-            }).then(function(foundGroups: Group[]): any {
-                // Remove all existing group relations from the database
-                for (const foundGroup of foundGroups) {
-                    // Check if this does what it should do
-                    // OLD CODE
-                    // foundGroup.members[0].user_group.destroy();
-                    foundGroup.members[0].$remove('groups', foundGroup);
+            const dbGroups = res.locals.user.groups;
 
-                }
+            // Remove all groups currently assigned to user
+            for (const group of dbGroups) {
+                await (res.locals.user as User).$remove('groups', group).then(_ => {
+                });
+            }
 
-                // Add all groups as stated in the request
-                req.body[1].forEach(function(groupData: any): void {
-                    if (groupData.selected) {
-                        Group.findByPk(groupData.id).then(function(specificGroup: Group): void {
-                            res.locals.user.addGroups(specificGroup, {through: {func: groupData.role}})
-                                .then(console.log);
+            // Add all groups as stated in the request
+            for (const groupData of req.body[1]) {
+                await Group.findByPk(groupData.id).then(async (specificGroup: Group) => {
+                    await (res.locals.user as User).$add('groups', specificGroup, {through: {func: groupData.role}})
+                        .then(() => {
+                        })
+                        .catch((err: Error) => {
+                            logger.error("user.route./:id.put: " + err);
                         });
-                    }
                 });
+            }
 
-                // Update the user in the database
-                return res.locals.user.update(req.body[0]).then(function(returnedUser: User): void {
+            // Update the user in the database
+            res.locals.user.update(req.body[0]).then((updatedUser: User) => {
+
+                // Transform updated user to web model
+                UserWeb.getWebModelFromDbModel(updatedUser).then((webUser: UserWeb) => {
                     // Send edited user back to the client.
-                    res.send(returnedUser);
-                }, function(err: Error): void {
+                    return res.status(200).send(webUser);
+                }).catch((err: Error) => {
                     logger.error(err);
+                    return res.sendStatus(500);
                 });
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(400);
             });
-
         });
     })
 
@@ -232,20 +249,26 @@ router.route("/:id")
      */
     .delete((req: Request, res: Response) => {
         // Store user in variable
-        const user: number = res.locals.session.user;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has the permission to manage (delete) users
-        checkPermission(user, {
-            type: "USER_MANAGE",
-            value: res.locals.user.id
-        }).then(function(result: boolean): any {
+        checkPermission(userId, {type: "USER_MANAGE"}).then((result: boolean) => {
+
             // If no permission, send 403
-            if (!result) { return res.sendStatus(403); }
+            if (!result) {
+                return res.status(403).send({message: "You are unauthorized to delete users."});
+            }
 
             // Destroy user in database
-            return res.locals.user.destroy();
-        }).then(function(): void {
-            res.status(204).send({status: "Successful"});
+            res.locals.user.destroy().then(() => {
+                return res.sendStatus(201);
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
+            });
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     });
 
@@ -255,52 +278,72 @@ router.route("/changePassword/:id")
      */
     .put((req: Request, res: Response) => {
         // Check if client has a session
-        const user: number = res.locals.session ? res.locals.session.userId : null;
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to change password of user
-        checkPermission(user, {type: "CHANGE_PASSWORD", value: +req.params.id}).then(function(result: boolean): any {
+        checkPermission(userId, {type: "CHANGE_PASSWORD", value: +req.params.id}).then(function(result: boolean): any {
+
             // If no permission, send 403
-            if (!result) { return res.sendStatus(403); }
+            if (!result) {
+                return res.status(403).send({
+                    message: "You do not have permission to change the password of the " +
+                        "requested user."
+                });
+            }
 
             // Get user from database
             User.findByPk(req.params.id, {
-                attributes: ["id", "displayName", "email", "passwordHash", "passwordSalt"],
-                include: [User.associations.role]
+                attributes: ["id", "firstName", "lastName", "email", "passwordHash", "passwordSalt"],
+                include: [Role]
             }).then(function(foundUser: User): any {
-                // If user does not exist, send 404
-                if (foundUser === null) {
-                    return res.status(404).send({status: "Not Found"});
-                } else {
-                    // Get the hash of the (original) password the user put
-                    const inputtedPasswordHash =
-                        getPasswordHashSync(req.body.password, foundUser.passwordSalt);
+                // User definitely exists. If not, it would have been filtered out in the checkPermission call.
 
-                    // Check if it is indeed the correct password
-                    if (inputtedPasswordHash.equals(foundUser.passwordHash)) {
-                        return res.status(406).send({status: "Not equal passwords"});
-                    }
+                // Get the hash of the (original) password the user put
+                const inputtedPasswordHash =
+                    getPasswordHashSync(req.body.password, foundUser.passwordSalt);
 
-                    // Check if both newly inputted passwords are the same
-                    if (req.body.passwordNew !== req.body.passwordNew2) {
-                        return res.status(406).send({status: "Not equal new passwords"});
-                    }
-
-                    // Generate new salt and hash
-                    const passwordSalt: string = generateSalt(16); // Create salt of 16 characters
-                    const passwordHash = getPasswordHashSync(req.body.passwordNew, passwordSalt);
-
-                    // Update user in database with new password and hash
-                    return foundUser.update({
-                        passwordHash,
-                        passwordSalt
-                    }).then(function(updatedUser: User): any {
-                        // Send updated user to the client
-                        return res.send(updatedUser);
-                    }, function(err: Error): void {
-                        logger.error(err);
+                // Check if it is indeed the correct password
+                if (Buffer.compare(inputtedPasswordHash, Buffer.from(foundUser.passwordHash)) !== 0) {
+                    return res.status(406).send({
+                        message: "The password submitted is not the current" +
+                            " password of this user."
                     });
                 }
+
+                if (typeof req.body.passwordNew !== "string" || typeof req.body.passwordNew2 !== "string") {
+                    return res.status(400).send({message: "The passwords submitted were not of type " +
+                            "'string'"});
+                }
+
+                // Check if both newly inputted passwords are the same
+                if (req.body.passwordNew !== req.body.passwordNew2) {
+                    return res.status(406).send({
+                        message: "The pair of new passwords submitted was not " +
+                            "equal."
+                    });
+                }
+
+                // Generate new salt and hash
+                const passwordSalt: string = generateSalt(passwordSaltLength); // Create salt of 16 characters
+                const passwordHash = getPasswordHashSync(req.body.passwordNew, passwordSalt);
+
+                // Update user in database with new password and hash
+                return foundUser.update({
+                    passwordHash,
+                    passwordSalt
+                }).then((updatedUser: User) => {
+                    // Send updated user to the client
+                    return res.status(200).send(updatedUser);
+                }).catch((err: Error) => {
+                    logger.error(err);
+                    return res.status(400).send("Was not able to update password.");
+                });
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
             });
+        }).catch((err: Error) => {
+            return res.sendStatus(400);
         });
     });
 
@@ -312,28 +355,25 @@ router.route("/approve/:approvalString")
         // Get the approval string
         const approvalString = req.params.approvalString;
 
-        // Check if it has the correct length
-        if (approvalString.length !== 24) {
-            return res.send(401);
-        }
-
         // Find the user whose approval string matches the url
-        User.findOne({where: {approvingHash: approvalString}}).then(function(foundUser: User): any {
+        User.findOne({where: {approvingHash: approvalString}}).then((foundUser: User) => {
+
             if (!foundUser) {
                 // If the same link is clicked again in the email
-                res.writeHead(301, {
+                res.writeHead(200, {
                     location: '/login'
                 });
-                res.send();
+                return res.send();
             }
 
-            foundUser.update({approved: true, approvingHash: generateSalt(23)})
-                .then(function(result: any): void {
-                res.writeHead(301, {
-                    location: '/completed_registration'
+            // If user is found, approve user, and redirect.
+            foundUser.update({approved: true, approvingHash: generateSalt(approvalStringLength - 1)})
+                .then((_: User) => {
+                    res.writeHead(200, {
+                        location: '/completed_registration'
+                    });
+                    return res.send();
                 });
-                res.send();
-            });
         });
     });
 

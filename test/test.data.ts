@@ -12,7 +12,7 @@ import {roles} from "../src/import_initial";
 import * as supertest from "supertest";
 import {authenticate} from "./test.helper";
 
-const password = "HonoursWorthyPassword";
+export const password = "HonoursWorthyPassword";
 const passwordSaltExample = generateSalt(16);
 
 export const superAdmin = {
@@ -321,6 +321,21 @@ export const session = {
     userId: 1,
     ip: "funky ip address",
     expires: new Date()
+};
+
+export const newUser = {
+    email: "somemember@nottue.tue.nl",
+    displayName: "New Member",
+    firstName: "New",
+    lastName: "Member",
+    honorsMembership: "member",
+    approvingHash: "daerqecxvionsd",
+    passwordSalt: passwordSaltExample,
+    passwordHash: getPasswordHashSync(password, passwordSaltExample),
+    password: password,
+    approved: false,
+    roleId: 3,
+    consentWithPortraitRight: false,
 };
 
 const users = [superAdmin, admin, boardMember, activeMember, nonActiveMember, zeroPermissionsMember];

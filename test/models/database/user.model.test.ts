@@ -48,7 +48,7 @@ describe("user.model.ts", () => {
      */
     describe("Adding an invalid instance", () => {
         // Setting needed properties
-        const needed_props = ["email", "firstName", "lastName", "displayName", "honorsMembership", "passwordHash", "passwordSalt", "approvingHash", "roleId"];
+        const needed_props = ["email", "firstName", "lastName", "honorsMembership", "passwordHash", "passwordSalt", "approvingHash", "roleId"];
 
         // Test for each needed property
         needed_props.forEach(function(prop: string): void {

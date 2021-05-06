@@ -31,9 +31,8 @@ export class UserWeb extends AbstractWebModel {
 
     /**
      * Display name of the user.
-     * Usually concatenation of first name and last name
+     * Is not a separate column in database, but it automatically generated upon generation from db model.
      */
-        // TODO delete this, and just make a function for get Display Name or smth
     public displayName: string;
 
     /**
@@ -109,8 +108,10 @@ export class UserWeb extends AbstractWebModel {
         // @ts-ignore
         const webUser = copyMatchingSourceKeyValues(new UserWeb(), dbUser.dataValues);
 
+        const castedUser = (dbUser as User);
+
         webUser.groups = [];
-        if ((dbUser as User).groups && (dbUser as User).groups.length !== 0) {
+        if (castedUser.groups && castedUser.groups.length !== 0) {
             for (const group of (dbUser as User).groups) {
                 const func = group.UserGroup.func;
                 delete group.UserGroup;
@@ -120,8 +121,8 @@ export class UserWeb extends AbstractWebModel {
             }
         }
 
-        if ((dbUser as User).role !== undefined) {
-            webUser.role = await RoleWeb.getWebModelFromDbModel((dbUser as User).role);
+        if (castedUser.role !== undefined) {
+            webUser.role = await RoleWeb.getWebModelFromDbModel(castedUser.role);
 
             webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(
                 function(groupOfUser: UserGroupWeb): boolean {
@@ -130,11 +131,14 @@ export class UserWeb extends AbstractWebModel {
             );
         }
 
+        if (castedUser.firstName !== undefined && castedUser.lastName !== undefined) {
+            webUser.displayName = webUser.firstName + " " + webUser.lastName;
+        }
 
         return webUser;
     }
 
     public getCopyable(): string[] {
-        return ["id", "email", "firstName", "lastName", "displayName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "approved", "approvingHash", "canOrganize"];
+        return ["id", "email", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "approved", "approvingHash", "canOrganize"];
     }
 }

@@ -21,7 +21,7 @@ router.route("/")
 
         // find the user of the session in the database
         User.findOne({
-            attributes: ["id", "email", "displayName", "consentWithPortraitRight", "roleId"],
+            attributes: ["id", "email", "firstName", "lastName", "consentWithPortraitRight", "roleId"],
             include: [{
                 model: Group,
                 attributes: ["id", "displayName", "fullName", "description", "canOrganize", "email"]

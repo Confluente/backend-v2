@@ -73,7 +73,7 @@ router.route("/:id")
                 {
                     model: User,
                     as: "members",
-                    attributes: ["displayName"]
+                    attributes: ["firstName", "lastName"]
                 }
             ]
         }).then((foundGroup: Group) => {

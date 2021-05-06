@@ -159,7 +159,6 @@ const users = [
     {
         id: 1,
         email: "superadmin",
-        displayName: "Super Administrator",
         firstName: "Super",
         lastName: "Administrator",
         honorsMembership: "member",
@@ -175,7 +174,6 @@ const users = [
     {
         id: 2,
         email: "admin",
-        displayName: "Administrator",
         firstName: "Just",
         lastName: "Administrator",
         honorsMembership: "member",
@@ -191,7 +189,6 @@ const users = [
     {
         id: 3,
         email: "boardmember@student.tue.nl",
-        displayName: "Board Member",
         firstName: "Board",
         lastName: "Member",
         honorsMembership: "member",
@@ -207,7 +204,6 @@ const users = [
     {
         id: 4,
         email: "activemember1@student.tue.nl",
-        displayName: "Active1 Member",
         firstName: "Active1",
         lastName: "Member",
         honorsMembership: "member",
@@ -225,7 +221,6 @@ const users = [
     {
         id: 5,
         email: "nonactivemember@student.tue.nl",
-        displayName: "NonActive Member",
         firstName: "NonActive",
         lastName: "Member",
         honorsMembership: "member",
@@ -239,9 +234,8 @@ const users = [
     {
         id: 6,
         email: "activemember3@student.tue.nl",
-        displayName: "Active3 Member",
         firstName: "Active3",
-        lastName: "dupermin",
+        lastName: "Member",
         honorsMembership: "Member",
         mobilePhoneNumber: "somenumber",
         approvingHash: "da;lkfjda;fjkad;fj",
