@@ -1,7 +1,5 @@
 import express, {NextFunction, Request, Response, Router} from "express";
-
 import Q from 'q';
-import marked from 'marked';
 import multer, {diskStorage, FileFilterCallback} from 'multer';
 import mime from 'mime-types';
 import fs from 'fs';
@@ -9,16 +7,15 @@ import fs from 'fs';
 import {Group} from "../models/database/group.model";
 import {User} from "../models/database/user.model";
 import {Activity} from "../models/database/activity.model";
+import {ActivityWeb} from "../models/web/activity.web.model";
 
 import {checkPermission} from "../permissions";
-
 import {stringifyArrayOfStrings} from "../helpers/array.helper";
+import {Op} from 'sequelize';
+import {logger} from "../logger";
 
 const router: Router = express.Router();
 
-import {Op, where} from 'sequelize';
-import {ActivityWeb} from "../models/web/activity.web.model";
-import {logger} from "../logger";
 
 // path where the pictures of the activities are put in in frontend
 let pathToPictures: string = '';
@@ -29,7 +26,10 @@ if (process.env.NODE_ENV === "production") {
     pathToPictures = '../Frontend-Angular/src/assets/img/activities/';
 }
 
-// Set The Storage Engine
+
+/**
+ * Constant (helper) for interacting with file system.
+ */
 const storage: any = diskStorage({
     destination: pathToPictures,
     filename(req: Request, file: any, cb: any): void {
@@ -37,7 +37,10 @@ const storage: any = diskStorage({
     }
 });
 
-// Init Upload
+
+/**
+ * Constant (helper) for uploading files using multer library.
+ */
 const upload = multer({
     storage,
     limits: {fileSize: 1000000}, // 1 MB
@@ -46,7 +49,10 @@ const upload = multer({
     }
 }).single("image");
 
-// Check File Type
+
+/**
+ * Function for checking file type.
+ */
 function checkFileType(file: any, cb: any): any {
     // Allowed ext
     const filetypes = /jpeg|jpg|png/;
@@ -60,9 +66,15 @@ function checkFileType(file: any, cb: any): any {
     }
 }
 
-// Deletes a picture of an activity given an id
+/**
+ * Function to delete the picture of an activity given the ID of the activity.
+ * @param id    ID of the activity.
+ */
 function deletePicture(id: number): void {
+    // Get a list of the files.
     const files = fs.readdirSync(pathToPictures);
+
+    // Loop over the files to check which one it is and unlink (delete) it.
     for (const file of files) {
         if (file.split(".")[0].toString() === id.toString()) {
             fs.unlinkSync(pathToPictures + file);
@@ -71,8 +83,11 @@ function deletePicture(id: number): void {
     }
 }
 
-// This route is for handling general operations for activities. Namely, getting all activities and creating a
-// new activity.
+
+/**
+ * This route is for handling general operations for activities. Namely, getting all activities and creating a
+ * new activity.
+ */
 router.route("/")
     /**
      * Gets every activity in the database happening from today onwards
@@ -177,7 +192,10 @@ router.route("/")
         });
     });
 
-// This route is for handling pictures on activities.
+
+/**
+ * This route is for handling pictures of activities.
+ */
 router.route("/pictures/:id")
     /**
      * Checks permissions for handling pictures for activity
@@ -223,8 +241,11 @@ router.route("/pictures/:id")
         });
     });
 
-// This route is for getting the activities for the manage page
-// For the manage page, you should only get the activities which you are allowed to edit
+
+/**
+ * This route is for getting the activities for the manage page.
+ * For the manage page, you should only get the activities which you are allowed to edit.
+ */
 router.route("/manage")
     /*
      * Gets all activities for the manage page.
@@ -269,7 +290,10 @@ router.route("/manage")
         });
     });
 
-// This route is for handling subscriptions on activities.
+
+/**
+ * This route is for handling subscriptions on activities.
+ */
 router.route("/subscriptions/:id")
     /*
      * Adds a subscription to a specific activity
@@ -334,8 +358,11 @@ router.route("/subscriptions/:id")
         });
     });
 
-// This route is for handling activity specific operations such as getting an activity, editing an activity and
-// removing an activity.
+
+/**
+ * This route is for handling activity specific operations such as getting an activity, editing an activity and
+ * removing an activity.
+ */
 router.route("/:id")
     /**
      * Gets activity with id from database and stores it in res.locals.activity
@@ -423,8 +450,8 @@ router.route("/:id")
         });
     })
 
-    /*
-     * Deletes a specific activity
+    /**
+     * Deletes a specific activity.
      */
     .delete((req: Request, res: Response) => {
         // Check if the client is logged in
