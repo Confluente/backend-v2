@@ -1,4 +1,3 @@
-import {expect} from "chai";
 import {TestFactory} from "../../testFactory";
 import {Role} from "../../../src/models/database/role.model";
 import {organizingGroup, publishedActivityWithSubscriptionForm, roleSuperAdmin, superAdmin} from "../../test.data";
@@ -6,9 +5,8 @@ import {User} from "../../../src/models/database/user.model";
 import {UserWeb} from "../../../src/models/web/user.web.model";
 import {Group} from "../../../src/models/database/group.model";
 import {Activity} from "../../../src/models/database/activity.model";
-import {cleanDb, cleanRoles} from "../../test.helper";
+import {cleanDb} from "../../test.helper";
 import {resolve} from "q";
-import {RoleWeb} from "../../../src/models/web/role.web.model";
 
 const factory: TestFactory = new TestFactory();
 
