@@ -163,22 +163,21 @@ describe("user.route.ts '/api/users'", () => {
                     done(new Error());
                 });
             });
-            
-            // it("Should create user properly", (done) => {
-            //     factory.agents.nobodyUserAgent
-            //         .post("/api/users/")
-            //         .send(newUser)
-            //         .expect(201)
-            //         .then((res: any) => {
-            //             User.findOne(res.body.id).then((user: User) => {
-            //                 user.destroy().then(_ => {
-            //                     done();
-            //                 });
-            //             });
-            //         }).catch(_ => {
-            //             done(new Error());
-            //         });
-            // });
+
+            it("Should create user properly", (done) => {
+                factory.agents.nobodyUserAgent
+                    .post("/api/users/")
+                    .send(newUser)
+                    .expect(201)
+                    .then(async (res: any) => {
+                        await User.findByPk(res.body.id).then(async (user: User) => {
+                            await user.destroy();
+                            done();
+                        });
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
         });
 
     });

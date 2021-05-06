@@ -94,14 +94,13 @@ router.route("/")
                 // Send approval email to email
                 createTestAccount().then(() => {
 
-                    // TODO test if this works?? Same as in expressServer
                     const transporter: any = createTransport({
                         service: 'gmail',
                         secure: true,
                         // Never fill this password in and add it to git! Only filled in locally or on the server!
                         auth: {
                             user: 'web@hsaconfluente.nl',
-                            pass: 'P$nxzDM%N0OhzcEHDcB#'
+                            pass: ''
                         }
                     });
 
