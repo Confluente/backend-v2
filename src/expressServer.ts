@@ -174,7 +174,6 @@ export async function setupServer(server: Express): Promise<void> {
                         from: '"website" <web@hsaconfluente.nl>',
                         to: '"secretary of H.S.A. Confluente" <secretary@hsaconfluente.nl>',
                         subject: "New members that registered on the website",
-                        // tslint:disable-next-line:max-line-length
                         text: "Heyhoi dear secretary \n \nIn the past week there have been "
                             + number_of_new_users.toString() + " new registrations on the website. "
                             + "\n\nThe names and emails of the new registrations are \n"
