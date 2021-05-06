@@ -1,5 +1,5 @@
 import {TestFactory} from "../testFactory";
-import {newGroup} from "../test.data";
+import {newGroup, nonOrganizingGroup} from "../test.data";
 
 const factory: TestFactory = new TestFactory();
 
@@ -163,7 +163,108 @@ describe("group.route.ts '/api/groups'", () => {
         });
     });
 
-    // TODO test editing existing group.
-    // TODO test deleting existing group.
-    // TODO test getting existing groups of type.
+    /**
+     * Checks if editing an existing group works.
+     */
+    describe("Editing a group", () => {
+
+        it("Returns error without proper permissions", (done) => {
+            factory.agents.zeroPermissionsAgent.put("/api/groups/1").send(newGroup).expect(403)
+                .then((_: any) => {
+                done();
+            }).catch((_: any) => {
+                done(new Error());
+            });
+        });
+
+        it("Returns error when group not found", (done) => {
+            factory.agents.superAdminAgent.put("/api/groups/31415").send(newGroup).expect(404)
+                .then((_: any) => {
+                done();
+            }).catch((_: any) => {
+                done(new Error());
+            });
+        });
+
+        it("Correctly updates group", (done) => {
+            factory.agents.superAdminAgent.get("/api/groups/1").then((res: any) => {
+                const editedGroup = res.body;
+                editedGroup.email = "UPDATEDFORTEST@GROUP.RU";
+
+                factory.agents.superAdminAgent.put("/api/groups/1").send(editedGroup).expect(201)
+                    .then((resUpdated: any) => {
+                    if (resUpdated.body.fullName === editedGroup.fullName
+                        && resUpdated.body.email === editedGroup.email
+                        && resUpdated.body.members.length > 0) {
+                        done();
+                    } else {
+                        done(new Error());
+                    }
+                });
+            }).catch((_: any) => {
+                done(new Error());
+            });
+        });
+    });
+
+    /**
+     * Checks if deleting an existing group works.
+     */
+    describe("Deleting a group", () => {
+
+        it("Returns error without proper permissions", (done) => {
+            factory.agents.zeroPermissionsAgent.delete("/api/groups/1").expect(403).then((_: any) => {
+                done();
+            }).catch((_: any) => {
+                done(new Error());
+            });
+        });
+
+        it("Returns error when group not found", (done) => {
+            factory.agents.superAdminAgent.delete("/api/groups/31415").expect(404).then((_: any) => {
+                done();
+            }).catch((_: any) => {
+                done(new Error());
+            });
+        });
+
+        it("Correctly deletes existing group", (done) => {
+            factory.agents.superAdminAgent.delete("/api/groups/3").expect(204).then((_: any) => {
+                factory.agents.superAdminAgent.get("/api/groups/3").expect(404).then((__: any) => {
+                    done();
+                }).catch((__: any) => {
+                    done(new Error());
+                });
+            }).catch((_: any) => {
+                done(new Error());
+            });
+        });
+    });
+
+    /**
+     * Checks if getting all groups of a given type works.
+     */
+    describe("Getting groups of a specified type", () => {
+
+        it("Returns error without proper permissions", (done) => {
+            factory.agents.zeroPermissionsAgent.get("/api/groups/type/committee").expect(403)
+                .then((_: any) => {
+                done();
+            }).catch((_: any) => {
+                done(new Error());
+            });
+        });
+
+        it("Correctly returns all groups of a given type", (done) => {
+            factory.agents.superAdminAgent.get("/api/groups/type/committee").expect(200).then((res: any) => {
+                if (res.body.length === 2) {
+                    done();
+                } else {
+                    done(new Error());
+                }
+            }).catch((_: any) => {
+                done(new Error());
+            });
+        });
+    });
 });
