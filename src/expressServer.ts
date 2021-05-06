@@ -175,7 +175,11 @@ export async function setupServer(server: Express): Promise<void> {
                         to: '"secretary of H.S.A. Confluente" <secretary@hsaconfluente.nl>',
                         subject: "New members that registered on the website",
                         // tslint:disable-next-line:max-line-length
-                        text: "Heyhoi dear secretary \n \nIn the past week there have been " + number_of_new_users.toString() + " new registrations on the website. \n\nThe names and emails of the new registrations are \n" + data_of_new_users + " \nSincerely, \nThe website \nOn behalf of the Web Committee"
+                        text: "Heyhoi dear secretary \n \nIn the past week there have been "
+                            + number_of_new_users.toString() + " new registrations on the website. "
+                            + "\n\nThe names and emails of the new registrations are \n"
+                            + data_of_new_users
+                            + " \nSincerely, \nThe website \nOn behalf of the Web Committee"
                     }).then((info: object) => {
                         logger.info(info.toString());
                     });
