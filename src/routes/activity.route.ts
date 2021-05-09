@@ -1,5 +1,4 @@
 import express, {NextFunction, Request, Response, Router} from "express";
-import Q from 'q';
 import multer, {diskStorage, FileFilterCallback} from 'multer';
 import mime from 'mime-types';
 import fs from 'fs';
@@ -110,66 +109,69 @@ router.route("/")
                 {model: Group, attributes: ["id", "displayName", "fullName", "email"]},
                 {model: User, attributes: ["id", "firstName", "lastName", "email"]}
             ]
-    }).then(async function(foundActivities: Activity[]): Promise<any> {
-            const activities = await ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
+        }).then((foundActivities: Activity[]) => {
+            ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities)
+                .then(async (activities: ActivityWeb[]) => {
+                    activities = await activities.filter((activity: ActivityWeb) => {
+                        // If the activity is published, everyone (also not logged in) is allowed to see them
+                        // These lines are needed not to crash the management table in some cases
+                        if (activity.published) {
+                            return true;
+                        }
 
-            // Check for every activity if the client can view them
-            const promises = activities.map((singleActivity: ActivityWeb) => {
-                // If the activity is published, everyone (also not logged in) is allowed to see them
-                // These lines are needed not to crash the management table in some cases
-                if (singleActivity.published) {
-                    return Q(singleActivity);
-                }
+                        // If not logged in (and unpublished), client has no permission
+                        if (!res.locals.session) {
+                            return false;
+                        }
 
-                // If not logged in (and unpublished), client has no permission
-                if (!res.locals.session) {
-                    return Q(null);
-                }
+                        // If logged in (and unpublished), check whether client has permission to view activity
+                        return checkPermission(res.locals.session.userId, {
+                            type: "ACTIVITY_VIEW",
+                            value: +activity.id
+                        }).then((permission: boolean) => {
+                            // If no permission, return null, otherwise return activity
+                            return permission;
+                        });
 
-                // If logged in (and unpublished), check whether client has permission to view activity
-                return checkPermission(res.locals.session.user, {
-                    type: "ACTIVITY_VIEW",
-                    value: +singleActivity.id
-                }).then(function(result: boolean): ActivityWeb {
-                    // If no permission, return null, otherwise return activity
-                    return result ? singleActivity : null;
-                });
+                    });
+
+                    // Return the activities
+                    res.status(200).send(activities);
+
+                }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
             });
-
-            Q.all(promises).then(function(promisedActivities: Activity[]): any {
-                // Filter out all null events
-                promisedActivities = promisedActivities.filter(function(singleActivity: Activity): boolean {
-                    return singleActivity !== null;
-                });
-
-                // Send activities to the client
-                res.send(promisedActivities);
-            }).done();
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     })
 
     /**
      * Creates a new activity.
+     *
+     * Check activity model for required fields.
+     * TODO change frontend. Only have to have organizerId, and not 'organizer' anymore.
      */
     .post((req: Request, res: Response) => {
         // Check whether the client is logged in
-        if (!res.locals.session) {
-            return res.sendStatus(401);
-        }
+        const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Store activity in variable
         const activity = req.body;
 
         // Check if mandatory fields are filled in
-        if (!activity.organizer || !activity.description || !activity.date || isNaN(Date.parse(activity.date))) {
+        if (!activity.name || !activity.description || !activity.date || isNaN(Date.parse(activity.date))
+            || !activity.organizerId) {
             return res.sendStatus(400);
         }
 
         // Check whether the client has permission to organize events
-        checkPermission(res.locals.session.user, {
+        checkPermission(userId, {
             type: "GROUP_ORGANIZE",
             value: activity.organizer
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
             // If no permission, send 403
             if (!result) {
                 return res.sendStatus(403);
@@ -186,16 +188,17 @@ router.route("/")
                 activity.privacyOfQuestions = stringifyArrayOfStrings(activity.privacyOfQuestions);
             }
 
-            // Set organizerId
-            activity.OrganizerId = activity.organizer;
-
             // Create activity in database
-            return Activity.create(activity).then(function(createdActivity: Activity): void {
+            Activity.create(activity).then((createdActivity: Activity) => {
                 // Send new activity back to the client
-                res.status(201).send(createdActivity);
-            }).catch(function(err: Error): void {
+                return res.status(201).send(createdActivity);
+            }).catch((err: Error) => {
                 logger.error(err);
+                return res.sendStatus(400);
             });
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     });
 
@@ -214,10 +217,11 @@ router.route("/pictures/:id")
         }
 
         // Check permissions
-        return checkPermission(res.locals.session.user, {
+        return checkPermission(res.locals.session.userId, {
             type: "ACTIVITY_EDIT",
             value: +req.params.id
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
+            // Check if user has permission to edit activities.
             if (!result) {
                 return res.sendStatus(403);
             }
@@ -230,7 +234,7 @@ router.route("/pictures/:id")
      * Uploads a picture
      */
     .post((req: Request, res: Response) => {
-        upload(req, res, function(result: any): void {
+        upload(req, res, () => {
             res.send();
         });
     })
@@ -243,7 +247,7 @@ router.route("/pictures/:id")
         // TODO check if this casting works
         deletePicture((req.params.id as unknown as number));
 
-        upload(req, res, function(result: any): void {
+        upload(req, res, () => {
             res.send({Successful: true});
         });
     });
@@ -259,6 +263,10 @@ router.route("/manage")
      * @return List of activities that the client is allowed to edit
      */
     .get((req: Request, res: Response) => {
+        if (!res.locals.session) {
+            return res.sendStatus(401);
+        }
+
         // Get all activities from the database
         Activity.findAll({
             attributes: ["id", "name", "description", "location", "date", "startTime", "endTime", "published", "subscriptionDeadline"],
@@ -270,30 +278,23 @@ router.route("/manage")
                 as: "Organizer",
                 attributes: ["id", "displayName", "fullName", "email"]
             }]
-        }).then(async function(foundActivities: Activity[]): Promise<void> {
+        }).then((foundActivities: Activity[]) => {
 
             // Transform all db activities into web activities
-            const activities: ActivityWeb[] = await ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities);
-
-            // For every activity, check if the client is allowed to edit it
-            const promises = activities.map(function(singleActivity: ActivityWeb): any {
-                return checkPermission(res.locals.session.user, {
-                    type: "ACTIVITY_EDIT",
-                    value: +singleActivity.id
-                }).then(function(result: boolean): ActivityWeb {
-                    return result ? singleActivity : null;
+            ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities).then((activities: ActivityWeb[]) => {
+                // For every activity, check if the client is allowed to edit it
+                activities = activities.filter((singleActivity: ActivityWeb) => {
+                    return checkPermission(res.locals.session.userId, {
+                        type: "ACTIVITY_EDIT",
+                        value: +singleActivity.id
+                    }).then((result: boolean) => {
+                        return result;
+                    });
                 });
+
+                // Return the filtered activities
+                return res.send(activities);
             });
-
-            Q.all(promises).then(function(promisedActivities: Activity[]): void {
-                // Filter all activities out that are null due to limited permission
-                promisedActivities = promisedActivities.filter(function(singleActivity: Activity): boolean {
-                    return singleActivity !== null;
-                });
-
-                // Send activities to the client
-                res.send(promisedActivities);
-            }).done();
         });
     });
 
@@ -311,7 +312,7 @@ router.route("/subscriptions/:id")
 
         // If client is not logged in, send 403
         if (userId == null) {
-            return res.status(403).send({status: "Not logged in"});
+            return res.status(403).send({message: "Not logged in"});
         }
 
         // Get activity from database
@@ -321,17 +322,17 @@ router.route("/subscriptions/:id")
                 as: "Organizer",
                 attributes: ["id", "displayName", "fullName", "email"]
             }]
-        }).then(function(foundActivity: Activity): any {
+        }).then((foundActivity: Activity) => {
             // format answer string
             const answerString = stringifyArrayOfStrings(req.body);
 
             // add relation
-            return User.findByPk(userId).then(function(foundUser: User): void {
+            return User.findByPk(userId).then((foundUser: User) => {
                 foundUser.$add('activity', foundActivity, {through: {answers: answerString}})
-                    .then(function(result: Activity): any {
+                    .then((result: Activity) => {
 
                         // Send relation back to the client
-                        res.send(result);
+                        return res.send(result);
                     });
             });
         });
@@ -346,7 +347,7 @@ router.route("/subscriptions/:id")
 
         // If client is not logged in, send 403
         if (userId == null) {
-            return res.status(403).send({status: "Not logged in"});
+            return res.status(403).send({message: "Not logged in"});
         }
 
         // Get activity from database
@@ -355,17 +356,20 @@ router.route("/subscriptions/:id")
                 model: User,
                 as: "participants"
             }]
-        }).then(function(foundActivity: Activity): any {
-            // looping through all subscriptions to find the one of the user that requested the delete
-            for (const participant of foundActivity.participants) {
-                if (participant.id === userId) {
-                    // TODO check if this works?
-                    participant.$remove('activity', foundActivity);
-                }
-            }
+        }).then((foundActivity: Activity) => {
+            // Filter correct user from all participants of event.
+            const participant: User[] = foundActivity.participants.filter((user: User) => {
+                return user.id === userId;
+            });
 
-            // Send confirmation to client
-            return res.send(200);
+            // Remove subscription of filtered participant.
+            participant[0].$remove('activity', foundActivity)
+                .then(_ => {
+                    return res.sendStatus(201);
+                }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
+            });
         });
     });
 
@@ -390,16 +394,19 @@ router.route("/:id")
                 as: "participants",
                 attributes: ["id", "displayName", "firstName", "lastName", "email"]
             }]
-        }).then(function(foundActivity: Activity): any {
+        }).then((foundActivity: Activity) => {
             // If activity not found, send 404
             if (foundActivity === null) {
-                res.status(404).send({status: "Not Found"});
+                res.status(404).send({message: "Not Found"});
             } else {
                 // Store activity
                 res.locals.activity = foundActivity;
 
                 next();
             }
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     })
 
@@ -411,21 +418,25 @@ router.route("/:id")
         const user = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to view the activity
-        checkPermission(user, {type: "ACTIVITY_VIEW", value: +req.params.id}).then(function(result: boolean): any {
+        checkPermission(user, {type: "ACTIVITY_VIEW", value: +req.params.id}).then((result: boolean) => {
+
             // If no permission, send 403
             if (!result) {
                 return res.sendStatus(403);
             }
 
-            // Store activity in variable
-            const activity = ActivityWeb.getWebModelFromDbModel(res.locals.activity);
-
-            res.send(activity);
+            // Transform activity to activity web and send to frontend.
+            ActivityWeb.getWebModelFromDbModel(res.locals.activity).then((activity: ActivityWeb) => {
+                return res.send(activity);
+            });
         });
     })
 
     /**
      * Edits a specific activity
+     *
+     * Needs an attribute 'organizerId' in the body of the request which stores the id of the database instance of
+     * the group organizing the activity.
      */
     .put((req: Request, res: Response) => {
         // Check if client is logged in
@@ -434,33 +445,34 @@ router.route("/:id")
         // Check if client has permission to edit the activity
         checkPermission(userId, {
             type: "ACTIVITY_EDIT",
-            value: res.locals.activity.id
-        }).then(function(result: boolean): any {
+            value: +req.params.id
+        }).then((result: boolean) => {
             // If no permission, send 403
             if (!result) {
                 return res.sendStatus(403);
             }
 
-            // Get the organizing group from the database
-            Group.findOne({where: {fullName: req.body.organizer}}).then(function(foundGroup: Group): any {
-                req.body.OrganizerId = foundGroup.id;
-                req.body.Organizer = foundGroup;
+            // Update the activity in the database
+            if (req.body.canSubscribe) {
+                // formatting the subscription form into strings for the database
+                req.body.typeOfQuestion = stringifyArrayOfStrings(req.body.typeOfQuestion);
+                req.body.questionDescriptions = stringifyArrayOfStrings(req.body.questionDescriptions);
+                req.body.formOptions = stringifyArrayOfStrings(req.body.formOptions);
+                req.body.required = stringifyArrayOfStrings(req.body.required);
+                req.body.privacyOfQuestions = stringifyArrayOfStrings(req.body.privacyOfQuestions);
+            }
 
-                // Update the activity in the database
-                if (req.body.canSubscribe) {
-                    // formatting the subscription form into strings for the database
-                    req.body.typeOfQuestion = stringifyArrayOfStrings(req.body.typeOfQuestion);
-                    req.body.questionDescriptions = stringifyArrayOfStrings(req.body.questionDescriptions);
-                    req.body.formOptions = stringifyArrayOfStrings(req.body.formOptions);
-                    req.body.required = stringifyArrayOfStrings(req.body.required);
-                    req.body.privacyOfQuestions = stringifyArrayOfStrings(req.body.privacyOfQuestions);
-                }
-
-                return res.locals.activity.update(req.body).then(function(updatedActivity: Activity): void {
-                    res.send(updatedActivity);
-                }, function(err: Error): void {
+            // Update activity in DB and return activity (as web activity) to frontend
+            return res.locals.activity.update(req.body).then((updatedActivity: Activity) => {
+                ActivityWeb.getWebModelFromDbModel(updatedActivity).then((act: ActivityWeb) => {
+                    return res.status(200).send(act);
+                }).catch((err: Error) => {
                     logger.error(err);
+                    return res.sendStatus(500);
                 });
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
             });
         });
     })
@@ -476,7 +488,9 @@ router.route("/:id")
         checkPermission(user, {
             type: "ACTIVITY_EDIT",
             value: res.locals.activity.id
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
+
+            // If no permission, return
             if (!result) {
                 return res.sendStatus(403);
             }
@@ -487,9 +501,12 @@ router.route("/:id")
             }
 
             // Delete activity from database
-            return res.locals.activity.destroy();
-        }).then(function(): void {
-            res.status(204).send({status: "Successful"});
+            res.locals.activity.destroy().then(() => {
+                res.status(201);
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
+            });
         });
     });
 
