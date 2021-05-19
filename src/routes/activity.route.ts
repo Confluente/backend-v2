@@ -171,14 +171,19 @@ router.route("/")
 
         // Check if mandatory fields are filled in
         if (!activity.name || !activity.description || !activity.date || isNaN(Date.parse(activity.date))
-            || !activity.organizerId) {
+                || !activity.organizerId) {
+            return res.sendStatus(400);
+        }
+
+        if (activity.canSubscribe && (!activity.typeOfQuestion || !activity.questionDescriptions
+                || !activity.formOptions || !activity.required || ! activity.privacyOfQuestions)) {
             return res.sendStatus(400);
         }
 
         // Check whether the client has permission to organize events
         checkPermission(userId, {
             type: "GROUP_ORGANIZE",
-            value: activity.organizer
+            value: activity.organizerId
         }).then((result: boolean) => {
             // If no permission, send 403
             if (!result) {
