@@ -294,7 +294,13 @@ router.route("/manage")
 
                 // Return the filtered activities
                 return res.send(activities);
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
             });
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     });
 
@@ -312,7 +318,7 @@ router.route("/subscriptions/:id")
 
         // If client is not logged in, send 403
         if (userId == null) {
-            return res.status(403).send({message: "Not logged in"});
+            return res.sendStatus(401);
         }
 
         // Get activity from database
@@ -333,8 +339,17 @@ router.route("/subscriptions/:id")
 
                         // Send relation back to the client
                         return res.send(result);
-                    });
+                    }).catch((err: Error) => {
+                    logger.error(err);
+                    return res.sendStatus(500);
+                });
+            }).catch((err: Error) => {
+                logger.error(err);
+                return res.sendStatus(500);
             });
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     })
 
@@ -347,7 +362,7 @@ router.route("/subscriptions/:id")
 
         // If client is not logged in, send 403
         if (userId == null) {
-            return res.status(403).send({message: "Not logged in"});
+            return res.sendStatus(401);
         }
 
         // Get activity from database
@@ -363,10 +378,9 @@ router.route("/subscriptions/:id")
             });
 
             // Remove subscription of filtered participant.
-            participant[0].$remove('activity', foundActivity)
-                .then(_ => {
-                    return res.sendStatus(201);
-                }).catch((err: Error) => {
+            participant[0].$remove('activity', foundActivity).then(_ => {
+                return res.sendStatus(201);
+            }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
             });
@@ -415,10 +429,10 @@ router.route("/:id")
      */
     .get((req: Request, res: Response) => {
         // Check if client is logged in
-        const user = res.locals.session ? res.locals.session.userId : null;
+        const userId = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to view the activity
-        checkPermission(user, {type: "ACTIVITY_VIEW", value: +req.params.id}).then((result: boolean) => {
+        checkPermission(userId, {type: "ACTIVITY_VIEW", value: +req.params.id}).then((result: boolean) => {
 
             // If no permission, send 403
             if (!result) {
@@ -429,6 +443,9 @@ router.route("/:id")
             ActivityWeb.getWebModelFromDbModel(res.locals.activity).then((activity: ActivityWeb) => {
                 return res.send(activity);
             });
+        }).catch((err: Error) => {
+            logger.error(err);
+            return res.sendStatus(500);
         });
     })
 
@@ -482,10 +499,10 @@ router.route("/:id")
      */
     .delete((req: Request, res: Response) => {
         // Check if the client is logged in
-        const user = res.locals.session ? res.locals.session.userId : null;
+        const userId = res.locals.session ? res.locals.session.userId : null;
 
         // Check if the client has permission to edit the activity
-        checkPermission(user, {
+        checkPermission(userId, {
             type: "ACTIVITY_EDIT",
             value: res.locals.activity.id
         }).then((result: boolean) => {
