@@ -31,7 +31,7 @@ export function stringifyArrayOfStrings(array: string[]): string {
  * @returns                 Array of string encoded in the input string
  */
 export function destringifyStringifiedArrayOfStrings(input_string: string): string[] {
-    if (input_string === null) {
+    if (input_string === null || input_string === undefined) {
         throw new Error("array.helper.destringifyStringifiedArrayofString: input_string was null");
     }
 

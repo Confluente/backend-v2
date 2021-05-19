@@ -22,6 +22,34 @@ describe("activity.route.ts '/api/activities'", () => {
 
         describe("get", () => {
 
+            it("Should return all activities for logged in user", (done) => {
+                factory.agents.superAdminAgent.get("/api/activities/")
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.length === 2) {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(() => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return activities for no permission user", (done) => {
+                factory.agents.nobodyUserAgent.get("/api/activities/")
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.length === 1) {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(() => {
+                    done(new Error());
+                });
+            });
+
         });
 
         describe("post", () => {

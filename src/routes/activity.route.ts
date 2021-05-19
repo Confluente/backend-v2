@@ -106,8 +106,16 @@ router.route("/")
                 }
             },
             include: [
-                {model: Group, attributes: ["id", "displayName", "fullName", "email"]},
-                {model: User, attributes: ["id", "firstName", "lastName", "email"]}
+                {
+                    model: Group,
+                    as: "organizer",
+                    attributes: ["id", "displayName", "fullName", "email"]
+                },
+                {
+                    model: User,
+                    as: "participants",
+                    attributes: ["id", "firstName", "lastName", "email"]
+                }
             ]
         }).then((foundActivities: Activity[]) => {
             ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities)
@@ -139,9 +147,9 @@ router.route("/")
                     res.status(200).send(activities);
 
                 }).catch((err: Error) => {
-                logger.error(err);
-                return res.sendStatus(500);
-            });
+                    logger.error(err);
+                    return res.sendStatus(500);
+                });
         }).catch((err: Error) => {
             logger.error(err);
             return res.sendStatus(500);
