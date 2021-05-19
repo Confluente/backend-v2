@@ -144,7 +144,7 @@ router.route("/")
                     });
 
                     // Return the activities
-                    res.status(200).send(activities);
+                    return res.status(200).send(activities);
 
                 }).catch((err: Error) => {
                     logger.error(err);
