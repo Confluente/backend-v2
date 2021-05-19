@@ -288,7 +288,7 @@ router.route("/manage")
             ],
             include: [{
                 model: Group,
-                as: "Organizer",
+                as: "organizer",
                 attributes: ["id", "displayName", "fullName", "email"]
             }]
         }).then((foundActivities: Activity[]) => {
@@ -306,7 +306,7 @@ router.route("/manage")
                 });
 
                 // Return the filtered activities
-                return res.send(activities);
+                return res.status(200).send(activities);
             }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
@@ -338,7 +338,7 @@ router.route("/subscriptions/:id")
         Activity.findByPk(req.params.id, {
             include: [{
                 model: Group,
-                as: "Organizer",
+                as: "organizer",
                 attributes: ["id", "displayName", "fullName", "email"]
             }]
         }).then((foundActivity: Activity) => {

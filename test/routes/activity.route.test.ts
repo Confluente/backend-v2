@@ -175,6 +175,30 @@ describe("activity.route.ts '/api/activities'", () => {
 
         describe("post", () => {
 
+            it("Should return 401 if no session", (done) => {
+                factory.agents.nobodyUserAgent.get("/api/activities/manage")
+                    .expect(401)
+                    .then(() => {
+                        done();
+                    }).catch(() => {
+                        done(new Error());
+                    });
+            });
+
+            it("Should return all activities for super admin", (done) => {
+                factory.agents.superAdminAgent.get("/api/activities/manage")
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.length === 2) {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(() => {
+                        done(new Error());
+                    });
+            });
+
         });
 
         describe("put", () => {
