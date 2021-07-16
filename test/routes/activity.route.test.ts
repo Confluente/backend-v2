@@ -1,5 +1,7 @@
 import {TestFactory} from "../testFactory";
 import {Activity} from "../../src/models/database/activity.model";
+import {Subscription} from "../../src/models/database/subscription.model";
+import {User} from "../../src/models/database/user.model";
 
 const factory: TestFactory = new TestFactory();
 
@@ -283,6 +285,25 @@ describe("activity.route.ts '/api/activities'", () => {
                         } else {
                             done(new Error());
                         }
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
+
+            it("Should create subscription normally", (done) => {
+                factory.agents.nonActiveMemberAgent.post("/api/activities/subscriptions/2")
+                    .send(["myname", "myemail", "myanswer1", "myanswer2"])
+                    .expect(200)
+                    .then((res: any) => {
+                        Activity.findByPk(2, {include: {model: User, as: "participants"}}).then((act: Activity) => {
+                            for (const user of act.participants) {
+                                if (user.id === 5) {
+                                    user.Subscription.destroy().then(_ => {
+                                        done();
+                                    });
+                                }
+                            }
+                        });
                     }).catch(_ => {
                         done(new Error());
                 });

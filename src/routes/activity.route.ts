@@ -147,9 +147,9 @@ router.route("/")
                     return res.status(200).send(activities);
 
                 }).catch((err: Error) => {
-                    logger.error(err);
-                    return res.sendStatus(500);
-                });
+                logger.error(err);
+                return res.sendStatus(500);
+            });
         }).catch((err: Error) => {
             logger.error(err);
             return res.sendStatus(500);
@@ -171,12 +171,12 @@ router.route("/")
 
         // Check if mandatory fields are filled in
         if (!activity.name || !activity.description || !activity.date || isNaN(Date.parse(activity.date))
-                || !activity.organizerId) {
+            || !activity.organizerId) {
             return res.sendStatus(400);
         }
 
         if (activity.canSubscribe && (!activity.typeOfQuestion || !activity.questionDescriptions
-                || !activity.formOptions || !activity.required || ! activity.privacyOfQuestions)) {
+            || !activity.formOptions || !activity.required || !activity.privacyOfQuestions)) {
             return res.sendStatus(400);
         }
 
@@ -295,26 +295,26 @@ router.route("/manage")
 
             // Transform all db activities into web activities
             ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities)
-                    .then(async (activities: ActivityWeb[]) => {
-                async function filter(arr: any, callback: any): Promise<any> {
-                    const fail = Symbol();
-                    return (await Promise.all(arr.map(async (item: any) => (await callback(item)) ? item : fail)))
-                        // tslint:disable-next-line:no-non-null-assertion
-                        .filter(i => i !== fail);
-                }
+                .then(async (activities: ActivityWeb[]) => {
+                    async function filter(arr: any, callback: any): Promise<any> {
+                        const fail = Symbol();
+                        return (await Promise.all(arr.map(async (item: any) => (await callback(item)) ? item : fail)))
+                            // tslint:disable-next-line:no-non-null-assertion
+                            .filter(i => i !== fail);
+                    }
 
-                // For every activity, check if the client is allowed to edit it
-                activities = await filter(activities, async (singleActivity: ActivityWeb) => {
-                    const result = await checkPermission(res.locals.session.userId, {
-                        type: "ACTIVITY_EDIT",
-                        value: +singleActivity.id
+                    // For every activity, check if the client is allowed to edit it
+                    activities = await filter(activities, async (singleActivity: ActivityWeb) => {
+                        const result = await checkPermission(res.locals.session.userId, {
+                            type: "ACTIVITY_EDIT",
+                            value: +singleActivity.id
+                        });
+                        return result;
                     });
-                    return result;
-                });
 
-                // Return the filtered activities
-                return res.status(200).send(activities);
-            }).catch((err: Error) => {
+                    // Return the filtered activities
+                    return res.status(200).send(activities);
+                }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
             });
@@ -351,17 +351,21 @@ router.route("/subscriptions/:id")
         }).then((foundActivity: Activity) => {
 
             if (foundActivity.numberOfQuestions !== req.body.length) {
-                return res.status(400).send({message: "The number of submitted answers does not" +
-                        " correspond the number of questions in the form."});
+                return res.status(400).send({
+                    message: "The number of submitted answers does not" +
+                        " correspond the number of questions in the form."
+                });
             }
 
 
             const required = destringifyStringifiedArrayOfStrings(foundActivity.required);
             for (let i = 0; i < foundActivity.numberOfQuestions; i++) {
                 if (required[i] === "true" &&
-                        (req.body[i] === null || req.body[i] === undefined || req.body[i] === "")) {
-                    return res.status(400).send({message: "At least one required question was " +
-                            "not answered properly"});
+                    (req.body[i] === null || req.body[i] === undefined || req.body[i] === "")) {
+                    return res.status(400).send({
+                        message: "At least one required question was " +
+                            "not answered properly"
+                    });
                 }
             }
 
@@ -374,7 +378,7 @@ router.route("/subscriptions/:id")
                     .then((result: Activity) => {
 
                         // Send relation back to the client
-                        return res.send(result);
+                        return res.status(200).send(result);
                     }).catch((err: Error) => {
                     logger.error(err);
                     return res.sendStatus(500);
