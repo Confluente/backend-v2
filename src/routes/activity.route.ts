@@ -9,7 +9,7 @@ import {Activity} from "../models/database/activity.model";
 import {ActivityWeb} from "../models/web/activity.web.model";
 
 import {checkPermission} from "../permissions";
-import {stringifyArrayOfStrings} from "../helpers/array.helper";
+import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../helpers/array.helper";
 import {Op} from 'sequelize';
 import {logger} from "../logger";
 
@@ -294,15 +294,22 @@ router.route("/manage")
         }).then((foundActivities: Activity[]) => {
 
             // Transform all db activities into web activities
-            ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities).then((activities: ActivityWeb[]) => {
+            ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities)
+                    .then(async (activities: ActivityWeb[]) => {
+                async function filter(arr: any, callback: any): Promise<any> {
+                    const fail = Symbol();
+                    return (await Promise.all(arr.map(async (item: any) => (await callback(item)) ? item : fail)))
+                        // tslint:disable-next-line:no-non-null-assertion
+                        .filter(i => i !== fail);
+                }
+
                 // For every activity, check if the client is allowed to edit it
-                activities = activities.filter((singleActivity: ActivityWeb) => {
-                    return checkPermission(res.locals.session.userId, {
+                activities = await filter(activities, async (singleActivity: ActivityWeb) => {
+                    const result = await checkPermission(res.locals.session.userId, {
                         type: "ACTIVITY_EDIT",
                         value: +singleActivity.id
-                    }).then((result: boolean) => {
-                        return result;
                     });
+                    return result;
                 });
 
                 // Return the filtered activities
@@ -342,6 +349,22 @@ router.route("/subscriptions/:id")
                 attributes: ["id", "displayName", "fullName", "email"]
             }]
         }).then((foundActivity: Activity) => {
+
+            if (foundActivity.numberOfQuestions !== req.body.length) {
+                return res.status(400).send({message: "The number of submitted answers does not" +
+                        " correspond the number of questions in the form."});
+            }
+
+
+            const required = destringifyStringifiedArrayOfStrings(foundActivity.required);
+            for (let i = 0; i < foundActivity.numberOfQuestions; i++) {
+                if (required[i] === "true" &&
+                        (req.body[i] === null || req.body[i] === undefined || req.body[i] === "")) {
+                    return res.status(400).send({message: "At least one required question was " +
+                            "not answered properly"});
+                }
+            }
+
             // format answer string
             const answerString = stringifyArrayOfStrings(req.body);
 

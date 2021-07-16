@@ -175,30 +175,6 @@ describe("activity.route.ts '/api/activities'", () => {
 
         describe("post", () => {
 
-            it("Should return 401 if no session", (done) => {
-                factory.agents.nobodyUserAgent.get("/api/activities/manage")
-                    .expect(401)
-                    .then(() => {
-                        done();
-                    }).catch(() => {
-                        done(new Error());
-                    });
-            });
-
-            it("Should return all activities for super admin", (done) => {
-                factory.agents.superAdminAgent.get("/api/activities/manage")
-                    .expect(200)
-                    .then((res: any) => {
-                        if (res.body.length === 2) {
-                            done();
-                        } else {
-                            done(new Error());
-                        }
-                    }).catch(() => {
-                        done(new Error());
-                    });
-            });
-
         });
 
         describe("put", () => {
@@ -211,6 +187,58 @@ describe("activity.route.ts '/api/activities'", () => {
 
         describe("get", () => {
 
+            it("Should return 401 if no session", (done) => {
+                factory.agents.nobodyUserAgent.get("/api/activities/manage")
+                    .expect(401)
+                    .then(() => {
+                        done();
+                    }).catch(() => {
+                    done(new Error());
+                });
+            });
+
+            it("Should return all activities for super admin", (done) => {
+                factory.agents.superAdminAgent.get("/api/activities/manage")
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.length === 2) {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(() => {
+                    done(new Error());
+                });
+            });
+
+            it("Should return no activities for non active member", (done) => {
+                factory.agents.nonActiveMemberAgent.get("/api/activities/manage")
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.length === 0) {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(() => {
+                        done(new Error());
+                });
+            });
+
+            it("Should return all activities organized by group of active member", (done) => {
+                factory.agents.activeMemberAgent.get("/api/activities/manage")
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.length === 2) {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(() => {
+                        done(new Error());
+                });
+            });
+
         });
 
     });
@@ -218,6 +246,47 @@ describe("activity.route.ts '/api/activities'", () => {
     describe("/subscriptions/:id", () => {
 
         describe("post", () => {
+
+            it("Should return 401 if there is no session", (done) => {
+                factory.agents.nobodyUserAgent.post("/api/activities/subscriptions/2")
+                    .expect(401)
+                    .then((res: any) => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
+
+            it("Should return 400 if number of answers does not match up", (done) => {
+                factory.agents.nonActiveMemberAgent.post("/api/activities/subscriptions/2")
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "The number of submitted answers does not" +
+                            " correspond the number of questions in the form.") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
+
+            it("Should return 400 for not adhering to 'required' question answers", (done) => {
+                factory.agents.nonActiveMemberAgent.post("/api/activities/subscriptions/2")
+                    .send(["answer1", "answer2", undefined, "something"])
+                    .expect(400)
+                    .then((res: any) => {
+                        if (res.body.message === "At least one required question was " +
+                            "not answered properly") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
 
         });
 
