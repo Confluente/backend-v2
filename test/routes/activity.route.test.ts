@@ -389,7 +389,60 @@ describe("activity.route.ts '/api/activities'", () => {
         });
 
         describe("put", () => {
+            it("Returns 403 if not logged in", (done) => {
+                factory.agents.nobodyUserAgent.put("/api/activities/1")
+                    .send({})
+                    .expect(403)
+                    .then(_ => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
 
+            it("Returns 403 if no permission to edit activity", (done) => {
+                factory.agents.zeroPermissionsAgent.put("/api/activities/1")
+                    .send({})
+                    .expect(403)
+                    .then(_ => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
+
+            it("Successfully edits activities title", (done) => {
+                factory.agents.superAdminAgent.put("/api/activities/1")
+                    .send({name: "The first ever edited activity!"})
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.name === "The first ever edited activity!") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
+
+            it("Successfully edits activity with subscription form", (done) => {
+                factory.agents.superAdminAgent.put("/api/activities/2")
+                    .send({
+                        location: "Completely in the light",
+                        required: ["true", "true", "true", "false"]
+                    })
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.required[2] === true) {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
         });
 
         describe("delete", () => {

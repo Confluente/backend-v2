@@ -491,9 +491,6 @@ router.route("/:id")
 
     /**
      * Edits a specific activity
-     *
-     * Needs an attribute 'organizerId' in the body of the request which stores the id of the database instance of
-     * the group organizing the activity.
      */
     .put((req: Request, res: Response) => {
         // Check if client is logged in
@@ -509,13 +506,14 @@ router.route("/:id")
                 return res.sendStatus(403);
             }
 
-            // Update the activity in the database
-            if (req.body.canSubscribe) {
-                // formatting the subscription form into strings for the database
-                req.body.typeOfQuestion = stringifyArrayOfStrings(req.body.typeOfQuestion);
+            // formatting the subscription form into strings for the database
+            if (req.body.typeOfQuestion) {req.body.typeOfQuestion = stringifyArrayOfStrings(req.body.typeOfQuestion); }
+            if (req.body.questionDescriptions) {
                 req.body.questionDescriptions = stringifyArrayOfStrings(req.body.questionDescriptions);
-                req.body.formOptions = stringifyArrayOfStrings(req.body.formOptions);
-                req.body.required = stringifyArrayOfStrings(req.body.required);
+            }
+            if (req.body.formOptions) {req.body.formOptions = stringifyArrayOfStrings(req.body.formOptions); }
+            if (req.body.required) {req.body.required = stringifyArrayOfStrings(req.body.required); }
+            if (req.body.privacyOfQuestions) {
                 req.body.privacyOfQuestions = stringifyArrayOfStrings(req.body.privacyOfQuestions);
             }
 
