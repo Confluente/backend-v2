@@ -3,7 +3,7 @@ import {SubscriptionWeb} from "./subscription.web.model";
 import {GroupWeb} from "./group.web.model";
 import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
 import {AbstractWebModel} from "./abstract.web.model";
-import {Model, Sequelize} from "sequelize-typescript";
+import {Model} from "sequelize-typescript";
 import {Activity} from "../database/activity.model";
 import {destringifyStringifiedArrayOfStrings} from "../../helpers/array.helper";
 import * as fs from "fs";
@@ -165,18 +165,33 @@ export class ActivityWeb extends AbstractWebModel {
         if ('canSubscribe' in castedAct && castedAct.canSubscribe) {
             webActivity.subscriptionDeadline = castedAct.subscriptionDeadline !== null
                 ? new Date(castedAct.subscriptionDeadline) : null;
-            webActivity.typeOfQuestion = destringifyStringifiedArrayOfStrings(castedAct.typeOfQuestion);
-            webActivity.questionDescriptions = destringifyStringifiedArrayOfStrings(castedAct.questionDescriptions);
-            webActivity.required = destringifyStringifiedArrayOfStrings(castedAct.required)
-                .map((el: string) => (el === 'true'));
-            webActivity.privacyOfQuestions = destringifyStringifiedArrayOfStrings(castedAct.privacyOfQuestions)
-                .map((el: string) => (el === 'true'));
 
-            const nonSplitFormOptions = destringifyStringifiedArrayOfStrings(castedAct.formOptions);
-            webActivity.formOptions = [];
-            nonSplitFormOptions.forEach(function(question: string): void {
-                webActivity.formOptions.push(question.split('#;#'));
-            });
+            if (castedAct.typeOfQuestion !== undefined) {
+                webActivity.typeOfQuestion = destringifyStringifiedArrayOfStrings(castedAct.typeOfQuestion);
+            }
+
+            if (castedAct.questionDescriptions !== undefined) {
+                webActivity.questionDescriptions = destringifyStringifiedArrayOfStrings(castedAct.questionDescriptions);
+            }
+
+            if (castedAct.required !== undefined) {
+                webActivity.required = destringifyStringifiedArrayOfStrings(castedAct.required)
+                    .map((el: string) => (el === 'true'));
+            }
+
+            if (castedAct.privacyOfQuestions !== undefined) {
+                webActivity.privacyOfQuestions = destringifyStringifiedArrayOfStrings(castedAct.privacyOfQuestions)
+                    .map((el: string) => (el === 'true'));
+            }
+
+            if (castedAct.formOptions !== undefined) {
+                const nonSplitFormOptions = destringifyStringifiedArrayOfStrings(castedAct.formOptions);
+
+                webActivity.formOptions = [];
+                nonSplitFormOptions.forEach(function(question: string): void {
+                    webActivity.formOptions.push(question.split('#;#'));
+                });
+            }
 
             // Fill participants
             webActivity.participants = [];
@@ -185,7 +200,7 @@ export class ActivityWeb extends AbstractWebModel {
                     const answers = destringifyStringifiedArrayOfStrings(member.Subscription.answers);
                     delete member.Subscription;
                     await UserWeb.getWebModelFromDbModel(member).then(function(user: UserWeb): void {
-                        webActivity.participants.push(new SubscriptionWeb(user, webActivity, answers));
+                        webActivity.participants.push(new SubscriptionWeb(user, null, answers));
                     });
                 }
             }

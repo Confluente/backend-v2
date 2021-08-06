@@ -9,7 +9,7 @@ import {Activity} from "../models/database/activity.model";
 import {ActivityWeb} from "../models/web/activity.web.model";
 
 import {checkPermission} from "../permissions";
-import {stringifyArrayOfStrings} from "../helpers/array.helper";
+import {destringifyStringifiedArrayOfStrings, stringifyArrayOfStrings} from "../helpers/array.helper";
 import {Op} from 'sequelize';
 import {logger} from "../logger";
 
@@ -106,8 +106,16 @@ router.route("/")
                 }
             },
             include: [
-                {model: Group, attributes: ["id", "displayName", "fullName", "email"]},
-                {model: User, attributes: ["id", "firstName", "lastName", "email"]}
+                {
+                    model: Group,
+                    as: "organizer",
+                    attributes: ["id", "displayName", "fullName", "email"]
+                },
+                {
+                    model: User,
+                    as: "participants",
+                    attributes: ["id", "firstName", "lastName", "email"]
+                }
             ]
         }).then((foundActivities: Activity[]) => {
             ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities)
@@ -136,7 +144,7 @@ router.route("/")
                     });
 
                     // Return the activities
-                    res.status(200).send(activities);
+                    return res.status(200).send(activities);
 
                 }).catch((err: Error) => {
                 logger.error(err);
@@ -167,10 +175,15 @@ router.route("/")
             return res.sendStatus(400);
         }
 
+        if (activity.canSubscribe && (!activity.typeOfQuestion || !activity.questionDescriptions
+            || !activity.formOptions || !activity.required || !activity.privacyOfQuestions)) {
+            return res.sendStatus(400);
+        }
+
         // Check whether the client has permission to organize events
         checkPermission(userId, {
             type: "GROUP_ORGANIZE",
-            value: activity.organizer
+            value: activity.organizerId
         }).then((result: boolean) => {
             // If no permission, send 403
             if (!result) {
@@ -275,26 +288,32 @@ router.route("/manage")
             ],
             include: [{
                 model: Group,
-                as: "Organizer",
+                as: "organizer",
                 attributes: ["id", "displayName", "fullName", "email"]
             }]
         }).then((foundActivities: Activity[]) => {
 
             // Transform all db activities into web activities
-            ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities).then((activities: ActivityWeb[]) => {
-                // For every activity, check if the client is allowed to edit it
-                activities = activities.filter((singleActivity: ActivityWeb) => {
-                    return checkPermission(res.locals.session.userId, {
-                        type: "ACTIVITY_EDIT",
-                        value: +singleActivity.id
-                    }).then((result: boolean) => {
-                        return result;
-                    });
-                });
+            ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities)
+                .then(async (activities: ActivityWeb[]) => {
+                    async function filter(arr: any, callback: any): Promise<any> {
+                        const fail = Symbol();
+                        return (await Promise.all(arr.map(async (item: any) => (await callback(item)) ? item : fail)))
+                            // tslint:disable-next-line:no-non-null-assertion
+                            .filter(i => i !== fail);
+                    }
 
-                // Return the filtered activities
-                return res.send(activities);
-            }).catch((err: Error) => {
+                    // For every activity, check if the client is allowed to edit it
+                    activities = await filter(activities, async (singleActivity: ActivityWeb) => {
+                        return await checkPermission(res.locals.session.userId, {
+                            type: "ACTIVITY_EDIT",
+                            value: +singleActivity.id
+                        });
+                    });
+
+                    // Return the filtered activities
+                    return res.status(200).send(activities);
+                }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
             });
@@ -325,10 +344,30 @@ router.route("/subscriptions/:id")
         Activity.findByPk(req.params.id, {
             include: [{
                 model: Group,
-                as: "Organizer",
+                as: "organizer",
                 attributes: ["id", "displayName", "fullName", "email"]
             }]
         }).then((foundActivity: Activity) => {
+
+            if (foundActivity.numberOfQuestions !== req.body.length) {
+                return res.status(400).send({
+                    message: "The number of submitted answers does not" +
+                        " correspond the number of questions in the form."
+                });
+            }
+
+
+            const required = destringifyStringifiedArrayOfStrings(foundActivity.required);
+            for (let i = 0; i < foundActivity.numberOfQuestions; i++) {
+                if (required[i] === "true" &&
+                    (req.body[i] === null || req.body[i] === undefined || req.body[i] === "")) {
+                    return res.status(400).send({
+                        message: "At least one required question was " +
+                            "not answered properly"
+                    });
+                }
+            }
+
             // format answer string
             const answerString = stringifyArrayOfStrings(req.body);
 
@@ -338,7 +377,7 @@ router.route("/subscriptions/:id")
                     .then((result: Activity) => {
 
                         // Send relation back to the client
-                        return res.send(result);
+                        return res.status(200).send(result);
                     }).catch((err: Error) => {
                     logger.error(err);
                     return res.sendStatus(500);
@@ -401,12 +440,12 @@ router.route("/:id")
         Activity.findByPk(req.params.id, {
             include: [{
                 model: Group,
-                as: "Organizer",
+                as: "organizer",
                 attributes: ["id", "displayName", "fullName", "email"]
             }, {
                 model: User,
                 as: "participants",
-                attributes: ["id", "displayName", "firstName", "lastName", "email"]
+                attributes: ["id", "firstName", "lastName", "email"]
             }]
         }).then((foundActivity: Activity) => {
             // If activity not found, send 404
@@ -441,7 +480,7 @@ router.route("/:id")
 
             // Transform activity to activity web and send to frontend.
             ActivityWeb.getWebModelFromDbModel(res.locals.activity).then((activity: ActivityWeb) => {
-                return res.send(activity);
+                return res.status(200).send(activity);
             });
         }).catch((err: Error) => {
             logger.error(err);
@@ -451,9 +490,6 @@ router.route("/:id")
 
     /**
      * Edits a specific activity
-     *
-     * Needs an attribute 'organizerId' in the body of the request which stores the id of the database instance of
-     * the group organizing the activity.
      */
     .put((req: Request, res: Response) => {
         // Check if client is logged in
@@ -469,13 +505,14 @@ router.route("/:id")
                 return res.sendStatus(403);
             }
 
-            // Update the activity in the database
-            if (req.body.canSubscribe) {
-                // formatting the subscription form into strings for the database
-                req.body.typeOfQuestion = stringifyArrayOfStrings(req.body.typeOfQuestion);
+            // formatting the subscription form into strings for the database
+            if (req.body.typeOfQuestion) {req.body.typeOfQuestion = stringifyArrayOfStrings(req.body.typeOfQuestion); }
+            if (req.body.questionDescriptions) {
                 req.body.questionDescriptions = stringifyArrayOfStrings(req.body.questionDescriptions);
-                req.body.formOptions = stringifyArrayOfStrings(req.body.formOptions);
-                req.body.required = stringifyArrayOfStrings(req.body.required);
+            }
+            if (req.body.formOptions) {req.body.formOptions = stringifyArrayOfStrings(req.body.formOptions); }
+            if (req.body.required) {req.body.required = stringifyArrayOfStrings(req.body.required); }
+            if (req.body.privacyOfQuestions) {
                 req.body.privacyOfQuestions = stringifyArrayOfStrings(req.body.privacyOfQuestions);
             }
 
@@ -519,7 +556,7 @@ router.route("/:id")
 
             // Delete activity from database
             res.locals.activity.destroy().then(() => {
-                res.status(201);
+                return res.sendStatus(201);
             }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
