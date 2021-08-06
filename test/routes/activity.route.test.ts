@@ -2,6 +2,7 @@ import {TestFactory} from "../testFactory";
 import {Activity} from "../../src/models/database/activity.model";
 import {Subscription} from "../../src/models/database/subscription.model";
 import {User} from "../../src/models/database/user.model";
+import {stringifyArrayOfStrings} from "../../src/helpers/array.helper";
 
 const factory: TestFactory = new TestFactory();
 
@@ -312,6 +313,34 @@ describe("activity.route.ts '/api/activities'", () => {
         });
 
         describe("delete", () => {
+            it("Should return 401 for not logged in user", (done) => {
+                factory.agents.nobodyUserAgent.delete("/api/activities/subscriptions/2")
+                    .expect(401)
+                    .then(_ => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
+
+            it("Should delete subscription normally", (done) => {
+                Activity.findByPk(2).then((act: Activity) => {
+                    User.findByPk(1).then((user: User) => {
+                        user.$add('activities', act,
+                            {through: {answers:
+                                        stringifyArrayOfStrings(["myname", "myemail", "myanswer1", "myanswer2"])}})
+                                .then(_ => {
+                            factory.agents.superAdminAgent.delete("/api/activities/subscriptions/2")
+                                .expect(201)
+                                .then(__ => {
+                                    done();
+                                }).catch(__ => {
+                                    done(new Error());
+                            });
+                        });
+                    });
+                });
+            });
 
         });
 
