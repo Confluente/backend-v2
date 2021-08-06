@@ -128,7 +128,7 @@ router.route("/:id")
             if (!result) { return res.sendStatus(403); }
 
             // Update the database
-            return res.locals.group.update(req.body[0]).then(function(updatedGroup: Group): void {
+            return res.locals.group.update(req.body).then(function(updatedGroup: Group): void {
 
                 // remove all current group members
                 for (const member of updatedGroup.members) {
@@ -136,15 +136,15 @@ router.route("/:id")
                 }
 
                 // add all new group members
-                req.body[1].forEach(function(new_group_member: any): any {
+                req.body.members.forEach(function(new_group_member: any): any {
                     User.findByPk(new_group_member.id).then(function(newUser: User): void {
                         newUser.$add('groups', res.locals.group, {through: {func: new_group_member.func}})
                             .then(console.log);
                     });
                 });
 
-                // Send new group to the client
-                res.send(updatedGroup);
+                // Send updated group to the client
+                res.status(201).send(updatedGroup);
             }, function(err: Error): void {
                 logger.error(err);
             });
@@ -180,17 +180,31 @@ router.route("/type/:type")
      * Gets all groups of a certain type from the database
      */
     .get((req: Request, res: Response) => {
-        Group.findAll({
-            attributes: ["id", "fullName", "displayName", "description", "email"],
-            where: {type: req.params.type},
-            order: [
-                ["id", "ASC"]
-            ]
-        }).then(function(foundGroups: Group[]): void {
-            // Transform dbGroups to webGroups
-            const groups = GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
+        // Check if client is logged in
+        const user: number = res.locals.session ? res.locals.session.userId : null;
 
-            res.send(groups);
-        });
+        // Check if client has permission to view the group
+        checkPermission(user, {type: "GROUP_VIEW"})
+            .then((result: boolean) => {
+
+                // If no permission, send 403
+                if (!result) { return res.sendStatus(403); }
+
+                Group.findAll({
+                    attributes: ["id", "fullName", "displayName", "description", "email"],
+                    where: {type: req.params.type},
+                    order: [
+                        ["id", "ASC"]
+                    ]
+                }).then((foundGroups: Group[]) => {
+                    // Transform dbGroups to webGroups
+                    GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups).then((groups: any) => {
+                        res.status(200).send(groups);
+                    }).catch((_: any) => {
+                        res.sendStatus(500);
+                    });
+                });
+
+            });
     });
 module.exports = router;
