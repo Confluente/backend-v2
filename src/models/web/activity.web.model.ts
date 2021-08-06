@@ -3,7 +3,7 @@ import {SubscriptionWeb} from "./subscription.web.model";
 import {GroupWeb} from "./group.web.model";
 import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
 import {AbstractWebModel} from "./abstract.web.model";
-import {Model, Sequelize} from "sequelize-typescript";
+import {Model} from "sequelize-typescript";
 import {Activity} from "../database/activity.model";
 import {destringifyStringifiedArrayOfStrings} from "../../helpers/array.helper";
 import * as fs from "fs";

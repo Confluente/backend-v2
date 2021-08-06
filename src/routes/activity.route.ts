@@ -305,11 +305,10 @@ router.route("/manage")
 
                     // For every activity, check if the client is allowed to edit it
                     activities = await filter(activities, async (singleActivity: ActivityWeb) => {
-                        const result = await checkPermission(res.locals.session.userId, {
+                        return await checkPermission(res.locals.session.userId, {
                             type: "ACTIVITY_EDIT",
                             value: +singleActivity.id
                         });
-                        return result;
                     });
 
                     // Return the filtered activities
@@ -557,7 +556,7 @@ router.route("/:id")
 
             // Delete activity from database
             res.locals.activity.destroy().then(() => {
-                res.status(201);
+                return res.sendStatus(201);
             }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);

@@ -1,6 +1,5 @@
 import {TestFactory} from "../testFactory";
 import {Activity} from "../../src/models/database/activity.model";
-import {Subscription} from "../../src/models/database/subscription.model";
 import {User} from "../../src/models/database/user.model";
 import {stringifyArrayOfStrings} from "../../src/helpers/array.helper";
 
@@ -253,7 +252,7 @@ describe("activity.route.ts '/api/activities'", () => {
             it("Should return 401 if there is no session", (done) => {
                 factory.agents.nobodyUserAgent.post("/api/activities/subscriptions/2")
                     .expect(401)
-                    .then((res: any) => {
+                    .then(() => {
                         done();
                     }).catch(_ => {
                         done(new Error());
@@ -295,7 +294,7 @@ describe("activity.route.ts '/api/activities'", () => {
                 factory.agents.nonActiveMemberAgent.post("/api/activities/subscriptions/2")
                     .send(["myname", "myemail", "myanswer1", "myanswer2"])
                     .expect(200)
-                    .then((res: any) => {
+                    .then(() => {
                         Activity.findByPk(2, {include: {model: User, as: "participants"}}).then((act: Activity) => {
                             for (const user of act.participants) {
                                 if (user.id === 5) {
@@ -446,7 +445,42 @@ describe("activity.route.ts '/api/activities'", () => {
         });
 
         describe("delete", () => {
+            it("Returns 403 if not logged in", (done) => {
+                factory.agents.nobodyUserAgent.delete("/api/activities/1")
+                    .expect(403)
+                    .then(_ => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                    });
+            });
 
+            it("Returns 403 if no permission to edit activity", (done) => {
+                factory.agents.zeroPermissionsAgent.delete("/api/activities/1")
+                    .expect(403)
+                    .then(_ => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
+
+            it("Deletes activity successfully", (done) => {
+                Activity.create({
+                    name: "test",
+                    description: "some description",
+                    date: new Date(),
+                    organizerId: 1
+                }).then((act: Activity) => {
+                    factory.agents.superAdminAgent.delete("/api/activities/" + act.id)
+                        .expect(201)
+                        .then(_ => {
+                            done();
+                        }).catch(_ => {
+                            done(new Error());
+                        });
+                });
+            });
         });
 
     });
