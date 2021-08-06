@@ -441,12 +441,12 @@ router.route("/:id")
         Activity.findByPk(req.params.id, {
             include: [{
                 model: Group,
-                as: "Organizer",
+                as: "organizer",
                 attributes: ["id", "displayName", "fullName", "email"]
             }, {
                 model: User,
                 as: "participants",
-                attributes: ["id", "displayName", "firstName", "lastName", "email"]
+                attributes: ["id", "firstName", "lastName", "email"]
             }]
         }).then((foundActivity: Activity) => {
             // If activity not found, send 404
@@ -481,7 +481,7 @@ router.route("/:id")
 
             // Transform activity to activity web and send to frontend.
             ActivityWeb.getWebModelFromDbModel(res.locals.activity).then((activity: ActivityWeb) => {
-                return res.send(activity);
+                return res.status(200).send(activity);
             });
         }).catch((err: Error) => {
             logger.error(err);

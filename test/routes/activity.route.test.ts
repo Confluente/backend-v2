@@ -349,7 +349,43 @@ describe("activity.route.ts '/api/activities'", () => {
     describe("/:id", () => {
 
         describe("get", () => {
+            it("Returns 404 for unknown activity", (done) => {
+                factory.agents.superAdminAgent.get("/api/activities/100")
+                    .expect(404)
+                    .then((res: any) => {
+                        if (res.body.message === "Not Found") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
 
+            it("Returns 403 if no permission to view", (done) => {
+                factory.agents.zeroPermissionsAgent.get("/api/activities/1")
+                    .expect(403)
+                    .then(_ => {
+                        done();
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
+
+            it("Should return activity successfully", (done) => {
+                factory.agents.superAdminAgent.get("/api/activities/2")
+                    .expect(200)
+                    .then((res: any) => {
+                        if (res.body.id === 2 && res.body.location === "Completely in the dark") {
+                            done();
+                        } else {
+                            done(new Error());
+                        }
+                    }).catch(_ => {
+                        done(new Error());
+                });
+            });
         });
 
         describe("put", () => {
