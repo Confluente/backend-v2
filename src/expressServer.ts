@@ -24,12 +24,17 @@ export async function setupServer(server: Express): Promise<void> {
         webroot = path.resolve(__dirname, "www");
     } else if (process.env.NODE_ENV === "development") {
         console.log("Running in DEVELOPMENT mode!");
+
+        server.use(function(req: any, res: any, next: () => void): void {
+            logger.info(req.url, "express_request");
+            next();
+        });
     } else { // Running in production
         console.log("Running in PRODUCTION mode!");
         webroot = path.resolve(__dirname, "../frontend/build");
 
         server.use(function(req: any, res: any, next: () => void): void {
-            logger.info(req, "express_request");
+            logger.info(req.url, "express_request");
             next();
         });
     }

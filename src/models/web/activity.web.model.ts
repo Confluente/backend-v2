@@ -230,6 +230,7 @@ export class ActivityWeb extends AbstractWebModel {
     }
 
     public getCopyable(): string[] {
-        return ["id", "name", "description", "location", "canSubscribe", "participationFee", "numberOfQuestions", "published", "hasCoverImage", "startTime", "endTime"];
+        return ["id", "name", "date", "description", "location",
+            "canSubscribe", "participationFee", "numberOfQuestions", "published", "hasCoverImage", "startTime", "endTime"];
     }
 }

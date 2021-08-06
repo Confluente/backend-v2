@@ -139,6 +139,6 @@ export class UserWeb extends AbstractWebModel {
     }
 
     public getCopyable(): string[] {
-        return ["id", "email", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "approved", "approvingHash", "canOrganize"];
+        return ["id", "email", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "consentWithPortraitRight", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "approved", "approvingHash", "canOrganize"];
     }
 }
