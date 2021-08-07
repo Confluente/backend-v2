@@ -556,7 +556,7 @@ router.route("/:id")
 
             // Delete activity from database
             res.locals.activity.destroy().then(() => {
-                return res.sendStatus(201);
+                return res.sendStatus(200);
             }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
