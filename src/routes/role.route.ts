@@ -81,7 +81,7 @@ router.route("/:id")
         const userId = res.locals.session ? res.locals.session.userId : null;
 
         checkPermission(userId, {
-            type: "ROLE_MANAGE",
+            type: "ROLE_VIEW",
             value: userId
         }).then(function(result: boolean): any {
             // If no result, then the client has no permission
@@ -121,11 +121,7 @@ router.route("/:id")
             }
 
             // Find the role
-            Role.findByPk(req.params.id, {
-                attributes: ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE",
-                    "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "ACTIVITY_VIEW_PUBLISHED",
-                    "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"],
-            }).then((role: Role) => {
+            Role.findByPk(req.params.id).then((role: Role) => {
                 // Return if role not found
                 if (role === null) {
                     res.status(404).send({status: "Not Found"});
@@ -156,11 +152,7 @@ router.route("/:id")
             if (!result) { return res.sendStatus(403); }
 
             // Find the role
-            Role.findByPk(req.params.id, {
-                attributes: ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE",
-                    "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "ACTIVITY_VIEW_PUBLISHED",
-                    "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"],
-            }).then((role: Role): any => {
+            Role.findByPk(req.params.id).then((role: Role): any => {
                 // Return if role not found
                 if (role === null) {
                     return res.status(404).send({status: "Not Found"});
