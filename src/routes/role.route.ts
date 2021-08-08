@@ -17,7 +17,7 @@ router.route("/")
 
         // Check if the client has permission to manage roles
         checkPermission(userId, {
-            type: "ROLE_MANAGE",
+            type: "ROLE_VIEW",
             value: userId
         }).then(function(result: boolean): any {
             // If no result, then the client has no permission

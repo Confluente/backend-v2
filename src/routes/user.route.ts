@@ -24,7 +24,7 @@ router.route("/")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if the client has permission to manage users
-        checkPermission(userId, {type: "USER_MANAGE"}).then((result: boolean) => {
+        checkPermission(userId, {type: "USER_VIEW_ALL"}).then((result: boolean) => {
 
             // If no permission, return 403
             if (!result) {

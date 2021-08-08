@@ -160,7 +160,6 @@ router.route("/")
      * Creates a new activity.
      *
      * Check activity model for required fields.
-     * TODO change frontend. Only have to have organizerId, and not 'organizer' anymore.
      */
     .post((req: Request, res: Response) => {
         // Check whether the client is logged in
