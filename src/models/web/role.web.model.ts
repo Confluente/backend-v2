@@ -6,6 +6,11 @@ import {Role} from "../database/role.model";
 export class RoleWeb extends AbstractWebModel {
 
     /**
+     * ID of the role in the database.
+     */
+    public id: number;
+
+    /**
      * Name of the role.
      */
     public name!: string;
@@ -100,6 +105,6 @@ export class RoleWeb extends AbstractWebModel {
     }
 
     public getCopyable(): string[] {
-        return ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE", "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "GROUP_VIEW", "GROUP_MANAGE", "GROUP_ORGANIZE_WITH_ALL", "ACTIVITY_VIEW_PUBLISHED", "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"];
+        return ["id", "name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE", "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "GROUP_VIEW", "GROUP_MANAGE", "GROUP_ORGANIZE_WITH_ALL", "ACTIVITY_VIEW_PUBLISHED", "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"];
     }
 }

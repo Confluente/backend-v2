@@ -27,9 +27,6 @@ router.route("/")
 
             // If client has permission, find all roles in database
             Role.findAll({
-                attributes: ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE",
-                    "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "ACTIVITY_VIEW_PUBLISHED",
-                    "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"],
                 order: [
                     ["id", "ASC"]
                 ]
@@ -88,14 +85,10 @@ router.route("/:id")
             value: userId
         }).then(function(result: boolean): any {
             // If no result, then the client has no permission
-            if (!result) { res.sendStatus(403); }
+            if (!result) { return res.sendStatus(403); }
 
             // If client has permission, get the role from the database
-            Role.findByPk(req.params.id, {
-                attributes: ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE",
-                    "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "ACTIVITY_VIEW_PUBLISHED",
-                    "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"],
-            }).then(async function(foundRole: Role): Promise<any> {
+            Role.findByPk(req.params.id).then(async function(foundRole: Role): Promise<any> {
                 // Return if role not found
                 if (foundRole === null) {
                     return res.status(404).send({status: "Not Found"});
@@ -132,13 +125,13 @@ router.route("/:id")
                 attributes: ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE",
                     "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "ACTIVITY_VIEW_PUBLISHED",
                     "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"],
-            }).then(function(role: Role): any {
+            }).then((role: Role) => {
                 // Return if role not found
                 if (role === null) {
                     res.status(404).send({status: "Not Found"});
                 } else {
-                    return role.update(req.body).then(function(updatedRole: Role): void {
-                        res.status(200).send(updatedRole);
+                    return role.update(req.body).then((updatedRole: Role) => {
+                        return res.status(200).send(updatedRole);
                     }, function(err: Error): void {
                         console.log(err);
                     });
@@ -158,7 +151,7 @@ router.route("/:id")
         checkPermission(userId, {
             type: "ROLE_MANAGE",
             value: userId
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
 
@@ -167,17 +160,17 @@ router.route("/:id")
                 attributes: ["name", "PAGE_VIEW", "PAGE_MANAGE", "USER_CREATE", "USER_VIEW_ALL", "USER_MANAGE",
                     "CHANGE_ALL_PASSWORDS", "ROLE_VIEW", "ROLE_MANAGE", "ACTIVITY_VIEW_PUBLISHED",
                     "ACTIVITY_VIEW_ALL_UNPUBLISHED", "ACTIVITY_MANAGE"],
-            }).then(function(role: Role): void {
+            }).then((role: Role): any => {
                 // Return if role not found
                 if (role === null) {
-                    res.status(404).send({status: "Not Found"});
+                    return res.status(404).send({status: "Not Found"});
                 } else {
                     // Destroy role in database
-                    role.destroy();
+                    return role.destroy();
                 }
             });
-        }).then(function(): void {
-            res.status(204).send({status: "Successful"});
+        }).then(() => {
+            return res.status(204).send({status: "Successful"});
         });
     });
 
