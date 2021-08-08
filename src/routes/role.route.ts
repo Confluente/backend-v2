@@ -83,7 +83,7 @@ router.route("/:id")
         checkPermission(userId, {
             type: "ROLE_VIEW",
             value: userId
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
             // If no result, then the client has no permission
             if (!result) { return res.sendStatus(403); }
 

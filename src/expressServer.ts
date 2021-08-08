@@ -107,7 +107,7 @@ export async function setupServer(server: Express): Promise<void> {
     server.use("/api/notifications", require("./routes/notification.route"));
     server.use("/api/partners", require("./routes/partner.route"));
     server.use("/api/*", (req: any, res: any) => {
-        res.sendStatus(404);
+        res.status(404).send({message: "Route not found"});
     });
 
     server.use((req: Request, res: Response, next: NextFunction) => {
