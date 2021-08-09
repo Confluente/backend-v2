@@ -195,7 +195,7 @@ export class ActivityWeb extends AbstractWebModel {
 
             // Fill participants
             webActivity.participants = [];
-            if (castedAct.participants !== null) {
+            if (castedAct.participants !== null && castedAct.participants !== undefined) {
                 for (const member of castedAct.participants) {
                     const answers = destringifyStringifiedArrayOfStrings(member.Subscription.answers);
                     delete member.Subscription;

@@ -517,6 +517,9 @@ router.route("/:id")
 
             // Update activity in DB and return activity (as web activity) to frontend
             return res.locals.activity.update(req.body).then((updatedActivity: Activity) => {
+
+                delete updatedActivity.participants;
+
                 ActivityWeb.getWebModelFromDbModel(updatedActivity).then((act: ActivityWeb) => {
                     return res.status(200).send(act);
                 }).catch((err: Error) => {
