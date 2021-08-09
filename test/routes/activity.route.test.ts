@@ -473,7 +473,7 @@ describe("activity.route.ts '/api/activities'", () => {
                     organizerId: 1
                 }).then((act: Activity) => {
                     factory.agents.superAdminAgent.delete("/api/activities/" + act.id)
-                        .expect(201)
+                        .expect(200)
                         .then(_ => {
                             done();
                         }).catch(_ => {
