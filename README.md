@@ -17,9 +17,10 @@ Make sure to have NodeJs and NPM installed. NPM comes with NodeJs. NodeJs is dow
 2. Load up the project in your IDE of choice
 3. Open a terminal and change directories to the project folder 
 4. Run `npm install`
-5. Run `npm run tests` to check if all tests pass, and the that the backend is installed correctly.   
-6. Generate an initial database by running `npm run gendb`
-7. Run the backend by running `npm run start`
+5. Run `npm install --only=dev`   
+6. Run `npm run tests` to check if all tests pass, and the that the backend is installed correctly.   
+7. Generate an initial database by running `npm run gendb`
+8. Run the backend by running `npm run start`
 
 All the aforementioned scripts are defined in the `package.json` file.
 
