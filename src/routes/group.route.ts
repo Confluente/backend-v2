@@ -1,4 +1,4 @@
-import express, {NextFunction, Request, Response, Router} from "express";
+import express, {Request, Response, Router} from "express";
 
 import {Group} from "../models/database/group.model";
 import {User} from "../models/database/user.model";
@@ -10,25 +10,21 @@ import {logger} from "../logger";
 const router: Router = express.Router();
 
 router.route("/")
-    .all((req: Request, res: Response, next: NextFunction) => {
-        // Check if client is logged in
-        const userId = res.locals.session ? res.locals.session.userId : null;
-
-        checkPermission(userId, { type: "GROUP_MANAGE" }).then((result: boolean) => {
-            // If false then return 403
-            if (!result) { return res.sendStatus(403); }
-
-            next();
-        }).catch(function(_: Error): any {
-            // Bad request
-            return res.sendStatus(400);
-        });
-    })
-
     /**
      * Gets all groups from the database
      */
     .get((req: Request, res: Response) => {
+        // Check if client is logged in
+        const userId = res.locals.session ? res.locals.session.userId : null;
+
+        checkPermission(userId, { type: "GROUP_VIEW" }).then((result: boolean) => {
+            // If false then return 403
+            if (!result) { return res.sendStatus(403); }
+        }).catch(function(_: Error): any {
+            // Bad request
+            return res.sendStatus(400);
+        });
+
         Group.findAll({
             attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type"],
             order: [
@@ -48,6 +44,16 @@ router.route("/")
      * Creates a new group
      */
     .post((req: Request, res: Response) => {
+        // Check if client is logged in
+        const userId = res.locals.session ? res.locals.session.userId : null;
+
+        checkPermission(userId, { type: "GROUP_MANAGE" }).then((result: boolean) => {
+            // If false then return 403
+            if (!result) { return res.sendStatus(403); }
+        }).catch(function(_: Error): any {
+            // Bad request
+            return res.sendStatus(400);
+        });
 
         // Checks if all required fields are filled in
         if (!req.body.displayName || !req.body.fullName || !req.body.description || !req.body.email || !req.body.type) {
