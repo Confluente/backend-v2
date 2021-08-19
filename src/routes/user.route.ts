@@ -181,20 +181,8 @@ router.route("/:id")
 
     /**
      * Edit a user.
-     * To edit a user, the request body needs to be a list with two entries: [user attributes, group data]
-     * The user attributes can include any attributes available in the user model.
-     * The group data is a list, where each entry represents data of a group. i.e. group data = [group1, group2, etc]
-     *      each group must have
-     *          {
-     *              id: number         // the id of the group
-     *              role: string       // the role this user fulfills in the group
-     *          }
      */
     .put((req: Request, res: Response) => {
-
-        if (!Array.isArray(req.body) || req.body.length !== 2) {
-            return res.status(400).send({message: "Bad request"});
-        }
 
         // Store user in variable
         const userId: number = res.locals.session ? res.locals.session.userId : null;
@@ -206,28 +194,8 @@ router.route("/:id")
                 return res.status(403).send({message: "You are unauthorized to edit users."});
             }
 
-            const dbGroups = res.locals.user.groups;
-
-            // Remove all groups currently assigned to user
-            for (const group of dbGroups) {
-                await (res.locals.user as User).$remove('groups', group).then(_ => {
-                });
-            }
-
-            // Add all groups as stated in the request
-            for (const groupData of req.body[1]) {
-                await Group.findByPk(groupData.id).then(async (specificGroup: Group) => {
-                    await (res.locals.user as User).$add('groups', specificGroup, {through: {func: groupData.role}})
-                        .then(() => {
-                        })
-                        .catch((err: Error) => {
-                            logger.error("user.route./:id.put: " + err);
-                        });
-                });
-            }
-
             // Update the user in the database
-            res.locals.user.update(req.body[0]).then((updatedUser: User) => {
+            res.locals.user.update(req.body).then((updatedUser: User) => {
 
                 // Transform updated user to web model
                 UserWeb.getWebModelFromDbModel(updatedUser).then((webUser: UserWeb) => {
