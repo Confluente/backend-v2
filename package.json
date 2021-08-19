@@ -37,7 +37,7 @@
     "nodemon": "^2.0.7",
     "q": "^1.5.1",
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.5.0",
+    "sequelize": "^6.2.2",
     "sequelize-typescript": "^2.1.0",
     "sqlite3": "^5.0.2",
     "stream": "0.0.2",
