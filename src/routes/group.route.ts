@@ -20,23 +20,24 @@ router.route("/")
         checkPermission(userId, { type: "GROUP_VIEW" }).then((result: boolean) => {
             // If false then return 403
             if (!result) { return res.sendStatus(403); }
+
+            Group.findAll({
+                attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type"],
+                order: [
+                    ["id", "ASC"]
+                ]
+            }).then(async function(foundGroups: Group[]): Promise<void> {
+
+                // Transform dbGroups to webGroups
+                const groups = await GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
+
+                // Sends the groups back to the client
+                res.send(groups);
+            });
+
         }).catch(function(_: Error): any {
             // Bad request
             return res.sendStatus(400);
-        });
-
-        Group.findAll({
-            attributes: ["id", "fullName", "displayName", "description", "email", "canOrganize", "type"],
-            order: [
-                ["id", "ASC"]
-            ]
-        }).then(async function(foundGroups: Group[]): Promise<void> {
-
-            // Transform dbGroups to webGroups
-            const groups = await GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
-
-            // Sends the groups back to the client
-            res.send(groups);
         });
     })
 
@@ -50,22 +51,25 @@ router.route("/")
         checkPermission(userId, { type: "GROUP_MANAGE" }).then((result: boolean) => {
             // If false then return 403
             if (!result) { return res.sendStatus(403); }
+
+            // Checks if all required fields are filled in
+            if (!req.body.displayName || !req.body.fullName || !req.body.description || !req.body.email
+                || !req.body.type) {
+                return res.sendStatus(400);
+            }
+            // Create group in the database
+            Group.create(req.body).then(function(created_group: Group): void {
+                // Send created group back to the client
+                res.status(201).send(created_group);
+            }).catch(function(err: Error): void {
+                logger.error(err);
+            });
+
         }).catch(function(_: Error): any {
             // Bad request
             return res.sendStatus(400);
         });
 
-        // Checks if all required fields are filled in
-        if (!req.body.displayName || !req.body.fullName || !req.body.description || !req.body.email || !req.body.type) {
-            return res.sendStatus(400);
-        }
-        // Create group in the database
-        Group.create(req.body).then(function(result: Group): void {
-            // Send created group back to the client
-                res.status(201).send(result);
-            }).catch(function(err: Error): void {
-                logger.error(err);
-            });
     });
 
 router.route("/:id")
