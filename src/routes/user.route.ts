@@ -89,7 +89,7 @@ router.route("/")
             };
 
             // Create new user in database
-            return User.create(user).then(function(createdUser: User): void {
+            return User.create(user).then((createdUser: User) => {
 
                 // Send approval email to email
                 createTestAccount().then(() => {
@@ -136,7 +136,7 @@ router.route("/:id")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check whether user has permission to see the information of the user requested
-        checkPermission(userId, {type: "USER_VIEW", value: +req.params.id}).then(function(result: boolean): any {
+        checkPermission(userId, {type: "USER_VIEW", value: +req.params.id}).then((result: boolean) => {
             // If no permission, return 403
             if (!result) {
                 return res.status(403).send({message: "You are not authorized to view the requested user"});
@@ -249,7 +249,7 @@ router.route("/changePassword/:id")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         // Check if client has permission to change password of user
-        checkPermission(userId, {type: "CHANGE_PASSWORD", value: +req.params.id}).then(function(result: boolean): any {
+        checkPermission(userId, {type: "CHANGE_PASSWORD", value: +req.params.id}).then((result: boolean) => {
 
             // If no permission, send 403
             if (!result) {
@@ -263,7 +263,7 @@ router.route("/changePassword/:id")
             User.findByPk(req.params.id, {
                 attributes: ["id", "firstName", "lastName", "email", "passwordHash", "passwordSalt"],
                 include: [Role]
-            }).then(function(foundUser: User): any {
+            }).then((foundUser: User) => {
                 // User definitely exists. If not, it would have been filtered out in the checkPermission call.
 
                 // Get the hash of the (original) password the user put

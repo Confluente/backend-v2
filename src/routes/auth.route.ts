@@ -37,7 +37,7 @@ router.route("/")
             }
 
             // get the data values of the user
-            UserWeb.getWebModelFromDbModel(foundUser).then(function(profile: UserWeb): void {
+            UserWeb.getWebModelFromDbModel(foundUser).then((profile: UserWeb) => {
                 // send the profile back the client
                 res.status(200).send(profile);
             });
@@ -55,7 +55,7 @@ router.route("/login")
         }
 
         // authenticate user
-        authenticate(req.body.email, req.body.password).then(function(foundUser: User): any {
+        authenticate(req.body.email, req.body.password).then((foundUser: User) => {
 
             // check if user account is approved
             if (foundUser.approved === false) {
@@ -66,11 +66,11 @@ router.route("/login")
 
             // start a new session and send that session back to the client
             return startSession(foundUser.id, req.ip)
-                .then(function(session: any): void {
+                .then((session: any) => {
                     res.cookie('session', session.token.toString("base64"), { expires: session.expires });
                     res.status(200).send({message: "Logged in successfully!"});
                 });
-        }).catch(function(err: Error): any {
+        }).catch((err: Error) => {
             // Authentication failed, send back error
             return res.status(400).send({error: err});
         });

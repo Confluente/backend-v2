@@ -20,7 +20,7 @@ router.route("/portraitRight/:id")
 
         // Check if user id of logged in user is the same as user id for which request was send
         if (parseInt(req.params.id, undefined) !== userId) {
-            checkPermission(userId, {type: "USER_MANAGE"}).then(function(result: boolean): any {
+            checkPermission(userId, {type: "USER_MANAGE"}).then((result: boolean) => {
                 if (!result) {
                     return res.status(403).send({message: "User unauthorized to update requested user."});
                 } else {
@@ -33,7 +33,7 @@ router.route("/portraitRight/:id")
 
         function updateConsent(): any {
             // Retrieve user from database
-            User.findByPk(userId).then(function(user: User | null): void {
+            User.findByPk(userId).then((user: User | null): void => {
 
                 if (user === null) {
                     // If requested user is not in the database, then the request was faulty.
@@ -41,8 +41,8 @@ router.route("/portraitRight/:id")
                 }
 
                 // Update user object in database
-                user.update({consentWithPortraitRight: req.body.answer}).then(function(_: User): any {
-                    res.sendStatus(200);
+                user.update({consentWithPortraitRight: req.body.answer}).then((_: User) => {
+                    return res.sendStatus(200);
                 });
             });
         }
