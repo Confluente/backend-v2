@@ -106,11 +106,11 @@ router.route("/companyOpportunities/:id")
                     res.locals.companyOpportunity = foundCompanyOpportunity;
                     next();
                 }
-            }).catch(function(err: Error): any {
+            }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
             });
-        }).catch(function(err: Error): any {
+        }).catch((err: Error) => {
             logger.error(err);
             return res.sendStatus(500);
         });
@@ -146,7 +146,7 @@ router.route("/companyOpportunities/:id")
                 logger.error(err);
                 return res.status(400).send({message: "Could not update company opportunity."});
             });
-        }).catch(function(err: Error): any {
+        }).catch((err: Error) => {
             logger.error(err);
             return res.sendStatus(500);
         });
@@ -160,7 +160,7 @@ router.route("/companyOpportunities/:id")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         checkPermission(userId, {type: "PARTNER_MANAGE"})
-            .then(function(result: boolean): any {
+            .then((result: boolean) => {
                 if (!result) {
                     return res.status(403).send({message: "Unauthorized to delete company opportunity."});
                 }
@@ -168,11 +168,11 @@ router.route("/companyOpportunities/:id")
                 // Destroy company opportunity in database
                 res.locals.companyOpportunity.destroy().then(() => {
                     return res.sendStatus(204);
-                }).catch(function(err: Error): any {
+                }).catch((err: Error) => {
                     logger.error(err);
                     return res.sendStatus(500);
                 });
-            }).catch(function(err: Error): any {
+            }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
             });
@@ -186,7 +186,7 @@ router.route("/companyOpportunities/category/:category")
         const userId: number = res.locals.session ? res.locals.session.userId : null;
 
         checkPermission(userId, {type: "PARTNER_VIEW"})
-            .then(function(result: boolean): any {
+            .then((result: boolean) => {
                 if (!result) {
                     return res.status(403).send({message: "Unauthorized to get all company opportunities " +
                             "of one category."});
@@ -195,14 +195,14 @@ router.route("/companyOpportunities/category/:category")
                 // Find all company opportunities of requested category.
                 CompanyOpportunity.findAll({
                     where: {category: req.params.category}
-                }).then(function(foundCompanyOpportunities: CompanyOpportunity[]): any {
+                }).then((foundCompanyOpportunities: CompanyOpportunity[]) => {
                     // Return status
                     return res.status(200).send(foundCompanyOpportunities);
-                }).catch(function(err: Error): any {
+                }).catch((err: Error) => {
                     logger.error(err);
                     return res.sendStatus(500);
                 });
-            }).catch(function(err: Error): any {
+            }).catch((err: Error) => {
                 logger.error(err);
                 return res.sendStatus(500);
             });

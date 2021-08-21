@@ -115,7 +115,7 @@ export class UserWeb extends AbstractWebModel {
             for (const group of (dbUser as User).groups) {
                 const func = group.UserGroup.func;
                 delete group.UserGroup;
-                GroupWeb.getWebModelFromDbModel(group).then(function(webGroup: GroupWeb): void {
+                GroupWeb.getWebModelFromDbModel(group).then((webGroup: GroupWeb) => {
                     webUser.groups.push(new UserGroupWeb(null, webGroup, func));
                 });
             }
@@ -125,7 +125,7 @@ export class UserWeb extends AbstractWebModel {
             webUser.role = await RoleWeb.getWebModelFromDbModel(castedUser.role);
 
             webUser.canOrganize = webUser.role.ACTIVITY_MANAGE || webUser.groups.some(
-                function(groupOfUser: UserGroupWeb): boolean {
+                        (groupOfUser: UserGroupWeb): boolean => {
                     return groupOfUser.group.canOrganize;
                 }
             );

@@ -22,7 +22,7 @@ const fs = require('fs');
     const port: number = !Number.isNaN(Number(process.env.PORT)) ? Number(process.env.PORT) : 3000;
 
     // Start server
-    httpServer.listen(port, function(): any {
+    httpServer.listen(port, () => {
         logger.info('Listening on port ' + port);
     });
 
@@ -34,7 +34,7 @@ const fs = require('fs');
             ca: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/fullchain.pem')
         }, app);
 
-        httpsServer.listen(443, function(): void {
+        httpsServer.listen(443, () => {
             logger.info('Listening...');
         });
     }

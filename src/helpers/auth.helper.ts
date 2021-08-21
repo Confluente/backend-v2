@@ -20,9 +20,9 @@ export function getPasswordHash(password: string, salt: string): any {
         throw new Error("auth.helper.getPasswordHash: salt was null.");
     }
 
-    return Promise(function(resolve: any, reject: any): any {
+    return Promise((resolve: any, reject: any) => {
         pbkdf2(password, salt, digest_iterations, 256 / 8, 'sha256',
-            function(err: Error | null, hash: Buffer): any {
+            (err: Error | null, hash: Buffer) => {
             if (err) {
                 return reject(err);
             }
@@ -75,13 +75,13 @@ export function getPasswordHashSync(password: string, salt: string): Buffer {
  */
 export function authenticate(email: string, password: string): any {
     email = email.toLowerCase();
-    return User.findOne({where: {email}}).then(function(user: User | null): any {
+    return User.findOne({where: {email}}).then((user: User | null) => {
         if (user === null) {
             throw new Error("Email address " + email + " not associated to any account.");
         }
 
         return getPasswordHash(password, user.passwordSalt)
-            .then(function(hash: Buffer): any {
+            .then((hash: Buffer) => {
                 if (hash.equals(user.passwordHash)) {
                     return user;
                 } else {
@@ -106,7 +106,7 @@ export function startSession(userId: number, ip: string): any {
     }
     
     const session_lifetime = 7; // in days
-    return q.nfbind(randomBytes)(32).then(function(bytes: any): any {
+    return q.nfbind(randomBytes)(32).then((bytes: any) => {
         return Session.create({
             userId: userId,
             ip,

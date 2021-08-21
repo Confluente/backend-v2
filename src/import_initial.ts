@@ -386,43 +386,43 @@ if (process.env.NODE_ENV !== "test") {
         await db.sync({force: true});
 
         all([
-            await Role.bulkCreate(roles).then(function(result: any): void {
+            await Role.bulkCreate(roles).then((result: any) => {
                 console.log("==========Created roles==========");
-            }).catch(function(err: any): void {
+            }).catch((err: any) => {
                 console.error("Roles error!!!");
                 console.log(err);
             }),
 
-            await User.bulkCreate(users).then(function(result: any): void {
+            await User.bulkCreate(users).then((result: any) => {
                 console.log("==========Created users==========");
-            }).catch(function(err: any): void {
+            }).catch((err: any) => {
                 console.error("Users error!!!");
                 console.log(err);
             }),
 
-            await Group.bulkCreate(groups).then(function(result: any): void {
+            await Group.bulkCreate(groups).then((result: any) => {
                 console.log("==========Created groups==========");
-            }).catch(function(err: any): void {
+            }).catch((err: any) => {
                 console.error("Groups error!!!");
                 console.log(err);
             }),
 
-            await Activity.bulkCreate(activities).then(function(result: any): void {
+            await Activity.bulkCreate(activities).then((result: any) => {
                 console.log("==========Created activities==========");
-            }).catch(function(err: any): void {
+            }).catch((err: any) => {
                 console.error("Activities error!!!");
                 console.log(err);
             }),
-        ]).then(function(): void {
-            users.forEach(function(userData: any): void {
-                User.findByPk(userData.id).then(function(user: User): void {
+        ]).then(() => {
+            users.forEach((userData: any) => {
+                User.findByPk(userData.id).then((user: User) => {
                     if (!userData.functions || !userData.groups) {
                     } else if (userData.functions.length !== userData.groups.length) {
                     } else {
                         for (let i = 0; i < userData.groups.length; i++) {
-                            Group.findByPk(userData.groups[i]).then(function(group: Group): void {
+                            Group.findByPk(userData.groups[i]).then((group: Group) => {
                                 user.$add('groups', group, {through: {func: userData.functions[i]}})
-                                    .catch(function(err: Error): void {
+                                    .catch((err: Error): void => {
                                         console.log("Usergroup add error!");
                                         console.log(err);
                                     });

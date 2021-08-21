@@ -25,7 +25,7 @@ export async function setupServer(server: Express): Promise<void> {
     } else if (process.env.NODE_ENV === "development") {
         console.log("Running in DEVELOPMENT mode!");
 
-        server.use(function(req: any, res: any, next: () => void): void {
+        server.use((req: any, res: any, next: () => void) => {
             logger.info(req.url, "express_request");
             next();
         });
@@ -33,7 +33,7 @@ export async function setupServer(server: Express): Promise<void> {
         console.log("Running in PRODUCTION mode!");
         webroot = path.resolve(__dirname, "../frontend/build");
 
-        server.use(function(req: any, res: any, next: () => void): void {
+        server.use((req: any, res: any, next: () => void) => {
             logger.info(req.url, "express_request");
             next();
         });
@@ -41,7 +41,7 @@ export async function setupServer(server: Express): Promise<void> {
 
     server.use(bodyParser.json({limit: '10mb'}));
 
-    server.use(function(req: any, res: any, next: any): void {
+    server.use((req: any, res: any, next: any) => {
         // update to match the domain you will make the request from
         res.header("Access-Control-Allow-Origin", "http://localhost");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, serverend, delete, entries, foreach, get, has, keys, set, values, Authorization");
@@ -50,7 +50,7 @@ export async function setupServer(server: Express): Promise<void> {
         next();
     });
 
-    server.options('*', function(req: any, res: any): void {
+    server.options('*', (req: any, res: any) => {
         res.setHeader("Access-Control-Allow-Origin", "http://localhost");
         res.setHeader('Access-Control-Allow-Methods', "GET, POST, OPTIONS, PUT, DELETE");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -60,10 +60,10 @@ export async function setupServer(server: Express): Promise<void> {
     server.use(json({limit: '10mb'}));
     server.use(urlencoded({limit: '10mb', extended: false}));
     server.use(cookieParser());
-    server.use(function(req: any, res: any, next: any): void {
+    server.use((req: any, res: any, next: any) => {
         if (req.cookies.session) {
             const token: any = Buffer.from(req.cookies.session, "base64");
-            Session.findOne({where: {token}}).then(function(session: any): void {
+            Session.findOne({where: {token}}).then((session: any) => {
                 if (session) {
                     res.locals.session = session.dataValues;
                 } else {
@@ -113,7 +113,7 @@ export async function setupServer(server: Express): Promise<void> {
     server.use((req: Request, res: Response, next: NextFunction) => {
         const user: any = res.locals.session ? res.locals.session.userId : null;
         checkPermission(user, {type: "PAGE_VIEW", value: +req.path})
-            .then(function(hasPermission: any): any {
+            .then((hasPermission: any) => {
                 if (!hasPermission) {
                     if (user) {
                         return res.status(403).send("User does not have the permission to view this page!");
@@ -144,7 +144,7 @@ export async function setupServer(server: Express): Promise<void> {
 
     // This sends an email to the secretary of H.S.A. Confluente every week if
     // new users have registered on the website
-    scheduleJob('0 0 0 * * 7', function(): void {
+    scheduleJob('0 0 0 * * 7', () => {
         const lastWeek: Date = new Date();
         lastWeek.setDate(lastWeek.getDate() - 7);
         User.findAll({
@@ -154,7 +154,7 @@ export async function setupServer(server: Express): Promise<void> {
                     [Op.gte]: lastWeek
                 }
             }
-        }).then(function(newUsers: any): void {
+        }).then((newUsers: any) => {
             if (newUsers.length) {
                 // new users in the last 7 days so send an email to secretary
                 const number_of_new_users: number = newUsers.length;
@@ -165,7 +165,7 @@ export async function setupServer(server: Express): Promise<void> {
                     data_of_new_users += ", track: " + newUsers[i].track + "\n";
                 }
 
-                createTestAccount().then(function(): void {
+                createTestAccount().then(() => {
                     const transporter: any = createTransport({
                         service: 'gmail',
                         secure: true,

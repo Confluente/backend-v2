@@ -18,7 +18,7 @@ router.route("/:url([^\?]+)")
 
         checkPermission(user, {
             type: "PAGE_VIEW",
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
             // If no result, then the client has no permission
             if (!result) { return res.sendStatus(403); }
 
@@ -27,7 +27,7 @@ router.route("/:url([^\?]+)")
                     url: req.params.url
                 },
                 attributes: ["url", "title", "content", "author"]
-            }).then(async function(page: Page): Promise<any> {
+            }).then(async (page: Page): Promise<any> => {
 
                 // If page is not found, send 404
                 if (!page) {
@@ -51,7 +51,7 @@ router.route("/:url([^\?]+)")
 
         checkPermission(user, {
             type: "PAGE_MANAGE",
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
             // If no result, then the client has no permission
             if (!result) { return res.sendStatus(403); }
 
@@ -65,8 +65,8 @@ router.route("/:url([^\?]+)")
                 throw new Error("Not implemented: change page.url");
             }
 
-            return Page.upsert(values).then(function(pageResult: any): any {
-                return Page.findAll().then(function(foundPages: Page[]): any {
+            return Page.upsert(values).then((pageResult: any) => {
+                return Page.findAll().then((foundPages: Page[]) => {
                     return res.status(201).send(foundPages);
                 });
             });
@@ -80,22 +80,22 @@ router.route("/:url([^\?]+)")
         // Check if client is logged in
         const userId = res.locals.session ? res.locals.session.userId : null;
 
-        checkPermission(userId, { type: "PAGE_MANAGE" }).then(function(result: boolean): any {
+        checkPermission(userId, { type: "PAGE_MANAGE" }).then((result: boolean) => {
             // If false, then the client has no permission
             if (!result) { return res.sendStatus(403); }
 
-            return Page.destroy({where: {url: req.params.url}}).then(function(_: any): any {
+            return Page.destroy({where: {url: req.params.url}}).then((_: any) => {
                 return res.sendStatus(204);
             });
 
-        }).catch(function(err: Error): any {
+        }).catch((err: Error) => {
             logger.error(err);
-            res.status(400).send("Error in deleting the page.");
+            return res.status(400).send("Error in deleting the page.");
         });
     });
 
 router.get("/:url/view", (req: Request, res: Response) => {
-    return Page.findOne({where: {url: req.params.url}}).then(function(foundPage: Page): any {
+    return Page.findOne({where: {url: req.params.url}}).then((foundPage: Page) => {
         if (!foundPage) { return res.redirect("/404.html"); }
 
         // Transform dbPage to webPage
@@ -111,19 +111,19 @@ router.get("/", (req: Request, res: Response) => {
 
     checkPermission(user, {
         type: "PAGE_MANAGE",
-    }).then(function(result: boolean): any {
+    }).then((result: boolean) => {
         // If no result, then the client has no permission
         if (!result) { return res.sendStatus(403); }
 
         // Retrieve all pages
         Page.findAll({
             attributes: ["url", "title", "content", "author"]
-        }).then(async function(foundPages: Page[]): Promise<void> {
+        }).then(async (foundPages: Page[]) => {
 
             // Transform dbPages to webPages
             const pages = await PageWeb.getArrayOfWebModelsFromArrayOfDbModels(foundPages);
 
-            res.send(pages);
+            return res.send(pages);
         });
     });
 });

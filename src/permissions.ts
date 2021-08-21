@@ -13,7 +13,7 @@ import {Role} from "./models/database/role.model";
  */
 export function checkPermission(user: User | number, scope: { type: string, value?: number }): Promise<boolean> {
     return resolveUserAndRole(user)
-            .then(function(res: {dbUser: User, role: Role, loggedIn: boolean}): Promise<boolean> {
+            .then((res: {dbUser: User, role: Role, loggedIn: boolean}): Promise<boolean> => {
 
         // Determine rule based on context
         switch (scope.type) {
@@ -32,7 +32,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                         " made, but non was given");
                 }
 
-                return User.findByPk(scope.value).then(function(user_considered: User | null): boolean {
+                return User.findByPk(scope.value).then((user_considered: User | null): boolean => {
                     // If requested for non existing user, throw error.
                     if (user_considered === null) {
                         throw new Error("permissions.checkPermission: USER_VIEW permission was requested for non " +
@@ -56,7 +56,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                         "request is made, but non was given.");
                 }
 
-                return User.findByPk(scope.value).then(function(user_considered: User | null): boolean {
+                return User.findByPk(scope.value).then((user_considered: User | null): boolean => {
                     // If requested for non existing user, throw error.
                     if (user_considered === null) {
                         throw new Error("permissions.checkPermission: Change password was requested for non existing user");
@@ -75,12 +75,12 @@ export function checkPermission(user: User | number, scope: { type: string, valu
 
                 // If not logged in, resolve as false.
                 if (!res.loggedIn) {
-                    return new Promise(function(resolve): void {
+                    return new Promise((resolve): void => {
                         resolve(false);
                     });
                 }
                 return Group.findByPk(scope.value, {include: [User]})
-                        .then(function(group: Group | null): boolean {
+                        .then((group: Group | null): boolean => {
 
                     // If requested for non existing group, throw error.
                     if (group === null) {
@@ -94,8 +94,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                     }
 
                     // If the group is allowed to organize, check if user is in this group
-                    const member = group.members.some(
-                        function(mem: User & {UserGroup: any}): boolean {
+                    const member = group.members.some((mem: User & {UserGroup: any}): boolean => {
                             return mem.id === res.dbUser.id;
                         });
 
@@ -110,7 +109,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                 }
 
                 return Activity.findByPk(scope.value, {include: [{model: Group, include: [User]}]})
-                        .then(function(activity: Activity | null): boolean {
+                        .then((activity: Activity | null): boolean => {
                     // If requested for non existing activity, throw error.
                     if (activity === null) {
                         throw new Error("permissions.checkPermission: ACTIVITY_VIEW permission was requested for non " +
@@ -129,8 +128,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
 
                     // Unpublished activities allowed to be seen by organizers.
                     // Check if user is member of the group that organizes this activity.
-                    const organizing = activity.organizer.members.some(
-                        function(us: User & {UserGroup: any}): boolean {
+                    const organizing = activity.organizer.members.some((us: User & {UserGroup: any}): boolean => {
                             return us.id === res.dbUser.id;
                         });
 
@@ -146,13 +144,13 @@ export function checkPermission(user: User | number, scope: { type: string, valu
 
                 // If you are not logged in, you are not allowed to edit the activity.
                 if (!res.loggedIn) {
-                    return new Promise(function(resolve): void {
+                    return new Promise((resolve): void => {
                         resolve(false);
                     });
                 }
 
                 return Activity.findByPk(scope.value, {include: [{model: Group, include: [User]}]})
-                        .then(function(activity: Activity | null): boolean {
+                        .then((activity: Activity | null): boolean => {
 
                     // If requested for non existing activity, throw error.
                     if (activity === null) {
@@ -162,8 +160,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
 
                     // Activities allowed to be edited by organizers1
                     // Check if user is member of the group that organizes this activity
-                    const organizing = activity.organizer.members.some(
-                        function(us: User & {UserGroup: any}): boolean {
+                    const organizing = activity.organizer.members.some((us: User & {UserGroup: any}): boolean => {
                             return us.id === res.dbUser.id;
                         });
 
@@ -176,7 +173,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
                 }
 
                 if ((res.role as any)[scope.type] !== undefined) {
-                    return new Promise(function(resolve): void {
+                    return new Promise((resolve): void => {
                         resolve((res.role as any)[scope.type]);
                     });
                 } else {
@@ -194,7 +191,7 @@ export function checkPermission(user: User | number, scope: { type: string, valu
  *                  'not logged in user'.
  */
 export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User, role: Role, loggedIn: boolean}> {
-    return new Promise(function(resolve, reject): any {
+    return new Promise((resolve, reject) => {
         if (user === null || user === undefined) {
 
             // Find role associated to 'not logged in' user.
@@ -202,7 +199,7 @@ export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User,
                 where: {
                     name: 'Not logged in'
                 }
-            }).then(function(role: Role): any {
+            }).then((role: Role) => {
                 // If no role associated, throw error as this should always exist.
                 if (role === null) {
                     throw new Error("Permissions.check: 'Not logged in' role could not be found. " +
@@ -213,14 +210,14 @@ export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User,
             });
         } else if (typeof user === 'number') {
             // If user is a number, then find the User model instance associated to it.
-            return User.findByPk(user).then(function(dbUser: User | null): any {
+            return User.findByPk(user).then((dbUser: User | null) => {
 
                 // If no user associated, reject promise
                 if (dbUser === null) {
                     reject("permissions.resolveUserAndRole: user could not be resolved");
                 } else {
                     // If user associated, then find role associated to user.
-                    return Role.findByPk(dbUser.roleId).then(function(role: Role): any {
+                    return Role.findByPk(dbUser.roleId).then((role: Role) => {
 
                         // Because of db constraints, role must exist, no need for error checking.
                         resolve({dbUser: dbUser, role: role, loggedIn: true});
@@ -229,7 +226,7 @@ export function resolveUserAndRole(user: User | number): Promise<{ dbUser: User,
             });
         } else {
             // If user is a User model instance, then find the associated role.
-            return Role.findByPk(user.roleId).then(function(role: Role): any {
+            return Role.findByPk(user.roleId).then((role: Role) => {
                 resolve({dbUser: user, role: role, loggedIn: true});
             });
         }

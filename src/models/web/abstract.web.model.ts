@@ -7,7 +7,7 @@ export abstract class AbstractWebModel {
         const transformed: AbstractWebModel[] = [];
 
         for (const obj of dbModels) {
-            await this.getWebModelFromDbModel(obj).then(function(awm: AbstractWebModel): void {
+            await this.getWebModelFromDbModel(obj).then((awm: AbstractWebModel): void => {
                 transformed.push(awm);
             });
         }

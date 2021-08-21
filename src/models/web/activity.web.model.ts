@@ -142,7 +142,7 @@ export class ActivityWeb extends AbstractWebModel {
         const transformed: ActivityWeb[] = [];
 
         for (const obj of dbModels) {
-            await this.getWebModelFromDbModel(obj).then(function(aw: ActivityWeb): void {
+            await this.getWebModelFromDbModel(obj).then((aw: ActivityWeb): void => {
                 transformed.push(aw);
             });
         }
@@ -188,7 +188,7 @@ export class ActivityWeb extends AbstractWebModel {
                 const nonSplitFormOptions = destringifyStringifiedArrayOfStrings(castedAct.formOptions);
 
                 webActivity.formOptions = [];
-                nonSplitFormOptions.forEach(function(question: string): void {
+                nonSplitFormOptions.forEach((question: string): void => {
                     webActivity.formOptions.push(question.split('#;#'));
                 });
             }
@@ -199,7 +199,7 @@ export class ActivityWeb extends AbstractWebModel {
                 for (const member of castedAct.participants) {
                     const answers = destringifyStringifiedArrayOfStrings(member.Subscription.answers);
                     delete member.Subscription;
-                    await UserWeb.getWebModelFromDbModel(member).then(function(user: UserWeb): void {
+                    await UserWeb.getWebModelFromDbModel(member).then((user: UserWeb): void => {
                         webActivity.participants.push(new SubscriptionWeb(user, null, answers));
                     });
                 }
@@ -207,7 +207,7 @@ export class ActivityWeb extends AbstractWebModel {
         }
 
         if (castedAct.organizer !== undefined) {
-            await GroupWeb.getWebModelFromDbModel(castedAct.organizer).then(function(gw: GroupWeb): void {
+            await GroupWeb.getWebModelFromDbModel(castedAct.organizer).then((gw: GroupWeb): void => {
                 webActivity.organizer = gw;
             });
         }

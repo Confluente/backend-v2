@@ -26,16 +26,16 @@ router.route("/")
                 order: [
                     ["id", "ASC"]
                 ]
-            }).then(async function(foundGroups: Group[]): Promise<void> {
+            }).then(async (foundGroups: Group[]) => {
 
                 // Transform dbGroups to webGroups
                 const groups = await GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups);
 
                 // Sends the groups back to the client
-                res.send(groups);
+                return res.send(groups);
             });
 
-        }).catch(function(_: Error): any {
+        }).catch((_: Error) => {
             // Bad request
             return res.sendStatus(400);
         });
@@ -58,14 +58,14 @@ router.route("/")
                 return res.sendStatus(400);
             }
             // Create group in the database
-            Group.create(req.body).then(function(created_group: Group): void {
+            Group.create(req.body).then((created_group: Group) => {
                 // Send created group back to the client
-                res.status(201).send(created_group);
-            }).catch(function(err: Error): void {
+                return res.status(201).send(created_group);
+            }).catch((err: Error): void => {
                 logger.error(err);
             });
 
-        }).catch(function(_: Error): any {
+        }).catch((_: Error) => {
             // Bad request
             return res.sendStatus(400);
         });
@@ -132,13 +132,13 @@ router.route("/:id")
         checkPermission(user, {
             type: "GROUP_MANAGE",
             value: res.locals.group.id
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
 
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
 
             // Update the database
-            return res.locals.group.update(req.body).then(function(updatedGroup: Group): void {
+            return res.locals.group.update(req.body).then((updatedGroup: Group) => {
 
                 // remove all current group members
                 for (const member of updatedGroup.members) {
@@ -146,17 +146,18 @@ router.route("/:id")
                 }
 
                 // add all new group members
-                req.body.members.forEach(function(new_group_member: any): any {
-                    User.findByPk(new_group_member.id).then(function(newUser: User): void {
+                req.body.members.forEach((new_group_member: any) => {
+                    User.findByPk(new_group_member.id).then((newUser: User): void => {
                         newUser.$add('groups', res.locals.group, {through: {func: new_group_member.func}})
                             .then(console.log);
                     });
                 });
 
                 // Send updated group to the client
-                res.status(201).send(updatedGroup);
-            }, function(err: Error): void {
+                return res.status(201).send(updatedGroup);
+            }, (err: Error) => {
                 logger.error(err);
+                return res.sendStatus(500);
             });
         });
     })
@@ -173,15 +174,15 @@ router.route("/:id")
         checkPermission(user, {
             type: "GROUP_MANAGE",
             value: res.locals.group.id
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
 
             // If no permission, send 403
             if (!result) { return res.sendStatus(403); }
 
             // Destroy group in database
             return res.locals.group.destroy();
-        }).then(function(): void {
-            res.status(204).send({status: "Successful"});
+        }).then(() => {
+            return res.status(204).send({status: "Successful"});
         });
     });
 
@@ -209,9 +210,9 @@ router.route("/type/:type")
                 }).then((foundGroups: Group[]) => {
                     // Transform dbGroups to webGroups
                     GroupWeb.getArrayOfWebModelsFromArrayOfDbModels(foundGroups).then((groups: any) => {
-                        res.status(200).send(groups);
+                        return res.status(200).send(groups);
                     }).catch((_: any) => {
-                        res.sendStatus(500);
+                        return res.sendStatus(500);
                     });
                 });
 

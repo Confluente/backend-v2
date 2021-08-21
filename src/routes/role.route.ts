@@ -19,7 +19,7 @@ router.route("/")
         checkPermission(userId, {
             type: "ROLE_VIEW",
             value: userId
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
             // If no result, then the client has no permission
             if (!result) {
                 return res.sendStatus(403);
@@ -30,7 +30,7 @@ router.route("/")
                 order: [
                     ["id", "ASC"]
                 ]
-            }).then(async function(foundRoles: Role[]): Promise<any> {
+            }).then(async (foundRoles: Role[]) => {
                 // Transform dbRoles to webRoles
                 const roles = await RoleWeb.getArrayOfWebModelsFromArrayOfDbModels(foundRoles);
 
@@ -51,7 +51,7 @@ router.route("/")
         checkPermission(userId, {
             type: "ROLE_MANAGE",
             value: userId
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
             // If no result, then the client has no permission
             if (!result) {
                 return res.sendStatus(403);
@@ -63,9 +63,9 @@ router.route("/")
             }
 
             // Create new role in database
-            return Role.create(req.body).then(function(createdRole: Role): any {
+            return Role.create(req.body).then((createdRole: Role) => {
                 return res.status(201).send(createdRole);
-            }).catch(function(err: Error): any {
+            }).catch((err: Error) => {
                 return res.status(406).send("Role with identical name already exists");
             });
         });
@@ -88,7 +88,7 @@ router.route("/:id")
             if (!result) { return res.sendStatus(403); }
 
             // If client has permission, get the role from the database
-            Role.findByPk(req.params.id).then(async function(foundRole: Role): Promise<any> {
+            Role.findByPk(req.params.id).then(async (foundRole: Role) => {
                 // Return if role not found
                 if (foundRole === null) {
                     return res.status(404).send({status: "Not Found"});
@@ -114,7 +114,7 @@ router.route("/:id")
         checkPermission(userId, {
             type: "ROLE_MANAGE",
             value: userId
-        }).then(function(result: boolean): any {
+        }).then((result: boolean) => {
             // If no permission, send 403
             if (!result) {
                 return res.sendStatus(403);
@@ -128,7 +128,7 @@ router.route("/:id")
                 } else {
                     return role.update(req.body).then((updatedRole: Role) => {
                         return res.status(200).send(updatedRole);
-                    }, function(err: Error): void {
+                    }, (err: Error) => {
                         console.log(err);
                     });
                 }
