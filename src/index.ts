@@ -29,9 +29,9 @@ const fs = require('fs');
     // Only for live website version
     if (process.env.NODE_ENV === "production") {
         const httpsServer = https.createServer({
-            key: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/privkey.pem'),
-            cert: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/cert.pem'),
-            ca: fs.readFileSync('../../../etc/letsencrypt/live/hsaconfluente.nl-0001/fullchain.pem')
+            key: fs.readFileSync('../../../../etc/letsencrypt/live/hsaconfluente.nl/privkey.pem'),
+            cert: fs.readFileSync('../../../../etc/letsencrypt/live/hsaconfluente.nl/cert.pem'),
+            ca: fs.readFileSync('../../../../etc/letsencrypt/live/hsaconfluente.nl/fullchain.pem')
         }, app);
 
         httpsServer.listen(443, () => {

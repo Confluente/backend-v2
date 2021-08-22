@@ -31,7 +31,7 @@ export async function setupServer(server: Express): Promise<void> {
         });
     } else { // Running in production
         console.log("Running in PRODUCTION mode!");
-        webroot = path.resolve(__dirname, "../frontend/build");
+        webroot = path.resolve(__dirname, "../dist/frontend/");
 
         server.use((req: any, res: any, next: () => void) => {
             logger.info(req.url, "express_request");

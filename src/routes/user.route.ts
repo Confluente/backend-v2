@@ -264,47 +264,54 @@ router.route("/changePassword/:id")
                 attributes: ["id", "firstName", "lastName", "email", "passwordHash", "passwordSalt"],
                 include: [Role]
             }).then((foundUser: User) => {
-                // User definitely exists. If not, it would have been filtered out in the checkPermission call.
+                User.findByPk(userId, {attributes: ["id"], include: [Role]}).then((currentUser: User) => {
+                    // User definitely exists. If not, it would have been filtered out in the checkPermission call.
 
-                // Get the hash of the (original) password the user put
-                const inputtedPasswordHash =
-                    getPasswordHashSync(req.body.password, foundUser.passwordSalt);
+                    if (!currentUser.role.CHANGE_ALL_PASSWORDS) {
+                        // If not allowed to change all passwords, then original password has to be submitted
+                        // and be correct
 
-                // Check if it is indeed the correct password
-                if (Buffer.compare(inputtedPasswordHash, Buffer.from(foundUser.passwordHash)) !== 0) {
-                    return res.status(406).send({
-                        message: "The password submitted is not the current" +
-                            " password of this user."
+                        // Get the hash of the (original) password the user put
+                        const inputtedPasswordHash =
+                            getPasswordHashSync(req.body.password, foundUser.passwordSalt);
+
+                        // Check if it is indeed the correct password
+                        if (Buffer.compare(inputtedPasswordHash, Buffer.from(foundUser.passwordHash)) !== 0) {
+                            return res.status(406).send({
+                                message: "The password submitted is not the current" +
+                                    " password of this user."
+                            });
+                        }
+                    }
+
+                    if (typeof req.body.passwordNew !== "string" || typeof req.body.passwordNew2 !== "string") {
+                        return res.status(400).send({message: "The passwords submitted were not of type " +
+                                "'string'"});
+                    }
+
+                    // Check if both newly inputted passwords are the same
+                    if (req.body.passwordNew !== req.body.passwordNew2) {
+                        return res.status(406).send({
+                            message: "The pair of new passwords submitted was not " +
+                                "equal."
+                        });
+                    }
+
+                    // Generate new salt and hash
+                    const passwordSalt: string = generateSalt(passwordSaltLength); // Create salt of 16 characters
+                    const passwordHash = getPasswordHashSync(req.body.passwordNew, passwordSalt);
+
+                    // Update user in database with new password and hash
+                    return foundUser.update({
+                        passwordHash,
+                        passwordSalt
+                    }).then((updatedUser: User) => {
+                        // Send updated user to the client
+                        return res.status(200).send(updatedUser);
+                    }).catch((err: Error) => {
+                        logger.error(err);
+                        return res.status(400).send("Was not able to update password.");
                     });
-                }
-
-                if (typeof req.body.passwordNew !== "string" || typeof req.body.passwordNew2 !== "string") {
-                    return res.status(400).send({message: "The passwords submitted were not of type " +
-                            "'string'"});
-                }
-
-                // Check if both newly inputted passwords are the same
-                if (req.body.passwordNew !== req.body.passwordNew2) {
-                    return res.status(406).send({
-                        message: "The pair of new passwords submitted was not " +
-                            "equal."
-                    });
-                }
-
-                // Generate new salt and hash
-                const passwordSalt: string = generateSalt(passwordSaltLength); // Create salt of 16 characters
-                const passwordHash = getPasswordHashSync(req.body.passwordNew, passwordSalt);
-
-                // Update user in database with new password and hash
-                return foundUser.update({
-                    passwordHash,
-                    passwordSalt
-                }).then((updatedUser: User) => {
-                    // Send updated user to the client
-                    return res.status(200).send(updatedUser);
-                }).catch((err: Error) => {
-                    logger.error(err);
-                    return res.status(400).send("Was not able to update password.");
                 });
             }).catch((err: Error) => {
                 logger.error(err);
