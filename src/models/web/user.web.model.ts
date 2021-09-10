@@ -15,9 +15,21 @@ export class UserWeb extends AbstractWebModel {
     public id: number;
 
     /**
-     * Email of the user.
+     * Date of Birth of the user.
+     */
+     public dob: Date;
+
+
+    /**
+     * TU/e Email of the user.
      */
     public email!: string;
+
+    /**
+     * Personal Email of the user.
+     */
+     public personalEmail!: string;
+
 
     /**
      * First name of the user.
@@ -139,6 +151,6 @@ export class UserWeb extends AbstractWebModel {
     }
 
     public getCopyable(): string[] {
-        return ["id", "email", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "consentWithPortraitRight", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "approved", "approvingHash", "canOrganize"];
+        return ["id", "email", "personalEmail", "firstName", "lastName", "dob", "major", "address", "track", "honorsGeneration", "consentWithPortraitRight", "consentWithDOBRight", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "approved", "approvingHash", "canOrganize"];
     }
 }

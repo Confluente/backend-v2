@@ -42,7 +42,7 @@ export class User extends Model {
     public id!: number;
 
     /**
-     * Email of the user.
+     * TU/e Email of the user.
      */
     @Unique
     @AllowNull(false)
@@ -51,6 +51,16 @@ export class User extends Model {
         validate: {stringValidation},
     })
     public email!: string;
+
+    /**
+     * Personal Email of the user.
+     */
+     @Unique
+     @Column({
+         type: DataType.STRING(128),
+         validate: {stringValidation},
+     })
+     public personalEmail!: string;
 
     /**
      * First name of the user.
@@ -71,6 +81,16 @@ export class User extends Model {
         validate: {stringValidation},
     })
     public lastName!: string;
+
+    /**
+     * Date of Birth of the user.
+     */
+     @Unique
+     @Column({
+         type: DataType.DATE,
+         validate: {isDate: true},
+     })
+     public dob!: any;
 
     /**
      * Major of the user
@@ -146,6 +166,17 @@ export class User extends Model {
         validate: {booleanValidation}
     })
     public consentWithPortraitRight: boolean;
+
+    /**
+     * Whether the user gave consent regarding date of birth right.
+     */
+     @Default(false)
+     @AllowNull(false)
+     @Column({
+         type: DataType.BOOLEAN,
+         validate: {booleanValidation}
+     })
+     public consentWithDOBRight: boolean;
 
     /**
      * Hash of the password of the user.
