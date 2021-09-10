@@ -144,7 +144,7 @@ router.route("/:id")
 
             // Get user from database
             User.findByPk(req.params.id, {
-                attributes: ["id", "firstName", "lastName", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "consentWithPortraitRight"],
+                attributes: ["id", "firstName", "lastName", "dob", "major", "address", "track", "honorsGeneration", "honorsMembership", "campusCardNumber", "mobilePhoneNumber", "email", "personalEmail", "consentWithPortraitRight", "consentWithDOBRight"],
                 include: [Role, Group],
             }).then((foundUser: User) => {
                 // User must always be found. If user requested is not in the database, then the checkPermission will
