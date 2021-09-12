@@ -144,51 +144,54 @@ export async function setupServer(server: Express): Promise<void> {
 
     // This sends an email to the secretary of H.S.A. Confluente every week if
     // new users have registered on the website
-    scheduleJob('0 0 0 * * 7', () => {
-        const lastWeek: Date = new Date();
-        lastWeek.setDate(lastWeek.getDate() - 7);
-        User.findAll({
-            attributes: ["firstName", "lastName", "email", "track"],
-            where: {
-                createdAt: {
-                    [Op.gte]: lastWeek
-                }
-            }
-        }).then((newUsers: any) => {
-            if (newUsers.length) {
-                // new users in the last 7 days so send an email to secretary
-                const number_of_new_users: number = newUsers.length;
-                let data_of_new_users: string = "";
-                for (let i: number = 0; i < number_of_new_users; i++) {
-                    data_of_new_users += "Name: " + newUsers[i].firstName + " " + newUsers[i].lastName;
-                    data_of_new_users += ", Email: " + newUsers[i].email;
-                    data_of_new_users += ", track: " + newUsers[i].track + "\n";
-                }
 
-                createTestAccount().then(() => {
-                    const transporter: any = createTransport({
-                        service: 'gmail',
-                        secure: true,
-                        // Never fill this password in and add it to git! Only filled in locally or on the server!
-                        auth: {
-                            user: 'web@hsaconfluente.nl',
-                            pass: ''
-                        }
-                    });
-                    transporter.sendMail({
-                        from: '"website" <web@hsaconfluente.nl>',
-                        to: '"secretary of H.S.A. Confluente" <secretary@hsaconfluente.nl>',
-                        subject: "New members that registered on the website",
-                        text: "Heyhoi dear secretary \n \nIn the past week there have been "
-                            + number_of_new_users.toString() + " new registrations on the website. "
-                            + "\n\nThe names and emails of the new registrations are \n"
-                            + data_of_new_users
-                            + " \nSincerely, \nThe website \nOn behalf of the Web Committee"
-                    }).then((info: object) => {
-                        logger.info(info.toString());
-                    });
-                });
-            }
-        });
-    });
+    // TODO this does not work anymore as the 'createdAt' column is no longer in the database
+
+    // scheduleJob('0 0 0 * * 7', () => {
+    //     const lastWeek: Date = new Date();
+    //     lastWeek.setDate(lastWeek.getDate() - 7);
+    //     User.findAll({
+    //         attributes: ["firstName", "lastName", "email", "track"],
+    //         where: {
+    //             createdAt: {
+    //                 [Op.gte]: lastWeek
+    //             }
+    //         }
+    //     }).then((newUsers: any) => {
+    //         if (newUsers.length) {
+    //             // new users in the last 7 days so send an email to secretary
+    //             const number_of_new_users: number = newUsers.length;
+    //             let data_of_new_users: string = "";
+    //             for (let i: number = 0; i < number_of_new_users; i++) {
+    //                 data_of_new_users += "Name: " + newUsers[i].firstName + " " + newUsers[i].lastName;
+    //                 data_of_new_users += ", Email: " + newUsers[i].email;
+    //                 data_of_new_users += ", track: " + newUsers[i].track + "\n";
+    //             }
+    //
+    //             createTestAccount().then(() => {
+    //                 const transporter: any = createTransport({
+    //                     service: 'gmail',
+    //                     secure: true,
+    //                     // Never fill this password in and add it to git! Only filled in locally or on the server!
+    //                     auth: {
+    //                         user: 'web@hsaconfluente.nl',
+    //                         pass: ''
+    //                     }
+    //                 });
+    //                 transporter.sendMail({
+    //                     from: '"website" <web@hsaconfluente.nl>',
+    //                     to: '"secretary of H.S.A. Confluente" <secretary@hsaconfluente.nl>',
+    //                     subject: "New members that registered on the website",
+    //                     text: "Heyhoi dear secretary \n \nIn the past week there have been "
+    //                         + number_of_new_users.toString() + " new registrations on the website. "
+    //                         + "\n\nThe names and emails of the new registrations are \n"
+    //                         + data_of_new_users
+    //                         + " \nSincerely, \nThe website \nOn behalf of the Web Committee"
+    //                 }).then((info: object) => {
+    //                     logger.info(info.toString());
+    //                 });
+    //             });
+    //         }
+    //     });
+    // });
 }
