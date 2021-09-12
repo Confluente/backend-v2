@@ -426,7 +426,7 @@ describe("user.route.ts '/api/users'", () => {
             it("Should return 200 for unknown link", (done) => {
                 factory.agents.nobodyUserAgent
                     .get("/api/users/approve/aiewgdshoi")
-                    .expect(200)
+                    .expect(302)
                     .then((res: any) => {
                         if (res.headers.location === "/login") {
                             done();
@@ -443,7 +443,7 @@ describe("user.route.ts '/api/users'", () => {
                 User.create(newUser).then((user: User) => {
                     factory.agents.nobodyUserAgent
                         .get("/api/users/approve/" + user.approvingHash)
-                        .expect(200)
+                        .expect(302)
                         .then((res: any) => {
                             user.destroy().then(_ => {
                                 if (res.headers.location === "/completed_registration") {
