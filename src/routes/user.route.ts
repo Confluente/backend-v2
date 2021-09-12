@@ -72,6 +72,8 @@ router.route("/")
             return res.status(400).send({message: "Not all required attributes were send in the request."});
         }
 
+        req.body.email = req.body.email.toLowerCase();
+
         // generate approvingHash, passwordSalt and passwordHash
         req.body.approvingHash = generateSalt(approvalStringLength);
         req.body.passwordSalt = generateSalt(passwordSaltLength);
