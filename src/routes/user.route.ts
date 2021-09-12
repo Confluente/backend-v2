@@ -104,7 +104,7 @@ router.route("/")
                         }
                     });
 
-                    const link: string = "https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash;
+                    const link: string = "https://www.hsaconfluente.nl/api/users/approve/" + req.body.approvingHash;
 
                     transporter.sendMail({
                         from: '"website" <web@hsaconfluente.nl>',
@@ -335,7 +335,7 @@ router.route("/approve/:approvalString")
 
             if (!foundUser) {
                 // If the same link is clicked again in the email
-                res.writeHead(200, {
+                res.writeHead(302, {
                     location: '/login'
                 });
                 return res.send();
@@ -344,7 +344,7 @@ router.route("/approve/:approvalString")
             // If user is found, approve user, and redirect.
             foundUser.update({approved: true, approvingHash: generateSalt(approvalStringLength - 1)})
                 .then((_: User) => {
-                    res.writeHead(200, {
+                    res.writeHead(302, {
                         location: '/completed_registration'
                     });
                     return res.send();
