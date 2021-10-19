@@ -74,57 +74,64 @@ router.route("/")
 
         req.body.email = req.body.email.toLowerCase();
 
-        // generate approvingHash, passwordSalt and passwordHash
-        req.body.approvingHash = generateSalt(approvalStringLength);
-        req.body.passwordSalt = generateSalt(passwordSaltLength);
-        req.body.passwordHash = getPasswordHashSync(req.body.password, req.body.passwordSalt);
+        User.findOne({where: {email: req.body.email}}).then((alreadyExistingUser: User) => {
+            if (alreadyExistingUser) {
+                console.log("wadup");
+                return res.status(400).send({message: "An account already exists with that email address"});
+            }
 
-        // Delete password permanently
-        delete req.body.password;
+            // generate approvingHash, passwordSalt and passwordHash
+            req.body.approvingHash = generateSalt(approvalStringLength);
+            req.body.passwordSalt = generateSalt(passwordSaltLength);
+            req.body.passwordHash = getPasswordHashSync(req.body.password, req.body.passwordSalt);
 
-        // Set role of default member
-        Role.findOne({where: {name: 'Regular member'}}).then((role: Role) => {
+            // Delete password permanently
+            delete req.body.password;
 
-            const user = {
-                ...(req.body),
-                roleId: role.id
-            };
+            // Set role of default member
+            Role.findOne({where: {name: 'Regular member'}}).then((role: Role) => {
 
-            // Create new user in database
-            return User.create(user).then((createdUser: User) => {
+                const user = {
+                    ...(req.body),
+                    roleId: role.id
+                };
 
-                // Send approval email to email
-                createTestAccount().then(() => {
+                // Create new user in database
+                return User.create(user).then((createdUser: User) => {
 
-                    const transporter: any = createTransport({
-                        service: 'gmail',
-                        secure: true,
-                        // Never fill this password in and add it to git! Only filled in locally or on the server!
-                        auth: {
-                            user: 'web@hsaconfluente.nl',
-                            pass: ''
-                        }
+                    // Send approval email to email
+                    createTestAccount().then(() => {
+
+                        const transporter: any = createTransport({
+                            service: 'gmail',
+                            secure: true,
+                            // Never fill this password in and add it to git! Only filled in locally or on the server!
+                            auth: {
+                                user: 'web@hsaconfluente.nl',
+                                pass: ''
+                            }
+                        });
+
+                        const link: string = "https://www.hsaconfluente.nl/api/users/approve/" + req.body.approvingHash;
+
+                        transporter.sendMail({
+                            from: '"website" <web@hsaconfluente.nl>',
+                            to: req.body.email,
+                            subject: "Registration H.S.A. Confluente",
+                            text: "Thank you for making an account on our website hsaconfluente.nl! \n To fully activate your account, please visit this link: https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash,
+                            html: "<h3>&nbsp;</h3><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"padding: 10px 0 30px 0;\"><table style=\"border: 1px solid #cccccc; border-collapse: collapse;\" border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\"><tbody><tr><td style=\"padding: 40px 30px 40px 30px;\" bgcolor=\"#ffffff\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #153643; font-family: Arial, sans-serif; font-size: 24px;\"><h3><strong>Hooray! Welcome to H.S.A. Confluente</strong></h3></td></tr><tr><td style=\"padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;\">Thank you for signing up to the website of H.S.A. Confluente at <a href=\"http://www.hsaconfluente.nl\">www.hsaconfluente.nl</a>. To activate your account on our website, please click the  <a href='" + link + "'>here!</a></td></tr><tr><td><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Events</h4><p>Now that you have an account on the H.S.A. Confluente website, you can subscribe to all the wonderful events that H.S.A. Confluente is organizing. Want to see what activities are coming up? <a href=\"https://hsaconfluente.nl/activities\">Click here!</a></p></td></tr></tbody></table></td><td style=\"font-size: 0; line-height: 0;\" width=\"20\">&nbsp;</td><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Want to learn more?</h4><p>Are you interested in what H.S.A. Confluente is or can offer you? Then go and take an extensive look at our <a href=\"https://hsaconfluente.nl/\">website</a>! You can find pictures of all previous boards as well as information about what committees we have at H.S.A. Confluente!.</p></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr><tr><td style=\"padding: 30px 30px 30px 30px;\" bgcolor=\"#1689ad\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;\" width=\"75%\">Web Commttee H.S.A. Confluente, TU/e 2020</td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table>"
+                        }).then((_: any) => {
+                        });
                     });
-
-                    const link: string = "https://www.hsaconfluente.nl/api/users/approve/" + req.body.approvingHash;
-
-                    transporter.sendMail({
-                        from: '"website" <web@hsaconfluente.nl>',
-                        to: req.body.email,
-                        subject: "Registration H.S.A. Confluente",
-                        text: "Thank you for making an account on our website hsaconfluente.nl! \n To fully activate your account, please visit this link: https://www.hsaconfluente.nl/api/user/approve/" + req.body.approvingHash,
-                        html: "<h3>&nbsp;</h3><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"padding: 10px 0 30px 0;\"><table style=\"border: 1px solid #cccccc; border-collapse: collapse;\" border=\"0\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\"><tbody><tr><td style=\"padding: 40px 30px 40px 30px;\" bgcolor=\"#ffffff\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #153643; font-family: Arial, sans-serif; font-size: 24px;\"><h3><strong>Hooray! Welcome to H.S.A. Confluente</strong></h3></td></tr><tr><td style=\"padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;\">Thank you for signing up to the website of H.S.A. Confluente at <a href=\"http://www.hsaconfluente.nl\">www.hsaconfluente.nl</a>. To activate your account on our website, please click the  <a href='" + link + "'>here!</a></td></tr><tr><td><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Events</h4><p>Now that you have an account on the H.S.A. Confluente website, you can subscribe to all the wonderful events that H.S.A. Confluente is organizing. Want to see what activities are coming up? <a href=\"https://hsaconfluente.nl/activities\">Click here!</a></p></td></tr></tbody></table></td><td style=\"font-size: 0; line-height: 0;\" width=\"20\">&nbsp;</td><td valign=\"top\" width=\"260\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"height: 140px;\"><td style=\"padding: 25px 0px 0px; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px; height: 140px;\"><h4>Want to learn more?</h4><p>Are you interested in what H.S.A. Confluente is or can offer you? Then go and take an extensive look at our <a href=\"https://hsaconfluente.nl/\">website</a>! You can find pictures of all previous boards as well as information about what committees we have at H.S.A. Confluente!.</p></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table></td></tr><tr><td style=\"padding: 30px 30px 30px 30px;\" bgcolor=\"#1689ad\"><table border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr><td style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;\" width=\"75%\">Web Commttee H.S.A. Confluente, TU/e 2020</td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></table>"
-                    }).then((_: any) => {
-                    });
+                    res.status(201).send(createdUser);
+                }).catch((err: Error) => {
+                    logger.error(err);
+                    return res.status(406).send({message: "Account could not be created. " + err.message});
                 });
-                res.status(201).send(createdUser);
             }).catch((err: Error) => {
                 logger.error(err);
-                return res.status(406).send("Account could not be created. " + err.message);
+                return res.status(500);
             });
-        }).catch((err: Error) => {
-            logger.error(err);
-            return res.status(500);
         });
     });
 
@@ -287,8 +294,10 @@ router.route("/changePassword/:id")
                     }
 
                     if (typeof req.body.passwordNew !== "string" || typeof req.body.passwordNew2 !== "string") {
-                        return res.status(400).send({message: "The passwords submitted were not of type " +
-                                "'string'"});
+                        return res.status(400).send({
+                            message: "The passwords submitted were not of type " +
+                                "'string'"
+                        });
                     }
 
                     // Check if both newly inputted passwords are the same
