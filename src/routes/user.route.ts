@@ -76,7 +76,6 @@ router.route("/")
 
         User.findOne({where: {email: req.body.email}}).then((alreadyExistingUser: User) => {
             if (alreadyExistingUser) {
-                console.log("wadup");
                 return res.status(400).send({message: "An account already exists with that email address"});
             }
 
@@ -287,24 +286,21 @@ router.route("/changePassword/:id")
                         // Check if it is indeed the correct password
                         if (Buffer.compare(inputtedPasswordHash, Buffer.from(foundUser.passwordHash)) !== 0) {
                             return res.status(406).send({
-                                message: "The password submitted is not the current" +
-                                    " password of this user."
+                                message: "The password submitted is not the current password of this user."
                             });
                         }
                     }
 
                     if (typeof req.body.passwordNew !== "string" || typeof req.body.passwordNew2 !== "string") {
                         return res.status(400).send({
-                            message: "The passwords submitted were not of type " +
-                                "'string'"
+                            message: "The passwords submitted were not of type 'string'"
                         });
                     }
 
                     // Check if both newly inputted passwords are the same
                     if (req.body.passwordNew !== req.body.passwordNew2) {
                         return res.status(406).send({
-                            message: "The pair of new passwords submitted was not " +
-                                "equal."
+                            message: "The pair of new passwords submitted was not equal."
                         });
                     }
 
