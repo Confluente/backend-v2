@@ -85,7 +85,7 @@ export function authenticate(email: string, password: string): any {
                 if (hash.equals(user.passwordHash)) {
                     return user;
                 } else {
-                    throw new Error("Password incorrect");
+                    throw new Error("Username or password incorrect");
                 }
             });
     });
