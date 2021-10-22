@@ -145,7 +145,7 @@ describe("auth.helper.ts", () => {
                     done(new Error("Authentication successful with incorrect password"));
                 }).catch(function(err: Error): void {
                     cleanUsers();
-                    if (err.message === "Password incorrect") {
+                    if (err.message === "Username or password incorrect") {
                         done();
                     } else {
                         done(new Error("Could not authenticate for wrong reason"));
