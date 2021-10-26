@@ -33,7 +33,7 @@ router.route("/")
 
             // If no user was found, send an error
             if (foundUser === undefined || foundUser === null) {
-                res.status(400).send("Could not find user associated session token");
+                res.status(400).send({message: "Could not find user associated session token"});
             }
 
             // get the data values of the user
@@ -72,7 +72,7 @@ router.route("/login")
                 });
         }).catch((err: Error) => {
             // Authentication failed, send back error
-            return res.status(400).send({error: err});
+            return res.status(400).send({error: err.message});
         });
     });
 
