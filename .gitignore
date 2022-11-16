@@ -41,9 +41,6 @@ typings/
 # Webstorm IDE
 .idea/**
 
-# Package lock
-package-lock.json
-
 # dist
 dist
 
