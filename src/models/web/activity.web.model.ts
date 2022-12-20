@@ -1,4 +1,4 @@
-import marked from "marked";
+import { marked } from 'marked';
 import {SubscriptionWeb} from "./subscription.web.model";
 import {GroupWeb} from "./group.web.model";
 import {copyMatchingSourceKeyValues} from "../../helpers/web.model.copy.helper";
@@ -223,7 +223,7 @@ export class ActivityWeb extends AbstractWebModel {
         }
 
         // turn the description into html
-        webActivity.description_html = marked(webActivity.description || "");
+        webActivity.description_html = marked.parse(webActivity.description || "");
 
         // return webActivity object
         return webActivity;
