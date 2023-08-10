@@ -120,29 +120,31 @@ router.route("/")
         }).then((foundActivities: Activity[]) => {
             ActivityWeb.getArrayOfWebModelsFromArrayOfDbModels(foundActivities)
                 .then(async (activities: ActivityWeb[]) => {
-                    activities = await activities.filter((activity: ActivityWeb) => {
-                        // If the activity is published, everyone (also not logged in) is allowed to see them
-                        // These lines are needed not to crash the management table in some cases
-                        if (activity.published) {
-                            return true;
-                        }
 
-                        // If not logged in (and unpublished), client has no permission
-                        if (!res.locals.session) {
-                            return false;
-                        }
+                    // Makes an array of which activity is allowed to be viewed
+                    // Has to be this way to work around the async of promises since filter does not work with that
+                    const activitiesViewPermission = await Promise.all(
+                        activities.map(async (activity: ActivityWeb) => {
+                            // If the activity is published, everyone (also not logged in) is allowed to see them
+                            // These lines are needed not to crash the management table in some cases
+                            if (activity.published) {
+                                return true;
+                            }
+    
+                            // If not logged in (and unpublished), client has no permission
+                            if (!res.locals.session) {
+                                return false;
+                            }
+    
+                            // If logged in (and unpublished), check whether client has permission to view activity
+                            return await checkPermission(res.locals.session.userId, {
+                                type: "ACTIVITY_VIEW",
+                                value: +activity.id
+                            });
+                        })
+                    );
 
-                        // If logged in (and unpublished), check whether client has permission to view activity
-                        return checkPermission(res.locals.session.userId, {
-                            type: "ACTIVITY_VIEW",
-                            value: +activity.id
-                        }).then((permission: boolean) => {
-                            // If no permission, return null, otherwise return activity
-                            return permission;
-                        });
-
-                    });
-
+                    activities = activities.filter((activity, index) => activitiesViewPermission[index]);
                     // Return the activities
                     return res.status(200).send(activities);
 
