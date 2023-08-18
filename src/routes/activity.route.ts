@@ -177,7 +177,8 @@ router.route("/")
         }
 
         if (activity.canSubscribe && (!activity.typeOfQuestion || !activity.questionDescriptions
-            || !activity.formOptions || !activity.required || !activity.privacyOfQuestions)) {
+            || !activity.options || !activity.required || !activity.privacyOfQuestions)) {
+            console.log(activity);
             return res.sendStatus(400);
         }
 
