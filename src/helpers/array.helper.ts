@@ -10,7 +10,7 @@ export function stringifyArrayOfStrings(array: string[]): string {
 
     let result: string = "";
     for (let i: number = 0; i < array.length; i++) {
-        if (array[i].includes("#,#")) {
+        if (typeof array[i] === "string" && array[i].includes("#,#")) {
             throw new Error("array.helper.stringifyArrayOfStrings: item " + i + " contains #,# (is " + array[i]
                 + ") and can therefore not be stringified");
         }
