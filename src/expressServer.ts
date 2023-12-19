@@ -84,11 +84,11 @@ export async function setupServer(server: Express): Promise<void> {
                 next();
             } else {
                 // acme challenge is used for certificate verification for HTTPS
-                if (req.url === "/.well-known/acme-challenge/nPHb2tBcwnLHnTBGzHTtjYZVgoucfI5mLLKrkU4JUFM") {
+                if (req.url === "/.well-known/acme-challenge/w34RbDaItodmnSs5NWc0oWTeAFIfTLI_jKTbm6X9RJw") {
                     res.redirect('http://hsaconfluente.nl/assets/documents/acme');
                 }
 
-                if (req.url === "/.well-known/acme-challenge/VSV0B332eYswinjUwESM_9jNY59Se17kCryEzUo28eE") {
+                if (req.url === "/.well-known/acme-challenge/AwBsh5cJauTSfFSqJpBQH0dQtJydFhh-C6GQWQdR46E") {
                     res.redirect('http://hsaconfluente.nl/assets/documents/acme2');
                 }
 
