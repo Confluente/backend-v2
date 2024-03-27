@@ -38,8 +38,9 @@ typings/
 # Exported files
 *.csv
 
-# Webstorm IDE
+# Webstorm/VScode IDE
 .idea/**
+.vscode
 
 # dist
 dist
