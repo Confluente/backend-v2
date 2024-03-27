@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  backend:
+    build: .
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "81:81"
+    environment:
+      - NODE_ENV=development
+    command: bash -c "npm run gendb & npm run start"

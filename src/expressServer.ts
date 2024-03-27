@@ -24,6 +24,7 @@ export async function setupServer(server: Express): Promise<void> {
         webroot = path.resolve(__dirname, "www");
     } else if (process.env.NODE_ENV === "development") {
         console.log("Running in DEVELOPMENT mode!");
+        webroot = path.resolve(__dirname, "www");
 
         server.use((req: any, res: any, next: () => void) => {
             logger.info(req.url, "express_request");

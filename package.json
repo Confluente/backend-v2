@@ -8,10 +8,10 @@
     "build": "tsc",
     "prestart": "npm run build",
     "start": "npm run start_dev",
-    "start_dev": "cross-env NODE_ENV=development nodemon --watch ./src -e ts --exec ts-node ./src/index.ts",
+    "start_dev": "cross-env NODE_ENV=development nodemon --legacy-watch --watch ./src -e ts --exec ts-node ./src/index.ts",
     "start_prod": "cross-env NODE_ENV=production nodemon --watch ./src -e ts --exec ts-node ./src/index.ts",
     "export": "node export.ts",
-    "gendb": "npx ts-node src/import_initial.ts",
+    "gendb": "npx ts-node ./src/import_initial.ts",
     "tests": "cross-env NODE_ENV=test mocha -r ts-node/register test/**/*.test.ts test/*.test.ts test/**/**/*.test.ts -t 10000 --require test/testFactory.ts --exit"
   },
   "author": "H.S.A. Confluente",
